@@ -1,0 +1,142 @@
+\documentclass[12pt]{article}
+
+\usepackage[margin=1in, headheight=15.05pt]{geometry}
+\usepackage{indentfirst}
+\usepackage{xcolor}
+\usepackage{soul}
+\usepackage{enumitem}
+\usepackage{url}
+\usepackage{fancyhdr}
+
+\makeatletter
+\g@addto@macro\bfseries{\boldmath}
+\makeatother
+
+\newcommand{\br}{\vspace{2mm}}
+
+\definecolor{light-gray}{gray}{0.93}
+\DeclareRobustCommand{\hlgray}[1]{{\sethlcolor{light-gray}\hl{#1}}}
+\newcommand{\code}[1]{{\fontsize{11pt}{11pt}\selectfont\hlgray{\hbox{\texttt{#1}}}}}
+
+\linespread{1.05}
+
+\newcommand{\hwTitle}{Product Backlog}
+\newcommand{\courseTitle}{CS 307 (Spring 2017)}
+\newcommand{\projectName}{Meetchu}
+\newcommand{\teamName}{Team 17}
+\newcommand{\authorName}{Eric Aguilera, Justin Bonner, Carson Harmon, Dan Zheng}
+
+\lhead{\fontsize{14pt}{14pt}\selectfont{}\courseTitle}
+\chead{\fontsize{14pt}{14pt}\selectfont{}\textbf{\projectName}}
+\rhead{\fontsize{14pt}{14pt}\selectfont{}\teamName}
+
+\pagestyle{fancy}
+
+\begin{document}
+
+\section*{\Large \centering \hwTitle}
+{\centering \authorName \par}
+
+\section{Problem Statement}
+
+College courses are difficult and many students choose to form study groups. However, forming and managing a study group can be a hassle. Students have to juggle multiple applications, including messaging apps for communication and calendar/scheduling apps for planning meetings. However, there exists no centralized application designed specifically for student group study. Our product combines the best features from messaging and scheduling applications to provide the definitive group studying application for Purdue students.
+
+\section{Background Information}
+
+\subsection*{Audience}
+
+The target audience for Meetchu is the Purdue student body, specifically students who are active in study groups.
+
+\subsection*{Similar Platform}
+
+Meetchu has two main features: messaging and scheduling. Existing messaging platforms, like Messenger and GroupMe, allow users to send text messages, images, and files, as well as create group chats. Existing scheduling tools, such as Doodle and WhenIsGood, allow users to create events, suggest dates and times for meeting, and invite participate to select their preferences.
+
+\subsection*{Limitations}
+
+Messenger and GroupMe are not specialized for study groups: they do not help students find study partners or join existing study groups. Scheduling tools, such as Doodle and WhenIsGood, are designed for creating one-time meetings and don't support groups or messaging. Our biggest advantage over our these platforms is that our product brings together the best features of messaging and scheduling to provide a comprehensive tool for students.
+
+\newpage
+
+\section{Requirements}
+
+\subsection*{Functional}
+
+\textbf{Note: any user can act as a meeting creator, meeting participant, group creator, or group member. The latter types are listed separately from ‘user' only to categorize user stories clearly.}
+
+\subsubsection*{As a user, I would like to:}
+
+\begin{enumerate}[nolistsep]
+    \item create a Meetchu account using a valid email and password.
+    \item recover my password using my email.
+    \item add profile information (name, photo, major, phone number, short bio) to my account.
+    \item update my account information at any time.
+    \item search for courses by title and number.
+    \item add a course to my account.
+    \item view people in my courses.
+    \item view a list of my courses.
+    \item create and join study groups with people in my classes.
+    \item send personal messages to any other user.
+    \item view message history with other users.
+    \item see users who are online (if time allows)
+    \item link my account with and authenticate using Google and Facebook (if time allows).
+    \item view my class schedule (if time allows).
+    \item search for people in my classes by name or email (if time allows).
+    \item view the schedules of members in my study groups (if time allows).
+\end{enumerate}
+
+\subsubsection*{As a meeting creator, I would like to:}
+
+\begin{enumerate}[nolistsep]
+    \item create a one-time meeting for a study group.
+    \item create a personal one-time meeting with selected members.
+    \item suggest possible dates and times for a meeting.
+    \item add a title, purpose, and location to a meeting.
+    \item add or remove people from a meeting and notify them.
+    \item cancel a meeting and notify participants.
+    \item finalize the date and time for a meeting and notify participants.
+    \item view participants who have RSVP'd to a meeting.
+    \item add an address to a meeting and view on Google Maps (if time allows).
+    \item view meeting attendance (if time allows).
+    \item create a recurring meeting for a study group (if time allows).
+\end{enumerate}
+
+\newpage
+
+\subsubsection*{As a meeting participant, I would like to:}
+
+\begin{enumerate}[nolistsep]
+    \item view my meetings.
+    \item indicate my preferred times for a meeting.
+    \item RSVP to a meeting after its date and time have been finalized.
+    \item set time preferences for group meetings.
+    \item receive email notifications about upcoming meetings.
+\end{enumerate}
+
+\subsubsection*{As a group creator, I would like to:}
+\begin{enumerate}[nolistsep]
+    \item be able to delete the group and notify participants.
+\end{enumerate}
+
+\subsubsection*{As a group member, I would like to:}
+\begin{enumerate}[nolistsep]
+    \item be able to leave the group.
+    \item invite people to the group.
+    \item send messages to the group.
+    \item view group messages.
+\end{enumerate}
+
+\subsection*{Non-Functional}
+
+\subsubsection*{Performance}
+
+Meetchu will prioritize performance in order to maintain a responsive user interface. Performance is important for many features in our application. Database queries about users, groups, meetings, and messages must be processed quickly so that all requests resolve as fast as possible. For example, users should be notified quickly upon any changes to a particular meeting so that everyone can be on the same page. We will use MongoDB to store all persistent data and design intelligent schemas to minimize performance impact. Finally, we will ensure that the proper data structures are used to handle our backend computations so that application's performance is optimal.
+
+\subsubsection*{Security}
+
+Security is vital for Meetchu as it will store important personal information, such as user emails, passwords, personal information, and messages. We will implement the following measures to ensure the utmost security: storing encrypted passwords, preventing cross site scripting, sanitizing and validating user input.
+
+\subsubsection*{Ease of use}
+
+Meetchu will feature an intuitive user interface so that navigating the application, messaging, and scheduling meetings is easy as possible. By creating a user-friendly interface, we hope that students will have a streamlined and enjoyable experience using the application. For example, when creating meetings, users will be able to easily click and drag to select multiple preferred times for a meeting, rather than clicking each time individually. By providing this user-friendly interface, our application will be more likely to be adopted by our target audience.
+
+\end{document}

@@ -1,0 +1,69 @@
+\documentclass[12pt]{article}
+
+\usepackage[margin=1in, headheight=15.05pt]{geometry}
+\usepackage{indentfirst}
+\usepackage{xcolor}
+\usepackage{soul}
+\usepackage{enumitem}
+\usepackage{url}
+\usepackage{fancyhdr}
+
+\makeatletter
+\g@addto@macro\bfseries{\boldmath}
+\makeatother
+
+\newcommand{\br}{\vspace{2mm}}
+
+\definecolor{light-gray}{gray}{0.93}
+\DeclareRobustCommand{\hlgray}[1]{{\sethlcolor{light-gray}\hl{#1}}}
+\newcommand{\code}[1]{{\fontsize{11pt}{11pt}\selectfont\hlgray{\hbox{\texttt{#1}}}}}
+
+\linespread{1.05}
+
+\newcommand{\hwTitle}{Project Charter}
+\newcommand{\courseTitle}{CS 307 (Spring 2017)}
+\newcommand{\projectName}{Meetchu}
+\newcommand{\teamName}{Team 17}
+\newcommand{\authorName}{Eric Aguilera, Justin Bonner, Carson Harmon, Dan Zheng}
+
+\lhead{\fontsize{14pt}{14pt}\selectfont{}\courseTitle}
+\chead{\fontsize{14pt}{14pt}\selectfont{}\textbf{\projectName}}
+\rhead{\fontsize{14pt}{14pt}\selectfont{}\teamName}
+
+\pagestyle{fancy}
+
+\begin{document}
+
+\section*{\Large \centering \hwTitle}
+{\centering \authorName \par}
+
+\section{Problem Statement}
+
+College courses are difficult and many students choose to form study groups. However, forming and managing a study group can be a hassle. Students have to juggle multiple applications, including messaging apps for communication and calendar/scheduling apps for planning meetings. However, there exists no centralized application designed specifically for student group study. Our product combines the best features from messaging and scheduling applications to provide the definitive group studying application for Purdue students.
+
+\section{Project Objectives}
+\begin{enumerate}[nolistsep]
+    \item Create a web application that will aggregate student schedule information from Purdue's website.
+    \item Allow students to find classmates and form study groups based on their schedule information.
+    \item Allow study group members to create meetings and specify a location and range of possible dates.
+    \item Allow study group members to specify their available times for a meeting and display the best time for all members.
+    \item Allow members to receive notifiations about upcoming study group sessions and announcements via email and/or text.
+\end{enumerate}
+
+\section{Stakeholders}
+\begin{itemize}[nolistsep]
+    \item Users: Purdue students
+    \item Developers: Eric Aguilera, Justin Bonner, Carson Harmon, Dan Zheng
+    \item Project Manager: Dan Zheng
+    \item Project Owners: Eric Aguilera, Justin Bonner, Carson Harmon, Dan Zheng
+    \item Project Coordinator: (TBA)
+\end{itemize}
+
+\section{Deliverables}
+\begin{itemize}[nolistsep]
+    \item We will build a web app that allows students to easily form study groups.
+    \item We will create a web backend (using Node.js) that will help students find the best time to hold study sessions and include the ability to remind group members about the meeting.
+    \item We will build a web frontend with a clean, intuitive interface for users.
+\end{itemize}
+
+\end{document}
