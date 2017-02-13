@@ -16,6 +16,11 @@ dotenv.load({ path: '.env' });
 const models = require('./models');
 
 /**
+ * Controllers
+ */
+const homeController = require('./controllers/home');
+
+/**
  * Express configuration
  */
 const app = express();
@@ -24,9 +29,10 @@ app.set('port', process.env.PORT || 3000);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
-app.get('/', (req, res) => {
-  res.render('home');
-});
+/*
+ * Define app routes
+ */
+app.get('/', homeController.index);
 
 /**
  * Create any missing database tables and start Express server
