@@ -1,3 +1,16 @@
+# Node/NPM
+
+# Log files
+**/logs
+**/*.log
+**/npm-debug.log*
+
+# Dependency directories
+**/node_modules
+
+# Environmental variables file
+**/.env
+
 # LaTeX-related
 *.aux
 *.glo
