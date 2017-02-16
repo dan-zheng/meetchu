@@ -16,6 +16,7 @@
     "no-underscore-dangle": 0,
     "no-alert": 0,
     "no-lone-blocks": 0,
-    "comma-dangle": 0
+    "comma-dangle": 0,
+    "prefer-template": 0
   }
 }

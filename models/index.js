@@ -28,6 +28,11 @@ Object.keys(db).forEach((modelName) => {
   }
 });
 
+// Define a Many-to-Many Relationship for Users-Groups
+// Relationship is defined in UserGroup table
+db.User.belongsToMany(db.Group, { as: 'Group', through: 'UserGroup' });
+db.Group.belongsToMany(db.User, { through: 'UserGroup' });
+
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 

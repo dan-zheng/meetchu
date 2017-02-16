@@ -1,5 +1,3 @@
-'use strict';
-
 module.exports = (sequelize, Sequelize) => {
   const User = sequelize.define('User', {
     id: {
@@ -29,10 +27,10 @@ module.exports = (sequelize, Sequelize) => {
   }, {
     getterMethods: {
       fullName() {
-        return this.firstName + ' ' + this.lastName
+        return this.firstName + ' ' + this.lastName;
       },
       emailFullName() {
-        return this.fullName + ' <' + this.email + '>'
+        return this.fullName + ' <' + this.email + '>';
       }
     }
   });
