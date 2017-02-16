@@ -43,10 +43,21 @@ models.sequelize.sync().then(() => {
   });
 
   // Database test
-  models.User.create({
-    firstName: 'Jack',
-    lastName: 'Smith',
+  // findOrCreate to avoid problems with unique constraint
+  models.User.findOrCreate({
+    where: {
+      email: 'student@purdue.edu',
+      firstName: 'Jack',
+      lastName: 'Smith',
+    }
   });
+
+  models.User.findOne({
+    where: { email: 'student@purdue.edu' }
+  }).then(user => {
+    console.log('Found user: ' + user.emailFullName)
+  })
+
 });
 
 module.exports = app;

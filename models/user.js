@@ -1,12 +1,37 @@
+'use strict';
+
 module.exports = (sequelize, Sequelize) => {
   const User = sequelize.define('User', {
-    firstName: {
-      type: Sequelize.STRING
-    },
-    lastName: {
-      type: Sequelize.STRING
-    },
-  }, { freezeTableName: true });
-
-  return User;
+		id: {
+			type: Sequelize.INTEGER,
+			autoIncrement: true,
+			primaryKey: true
+		},
+		email: {
+			type: Sequelize.STRING,
+      validate: {
+        isEmail: true
+      },
+      allowNull: false,
+      unique: true
+		},
+		firstName: {
+			type: Sequelize.STRING,
+      allowNull: false
+		},
+		lastName: {
+			type: Sequelize.STRING,
+      allowNull: false
+		},
+	}, {
+		getterMethods: {
+			fullName() {
+        return this.firstName + ' ' + this.lastName
+      },
+      emailFullName() {
+        return this.fullName + ' <' + this.email + '>'
+      }
+		}
+	});
+	return User;
 };
