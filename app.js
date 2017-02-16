@@ -42,11 +42,31 @@ models.sequelize.sync().then(() => {
     console.log('Express server listening on port %d in %s mode', app.get('port'), app.get('env'));
   });
 
+  // Define a Many-to-Many Relationship for Users-Groups
+  // Relationship is defined in UserGroup table
+  models.User.belongsToMany(models.Group, {as: 'Group', through: 'UserGroup'});
+  models.Group.belongsToMany(models.User, {through: 'UserGroup'});
+
   // Database test
-  models.User.create({
-    firstName: 'Jack',
-    lastName: 'Smith',
+  models.User.findOrCreate({
+    where: {
+      email: 'student@purdue.edu',
+      firstName: 'Jack',
+      lastName: 'Smith',
+    }
+  }).spread((user, created) => {
+    console.log('Found user: ' + user.emailFullName)
+    models.Group.findOrCreate({
+      where: {
+        name: 'CS252 Students',
+        groupType: 'group',
+        description: 'A study group for CS 252 students'
+      }
+    }).spread((group, created) => {
+      user.setGroup(group);
+    });
   });
+
 });
 
 module.exports = app;
