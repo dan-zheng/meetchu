@@ -2,36 +2,36 @@
 
 module.exports = (sequelize, Sequelize) => {
   const User = sequelize.define('User', {
-		id: {
-			type: Sequelize.INTEGER,
-			autoIncrement: true,
-			primaryKey: true
-		},
-		email: {
-			type: Sequelize.STRING,
+    id: {
+      type: Sequelize.INTEGER,
+      autoIncrement: true,
+      primaryKey: true
+    },
+    email: {
+      type: Sequelize.STRING,
       validate: {
         isEmail: true
       },
       allowNull: false,
       unique: true
-		},
-		firstName: {
-			type: Sequelize.STRING,
+    },
+    firstName: {
+      type: Sequelize.STRING,
       allowNull: false
-		},
-		lastName: {
-			type: Sequelize.STRING,
+    },
+    lastName: {
+      type: Sequelize.STRING,
       allowNull: false
-		},
-	}, {
-		getterMethods: {
-			fullName() {
+    },
+  }, {
+    getterMethods: {
+      fullName() {
         return this.firstName + ' ' + this.lastName
       },
       emailFullName() {
         return this.fullName + ' <' + this.email + '>'
       }
-		}
-	});
-	return User;
+    }
+  });
+  return User;
 };
