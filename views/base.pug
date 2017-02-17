@@ -4,6 +4,10 @@ html
     meta(charset='utf-8')
     title #{title} - Meetchu
     link(rel='stylesheet', type='text/css', href='/dist/main.css')
+    link(rel='stylesheet', type='text/css', href='/dist/sidebar.css')
     script(src='/dist/bundle.js', defer)
-
-  block content
+    
+  include includes/sidebar
+  
+  .container
+    block content

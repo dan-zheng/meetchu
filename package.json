@@ -16,7 +16,9 @@
   ],
   "license": "MIT",
   "dependencies": {
+    "body-parser": "^1.16.1",
     "bootstrap-sass": "^3.3.7",
+    "compression": "^1.6.2",
     "dotenv": "^4.0.0",
     "express": "^4.14.1",
     "font-awesome": "^4.7.0",
@@ -25,7 +27,10 @@
     "passport": "^0.3.2",
     "passport-local": "^1.0.0",
     "pug": "^2.0.0-beta11",
-    "sequelize": "^3.30.2"
+    "sequelize": "^3.30.2",
+    "webpack": "^2.2.1",
+    "webpack-dev-middleware": "^1.10.0",
+    "webpack-hot-middleware": "^2.17.0"
   },
   "devDependencies": {
     "autoprefixer": "^6.7.3",

@@ -12,7 +12,9 @@ dotenv.load({ path: '.env' });
  * Intialize Sequelize using database url
  * Intialize db object used to store models
  */
-const sequelize = new Sequelize(process.env.DATABASE_URL);
+const sequelize = new Sequelize(process.env.DATABASE_URL, {
+  logging: false
+});
 const db = {};
 
 fs.readdirSync(__dirname)
