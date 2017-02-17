@@ -7,9 +7,13 @@
 
 # Dependency directories
 **/node_modules
+**/bower_components
 
 # Environmental variables file
 **/.env
+
+# Webpack output
+public/dist
 
 # LaTeX-related
 *.aux
