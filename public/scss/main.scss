@@ -1,15 +1,16 @@
-@import "_variables";
+@import '_fonts';
+@import '_variables';
 
-@import "lib/bootstrap/bootstrap";
-@import "lib/font-awesome/scss/font-awesome";
+@import 'lib/bootstrap/bootstrap';
+@import 'lib/font-awesome/scss/font-awesome';
 
-@import "_sidebar";
+@import '_sidebar';
 
 // Scaffolding
 
 body {
     position: relative;
-    min-height: 100vh;
+    min-height: 100%;
 }
 
 // Font Icons

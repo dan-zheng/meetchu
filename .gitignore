@@ -13,7 +13,7 @@
 **/.env
 
 # Compiled output
-dist
+public/css
 
 # LaTeX-related
 *.aux
