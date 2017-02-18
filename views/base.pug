@@ -3,15 +3,20 @@ html
   head
     meta(charset='utf-8')
     title #{title} - Meetchu
+    meta(name='viewport', content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no')
     link(rel='stylesheet', type='text/css', href='/css/main.css')
     script(src='js/lib/jquery.min.js', defer)
     script(src='js/lib/bootstrap.min.js', defer)
     script(src='js/main.js', defer)
     
   body
-    #wrapper
-      include includes/sidebar
-      
-      #content.container
+    if !user
+      #wrapper
+        include includes/sidebar
+        
+        #content.container
+          block content
+          a#sidebar-toggle.btn.btn-default(href='#sidebar-toggle') Toggle Sidebar
+    else
+      .container
         block content
-        a#sidebar-toggle.btn.btn-default(href='#sidebar-toggle') Toggle Sidebar
