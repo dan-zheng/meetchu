@@ -1,4 +1,4 @@
-$("#sidebar-toggle").click(e => {
+$("#sidebar-toggle").click((e) => {
   e.preventDefault();
   $("#wrapper").toggleClass("toggled");
 });

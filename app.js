@@ -36,7 +36,6 @@ app.use(sass({
   src: path.join(__dirname, 'public/scss'),
   dest: path.join(__dirname, 'public/css'),
   prefix: '/css',
-  //sourceMap: true,
   outputStyle: 'compressed'
 }));
 app.use(compression());
