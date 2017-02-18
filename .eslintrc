@@ -17,6 +17,7 @@
     "no-alert": 0,
     "no-lone-blocks": 0,
     "comma-dangle": 0,
-    "prefer-template": 0
+    "prefer-template": 0,
+    "import/newline-after-import": [{ "count": 0 }]
   }
 }
