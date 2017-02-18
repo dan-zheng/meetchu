@@ -23,6 +23,14 @@ module.exports = (sequelize, Sequelize) => {
     },
     major: {
       type: Sequelize.STRING
+    },
+    passwordHash: {
+      type: Sequelize.STRING,
+      allowNull: false
+    },
+    passwordSalt: {
+      type: Sequelize.STRING,
+      allowNull: false
     }
   }, {
     getterMethods: {
