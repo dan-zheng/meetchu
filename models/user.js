@@ -26,11 +26,11 @@ module.exports = (sequelize, Sequelize) => {
     },
     passwordHash: {
       type: Sequelize.STRING,
-      allowNull: false
+      allowNull: true
     },
     passwordSalt: {
       type: Sequelize.STRING,
-      allowNull: false
+      allowNull: true
     }
   }, {
     getterMethods: {

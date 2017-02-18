@@ -2,7 +2,7 @@ const models = require('../models');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 
-
+/*
 passport.use('local-signup', new LocalStrategy(
   {
     usernameField : 'email',
@@ -29,7 +29,7 @@ passport.use('local-signup', new LocalStrategy(
               firstName: req.firstName,
               lastName: req.lastName,
               passwordHash: bcrypt.hash(password, salt),
-              passwordSalt: salt;
+              passwordSalt: salt
             }
           }
         );
@@ -38,6 +38,7 @@ passport.use('local-signup', new LocalStrategy(
     );
   }
 ));
+*/
 
 /**
  * GET /login

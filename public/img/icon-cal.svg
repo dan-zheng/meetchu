@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="256px" height="256px" viewBox="0 0 256 256" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 42 (36781) - http://www.bohemiancoding.com/sketch -->
+    <title>icon-cal</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="icon-cal">
+            <ellipse id="Oval-3" fill="#FFFFFF" cx="130" cy="130" rx="112" ry="112"></ellipse>
+            <g id="Calendar" transform="translate(69.000000, 66.000000)">
+                <rect id="Rectangle-159" stroke="#3C3F43" stroke-width="6" fill="#FFFFFF" x="0" y="18.2857143" width="121.081081" height="109.714286" rx="1"></rect>
+                <rect id="Rectangle-159" stroke="#3C3F43" stroke-width="6" fill="#CE5D6B" x="0" y="18.2857143" width="121.081081" height="36.5714286" rx="1"></rect>
+                <rect id="Rectangle-160" fill="#3C3F43" x="18.1621622" y="0" width="12.1081081" height="36.5714286" rx="1"></rect>
+                <rect id="Rectangle-160-Copy" fill="#3C3F43" x="90.8108108" y="0" width="12.1081081" height="36.5714286" rx="1"></rect>
+                <rect id="Rectangle-160-Copy-2" fill="#3C3F43" x="66.5945946" y="0" width="12.1081081" height="36.5714286" rx="1"></rect>
+                <rect id="Rectangle-160-Copy-3" fill="#3C3F43" x="42.3783784" y="0" width="12.1081081" height="36.5714286" rx="1"></rect>
+            </g>
+        </g>
+    </g>
+</svg>

@@ -12,8 +12,8 @@
 # Environmental variables file
 **/.env
 
-# Webpack output
-public/dist
+# Compiled output
+dist
 
 # LaTeX-related
 *.aux
