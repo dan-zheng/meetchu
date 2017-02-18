@@ -1,6 +1,4 @@
 const models = require('../models');
-const passport = require('passport');
-const LocalStrategy = require('passport-local').Strategy;
 
 /**
  * GET /login
