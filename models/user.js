@@ -26,15 +26,23 @@ module.exports = (sequelize, Sequelize) => {
     major: {
       type: Sequelize.STRING
     },
-    passwordHash: {
+    password: {
       type: Sequelize.STRING,
-      allowNull: true
-    },
-    passwordSalt: {
-      type: Sequelize.STRING,
-      allowNull: true
+      allowNull: false
     }
   }, {
+    hooks: {
+      beforeCreate: (model, options, done) => {
+         bcrypt.genSalt(10, (err1, salt) => {
+          if (err1) { return next(err1); }
+          bcrypt.hash(model.password, salt, null, (err2, hash) => {
+            if (err2) { return next(err2); }
+            model.password = hash;
+            return done(null, options);
+          });
+        });
+      }
+    },
     getterMethods: {
       fullName() {
         return this.firstName + ' ' + this.lastName;
@@ -55,6 +63,7 @@ module.exports = (sequelize, Sequelize) => {
         });
       },
       verifyPassword(password, done) {
+        console.log("testing123");
         return bcrypt.compare(password, this.password, (err, isMatch) => done(err, isMatch));
       }
     }

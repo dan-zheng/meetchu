@@ -3,6 +3,7 @@
  */
 const dotenv = require('dotenv');
 const express = require('express');
+const passport = require('passport');
 const path = require('path');
 const compression = require('compression');
 const bodyParser = require('body-parser');
@@ -25,10 +26,14 @@ const homeController = require('./controllers/home');
 const userController = require('./controllers/user');
 
 /**
+ * Passport configuration
+ */
+const passportConfig = require('./config/auth');
+
+/**
  * Express configuration
  */
 const app = express();
-
 app.set('port', process.env.PORT || 3000);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
@@ -41,6 +46,8 @@ app.use(sass({
 }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(passport.initialize());
+
 app.use(express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 }));
 
 /*
@@ -48,13 +55,14 @@ app.use(express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 }))
  */
 app.get('/', homeController.index);
 app.get('/signup', userController.getSignup);
+app.post('/signup', userController.postSignup);
 app.get('/login', userController.getLogin);
 app.post('/login', userController.postLogin);
 
 /**
  * Create any missing database tables and start Express server
  */
-models.sequelize.sync().then(() => {
+models.sequelize.sync({force: true}).then(() => {
   app.listen(app.get('port'), () => {
     console.log('Express server listening on port %d in %s mode', app.get('port'), app.get('env'));
   });
@@ -64,6 +72,7 @@ models.sequelize.sync().then(() => {
     email: 'student@purdue.edu',
     firstName: 'Jack',
     lastName: 'Smith',
+    password: 'password123'
   });
 
   const group = models.Group.create({

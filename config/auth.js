@@ -21,11 +21,14 @@ passport.deserializeUser((id, done) => {
  * Sign in using email and password.
  */
 passport.use(new LocalStrategy((email, password, done) => {
+  console.log("test");
   models.User.find({ where: { email } }).success((user) => {
     if (!user) {
+      console.log("email not found");
       done(null, false, { message: `Email #{email} not found.` });
     }
-    user.comparePasswords(password, (err, isMatch) => {
+    console.log("email found");
+    user.verifyPassword(password, (err, isMatch) => {
       if (err) { return done(err); }
       if (isMatch) {
         return done(null, user);
