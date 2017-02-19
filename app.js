@@ -60,23 +60,42 @@ models.sequelize.sync().then(() => {
   });
 
   // Database test
-  models.User.findOrCreate({
-    where: {
-      email: 'student@purdue.edu',
-      firstName: 'Jack',
-      lastName: 'Smith',
-    }
-  }).spread((user, userCreated) => {
-    console.log('Found user: ' + user.emailFullName);
-    models.Group.findOrCreate({
-      where: {
-        name: 'CS 252 Students',
-        groupType: 'group',
-        description: 'A study group for CS 252 students'
-      }
-    }).spread((group, groupCreated) => {
-      user.setGroup(group);
-    });
+  const user = models.User.create({
+    email: 'student@purdue.edu',
+    firstName: 'Jack',
+    lastName: 'Smith',
+  });
+
+  const group = models.Group.create({
+    name: 'CS 252 Students',
+    groupType: 'group',
+    description: 'A study group for CS 252 students'
+  });
+
+  // Course test
+  const course = models.Course.create({
+    name: 'Computer Architecture',
+    department: 'CS',
+    courseNumber: '250',
+    description: 'A class about computer architecture'
+  });
+
+  const prof1 = models.Instructor.create({
+    email: 'grr@purdue.edu',
+    name: 'Gustavo Rodriquez'
+  });
+
+  const prof2 = models.Instructor.create({
+    email: 'gba@purdue.edu',
+    name: 'George Adams'
+  });
+
+  Promise.all([user, group]).then((newUser, newGroup) => {
+    newUser.addGroup(newGroup);
+  });
+
+  Promise.all([course, prof1, prof2]).then((newCourse, newProf1, newProf2) => {
+    newCourse.addProfessors([newProf1, newProf2]);
   });
 });
 
