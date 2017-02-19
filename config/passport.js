@@ -1,5 +1,5 @@
 /**
- * Module dependencies
+ * Module dependencies.
  */
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
@@ -10,9 +10,9 @@ passport.serializeUser((user, done) => {
 });
 
 passport.deserializeUser((id, done) => {
-  models.User.find({ where: { id } }).success((user) => {
+  models.User.find({ where: { id } }).then((user) => {
     done(null, user);
-  }).error((err) => {
+  }).catch((err) => {
     done(err, null);
   });
 });
@@ -20,14 +20,11 @@ passport.deserializeUser((id, done) => {
 /**
  * Sign in using email and password.
  */
-passport.use(new LocalStrategy((email, password, done) => {
-  console.log("test");
-  models.User.find({ where: { email } }).success((user) => {
+passport.use(new LocalStrategy({ usernameField: 'email' }, (email, password, done) => {
+  models.User.find({ where: { email } }).then((user) => {
     if (!user) {
-      console.log("email not found");
       done(null, false, { message: `Email #{email} not found.` });
     }
-    console.log("email found");
     user.verifyPassword(password, (err, isMatch) => {
       if (err) { return done(err); }
       if (isMatch) {
@@ -35,7 +32,17 @@ passport.use(new LocalStrategy((email, password, done) => {
       }
       return done(null, false, { msg: 'Invalid email or password.' });
     });
-  }).error((err) => {
+  }).catch((err) => {
     done(err);
   });
 }));
+
+/**
+ * Middleware required for login.
+ */
+exports.isAuthenticated = (req, res, next) => {
+  if (req.isAuthenticated()) {
+    return next();
+  }
+  return res.redirect('/login');
+};

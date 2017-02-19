@@ -1,3 +1,6 @@
+@import '_variables';
+@import 'lib/bootstrap/bootstrap/_variables.scss';
+
 @mixin styling($sidebar-width, $icon-padding) {
   #wrapper {
     position: absolute;
@@ -69,7 +72,7 @@
         &:hover {
           text-decoration: none;
           color: blue;
-          background: $brand-primary;
+          background: #dbd9fa;
         }
 
         &:active {

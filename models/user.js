@@ -33,10 +33,10 @@ module.exports = (sequelize, Sequelize) => {
   }, {
     hooks: {
       beforeCreate: (model, options, done) => {
-         bcrypt.genSalt(10, (err1, salt) => {
-          if (err1) { return next(err1); }
-          bcrypt.hash(model.password, salt, null, (err2, hash) => {
-            if (err2) { return next(err2); }
+        return bcrypt.genSalt(10, (err1, salt) => {
+          if (err1) { return done(err1); }
+          return bcrypt.hash(model.password, salt, null, (err2, hash) => {
+            if (err2) { return done(err2); }
             model.password = hash;
             return done(null, options);
           });
@@ -64,7 +64,9 @@ module.exports = (sequelize, Sequelize) => {
       },
       verifyPassword(password, done) {
         console.log("testing123");
-        return bcrypt.compare(password, this.password, (err, isMatch) => done(err, isMatch));
+        bcrypt.compare(password, this.password, (err, isMatch) => {
+          done(err, isMatch);
+        });
       }
     }
   });

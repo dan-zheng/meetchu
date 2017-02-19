@@ -1,37 +1,39 @@
 /**
- * Module dependencies
+ * Module dependencies.
  */
 const dotenv = require('dotenv');
 const express = require('express');
 const passport = require('passport');
+const session = require('express-session');
+const SequelizeStore = require('connect-session-sequelize')(session.Store);
 const path = require('path');
 const compression = require('compression');
 const bodyParser = require('body-parser');
 const sass = require('node-sass-middleware');
 
 /**
- * Load environment variables from .env file
+ * Load environment variables from .env file.
  */
 dotenv.load({ path: '.env' });
 
 /**
- * Models
+ * Models.
  */
 const models = require('./models');
 
 /**
- * Controllers
+ * Controllers.
  */
 const homeController = require('./controllers/home');
 const userController = require('./controllers/user');
 
 /**
- * Passport configuration
+ * Passport configuration.
  */
-const passportConfig = require('./config/auth');
+const passportConfig = require('./config/passport');
 
 /**
- * Express configuration
+ * Express configuration.
  */
 const app = express();
 app.set('port', process.env.PORT || 3000);
@@ -46,12 +48,30 @@ app.use(sass({
 }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(session({
+  secret: process.env.SESSION_SECRET,
+  /*
+  store: new SequelizeStore({
+    db: models.sequelize
+  }),
+  */
+  cookie: {
+    maxAge: 1000 * 60 * 60 * 24
+  },
+  saveUninitialized: true,
+  resave: true,
+  proxy: true
+}));
 app.use(passport.initialize());
-
+app.use(passport.session());
+app.use((req, res, next) => {
+  res.locals.user = req.user;
+  next();
+});
 app.use(express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 }));
 
 /*
- * Define app routes
+ * App routes.
  */
 app.get('/', homeController.index);
 app.get('/signup', userController.getSignup);
@@ -60,9 +80,9 @@ app.get('/login', userController.getLogin);
 app.post('/login', userController.postLogin);
 
 /**
- * Create any missing database tables and start Express server
+ * Create any missing database tables and start Express server.
  */
-models.sequelize.sync({force: true}).then(() => {
+models.sequelize.sync({ force: true }).then(() => {
   app.listen(app.get('port'), () => {
     console.log('Express server listening on port %d in %s mode', app.get('port'), app.get('env'));
   });

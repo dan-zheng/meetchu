@@ -6,8 +6,8 @@ const passport = require('passport');
  * Sign up page.
  */
 exports.getSignup = (req, res) => {
-  res.render('account/signup', {
-    title: 'Sign up',
+  return res.render('account/signup', {
+    title: 'Sign up'
   });
 };
 
@@ -16,8 +16,6 @@ exports.getSignup = (req, res) => {
  * User signup.
  */
 exports.postSignup = (req, res) => {
-  // Sample function
-  console.log(req.body);
   models.User.create({
     firstName: req.body.firstName,
     lastName: req.body.lastName,
@@ -26,8 +24,6 @@ exports.postSignup = (req, res) => {
   }).then(() => {
     return res.redirect('/');
   });
-  // res.json(req.body);
-
 };
 
 /**
@@ -36,7 +32,7 @@ exports.postSignup = (req, res) => {
  */
 exports.getLogin = (req, res) => {
   return res.render('account/login', {
-    title: 'Login',
+    title: 'Login'
   });
 };
 
@@ -45,25 +41,17 @@ exports.getLogin = (req, res) => {
  * User login.
  */
 exports.postLogin = (req, res, next) => {
-  // Sample function
-  console.log(req.body);
-
-  return passport.authenticate('local', {
-    failureRedirect:'/login',
-    successRedirect: '/'
-  })(req, res, next);
-
-  //passport.authenticate('local', (err, user, info) => {
-
-
-    /*if (err) {return next(err);}
+  passport.authenticate('local', (err1, user, info) => {
+    if (err1) { return next(err1); }
     if (!user) {
       console.log('user doesn\'t exist');
-      return res.redirect('/login')
+      return res.redirect('/login');
     }
-    req.logIn(user, (err) => {
-      if (err) {return next(err);}
-      return res.redirect("/");
+    return req.login(user, (err2) => {
+      if (err2) { return next(err2); }
+      // console.log(req.user);
+      // console.log(req.session);
+      return res.redirect('/');
     });
-  })(req, res, next);*/
+  })(req, res, next);
 };
