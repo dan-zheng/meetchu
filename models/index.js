@@ -35,6 +35,14 @@ Object.keys(db).forEach((modelName) => {
 db.User.belongsToMany(db.Group, { as: 'Group', through: 'UserGroup' });
 db.Group.belongsToMany(db.User, { through: 'UserGroup' });
 
+// Define a Many-to-Many Relationship for Course-Instructor
+// This will allow us to efficiently search for courses based on instructor
+// Since courses may have more than one instructor
+// In the future, we may want to consider defining a relationship between Instructor and User
+// for when a Instructor creates an account with Meetchu
+db.Course.belongsToMany(db.Instructor, { as: 'Instructor', through: 'CourseInstructor' });
+db.Instructor.belongsToMany(db.Course, { through: 'CourseInstructor' });
+
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
