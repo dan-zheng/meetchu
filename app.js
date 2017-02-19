@@ -78,6 +78,8 @@ app.get('/signup', userController.getSignup);
 app.post('/signup', userController.postSignup);
 app.get('/login', userController.getLogin);
 app.post('/login', userController.postLogin);
+app.get('/addCourses', userControllers.getAddCourse);
+app.post('/addCourses', userControllers.postAddCourse);
 
 /**
  * Create any missing database tables and start Express server.
