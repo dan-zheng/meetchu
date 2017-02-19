@@ -5,12 +5,18 @@ html
     title #{title} - Meetchu
     meta(name='viewport', content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no')
     link(rel='stylesheet', type='text/css', href='/css/main.css')
+    if title == 'Home'
+      link(rel='stylesheet', type='text/css', href='/css/home.css')
+    if user
+      link(rel='stylesheet', type='text/css', href='/css/sidebar.css')
+    else
+      link(rel='stylesheet', type='text/css', href='/css/navbar-footer.css')
     script(src='js/lib/jquery.min.js', defer)
     script(src='js/lib/bootstrap.min.js', defer)
     script(src='js/main.js', defer)
     
   body
-    if !user
+    if user
       #wrapper
         include includes/sidebar
         
@@ -18,5 +24,7 @@ html
           block content
           a#sidebar-toggle.btn.btn-default(href='#sidebar-toggle') Toggle Sidebar
     else
-      .container
+      include includes/navbar
+      
+      #main.container
         block content

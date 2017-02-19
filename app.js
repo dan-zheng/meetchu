@@ -32,13 +32,13 @@ const app = express();
 app.set('port', process.env.PORT || 3000);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
+app.use(compression());
 app.use(sass({
   src: path.join(__dirname, 'public/scss'),
   dest: path.join(__dirname, 'public/css'),
   prefix: '/css',
-  outputStyle: 'compressed'
+  outputStyle: process.env.NODE_ENV === 'production' ? 'compressed' : 'nested'
 }));
-app.use(compression());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 }));
@@ -47,6 +47,7 @@ app.use(express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 }))
  * Define app routes
  */
 app.get('/', homeController.index);
+app.get('/signup', userController.getSignup);
 app.get('/login', userController.getLogin);
 app.post('/login', userController.postLogin);
 

@@ -4,14 +4,40 @@
 @import 'lib/bootstrap/bootstrap';
 @import 'lib/font-awesome/scss/font-awesome';
 
-@import '_sidebar';
-
 // Scaffolding
+
+html {
+  min-width: 100%;
+  min-height: 100%;
+}
 
 body {
   position: relative;
-  min-width: 100vw;
-  min-height: 100vh;
+  min-width: 100%;
+  min-height: 100%;
+}
+
+// Typography
+
+a {
+  transition: all .4s cubic-bezier(.24,.45,.46,.92);
+
+  &:hover {
+    text-decoration: none;
+  }
+}
+
+ul,
+p {
+  font-size: 14px;
+}
+
+// Buttons
+
+.btn {
+  padding: 10px 16px;
+  border-radius: 3px;
+  transition: all .4s cubic-bezier(.24,.45,.46,.92);
 }
 
 // Font Icons

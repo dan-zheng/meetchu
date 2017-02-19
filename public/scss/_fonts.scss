@@ -1,9 +1,26 @@
 @font-face {
-    font-family: 'San Franciso';
-    src: url('../fonts/sf-regular.ttf');
+    font-family: "Benton Sans";
+    src: url("../fonts/benton-sans-regular.otf");
+};
+
+@font-face {
+    font-family: "Uni Sans";
+    src: url("../fonts/uni-sans-thin.otf");
+};
+@font-face {
+    font-family: "Uni Sans";
+    src: url("../fonts/uni-sans-thin-italic.otf");
+    font-style: italic;
+};
+@font-face {
+    font-family: "Uni Sans";
+    src: url("../fonts/uni-sans-heavy.otf");
+    font-weight: bold;
 };
 
 @font-face {
     font-family: 'Menlo';
     src: url('../fonts/menlo-regular.ttf');
 };
+
+@import 'https://fonts.googleapis.com/css?family=Roboto:100,300,700';
