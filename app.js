@@ -74,10 +74,10 @@ models.sequelize.sync().then(() => {
 
   // Course test
   const course = models.Course.create({
-    name: 'Computer Architecture',
+    name: 'Programming in C',
     department: 'CS',
-    courseNumber: '250',
-    description: 'A class about computer architecture'
+    courseNumber: '240',
+    description: 'The UNIX environment, C development cycle, data representation, operators, program structure, recursion, macros, C preprocessor, pointers and addresses, dynamic memory allocation, structures, unions, typedef, bit-fields, pointer/structure applications, UNIX file abstraction, file access, low-level I/O, concurrency.'
   });
 
   const prof1 = models.Instructor.create({
@@ -90,12 +90,17 @@ models.sequelize.sync().then(() => {
     name: 'George Adams'
   });
 
-  Promise.all([user, group]).then((newUser, newGroup) => {
+  Promise.all([user, group]).then((data) => {
+    const newUser = data[0];
+    const newGroup = data[1];
     newUser.addGroup(newGroup);
   });
 
-  Promise.all([course, prof1, prof2]).then((newCourse, newProf1, newProf2) => {
-    newCourse.addProfessors([newProf1, newProf2]);
+  Promise.all([course, prof1, prof2]).then((data) => {
+    const newCourse = data[0];
+    const newProf1 = data[1];
+    const newProf2 = data[2];
+    newCourse.addInstructor([newProf1, newProf2]);
   });
 });
 
