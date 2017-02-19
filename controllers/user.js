@@ -11,6 +11,26 @@ exports.getSignup = (req, res) => {
 };
 
 /**
+ * GET /addCourses
+ * Course adding page
+ */
+exports.getAddCourse = (req, res) => {
+  res.render('account/addCourses', {
+    title: 'Add Courses',
+  });
+}
+
+/**
+ * POST /addCourses
+ * Add the course
+ */
+exports.postAddCourse = (req, res) => {
+  console.log('adding course: ' + req.course);
+  req.user.addCourse(req.course);
+  res.redirect('account/addCourses');
+}
+
+/**
  * GET /login
  * Login page.
  */
