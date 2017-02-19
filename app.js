@@ -102,6 +102,12 @@ models.sequelize.sync().then(() => {
     const newProf2 = data[2];
     newCourse.addInstructor([newProf1, newProf2]);
   });
+
+  Promise.all([course, user]).then((data) => {
+    const newCourse = data[0];
+    const newUser = data[1];
+    newUser.addCourse(newCourse);
+  });
 });
 
 module.exports = app;
