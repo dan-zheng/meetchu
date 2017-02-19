@@ -13,7 +13,7 @@ dotenv.load({ path: '.env' });
  * Intialize db object used to store models
  */
 const sequelize = new Sequelize(process.env.DATABASE_URL, {
-  logging: false
+  logging: false,
 });
 const db = {};
 
