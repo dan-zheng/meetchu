@@ -66,11 +66,12 @@ exports.postLogin = (req, res, next) => {
       console.log('user doesn\'t exist');
       return res.redirect('/login');
     }
-    return req.login(user, (err2) => {
+    req.login(user, (err2) => {
       if (err2) { return next(err2); }
-      // console.log(req.user);
-      // console.log(req.session);
-      return res.redirect('/');
+      console.log(req.session);
+      req.session.save(() => {
+        return res.redirect('/');
+      });
     });
   })(req, res, next);
 };

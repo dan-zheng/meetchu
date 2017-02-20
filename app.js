@@ -5,7 +5,7 @@ const dotenv = require('dotenv');
 const express = require('express');
 const passport = require('passport');
 const session = require('express-session');
-const SequelizeStore = require('connect-session-sequelize')(session.Store);
+const SequelizeStore = require('express-session-sequelize')(session.Store);
 const path = require('path');
 const compression = require('compression');
 const bodyParser = require('body-parser');
@@ -31,6 +31,11 @@ const userController = require('./controllers/user');
  * Passport configuration.
  */
 const passportConfig = require('./config/passport');
+const sequelizeStore = new SequelizeStore({
+  db: models.sequelize
+});
+
+// models.User.belongsTo(sequelizeStore.Session, { foreignKeyConstraint: true });
 
 /**
  * Express configuration.
@@ -50,13 +55,9 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(session({
   secret: process.env.SESSION_SECRET,
-  /*
-  store: new SequelizeStore({
-    db: models.sequelize
-  }),
-  */
+  store: sequelizeStore,
   cookie: {
-    maxAge: 1000 * 60 * 60 * 24
+    maxAge: 1000 * 60 * 60 * 24 * 7
   },
   saveUninitialized: true,
   resave: true,
@@ -78,47 +79,67 @@ app.get('/signup', userController.getSignup);
 app.post('/signup', userController.postSignup);
 app.get('/login', userController.getLogin);
 app.post('/login', userController.postLogin);
-app.get('/addCourses', userControllers.getAddCourse);
-app.post('/addCourses', userControllers.postAddCourse);
+app.get('/addCourses', userController.getAddCourse);
+app.post('/addCourses', userController.postAddCourse);
 
 /**
  * Create any missing database tables and start Express server.
  */
-models.sequelize.sync({ force: true }).then(() => {
+models.sequelize.sync().then(() => {
   app.listen(app.get('port'), () => {
     console.log('Express server listening on port %d in %s mode', app.get('port'), app.get('env'));
   });
 
   // Database test
-  const user = models.User.create({
-    email: 'student@purdue.edu',
-    firstName: 'Jack',
-    lastName: 'Smith',
-    password: 'password123'
+  const user = models.User.findOrCreate({
+    where: {
+      email: 'student@purdue.edu',
+      firstName: 'Jack',
+      lastName: 'Smith',
+      password: 'password123'
+    }
+  }).spread((user) => {
+    console.log(user);
   });
 
-  const group = models.Group.create({
-    name: 'CS 252 Students',
-    groupType: 'group',
-    description: 'A study group for CS 252 students'
+  const group = models.Group.findOrCreate({
+    where: {
+      name: 'CS 252 Students',
+      groupType: 'group',
+      description: 'A study group for CS 252 students'
+    }
+  }).catch((err) => {
+    console.log(err);
   });
 
   // Course test
-  const course = models.Course.create({
-    name: 'Programming in C',
-    department: 'CS',
-    courseNumber: '240',
-    description: 'The UNIX environment, C development cycle, data representation, operators, program structure, recursion, macros, C preprocessor, pointers and addresses, dynamic memory allocation, structures, unions, typedef, bit-fields, pointer/structure applications, UNIX file abstraction, file access, low-level I/O, concurrency.'
+  const course = models.Course.findOrCreate({
+    where: {
+      name: 'Programming in C',
+      department: 'CS',
+      courseNumber: '240',
+      description: 'The UNIX environment, C development cycle, data representation, operators, program structure, recursion, macros, C preprocessor, pointers and addresses, dynamic memory allocation, structures, unions, typedef, bit-fields, pointer/structure applications, UNIX file abstraction, file access, low-level I/O, concurrency.'
+    }
+  }).catch((err) => {
+    console.log(err);
   });
 
-  const prof1 = models.Instructor.create({
-    email: 'grr@purdue.edu',
-    name: 'Gustavo Rodriquez'
+  const prof1 = models.Instructor.findOrCreate({
+    where: {
+      email: 'grr@purdue.edu',
+      name: 'Gustavo Rodriquez'
+    }
+  }).catch((err) => {
+    console.log(err);
   });
 
-  const prof2 = models.Instructor.create({
-    email: 'gba@purdue.edu',
-    name: 'George Adams'
+  const prof2 = models.Instructor.findOrCreate({
+    where: {
+      email: 'gba@purdue.edu',
+      name: 'George Adams'
+    }
+  }).catch((err) => {
+    console.log(err);
   });
 
   Promise.all([user, group]).then((data) => {

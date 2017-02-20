@@ -63,7 +63,6 @@ module.exports = (sequelize, Sequelize) => {
         });
       },
       verifyPassword(password, done) {
-        console.log("testing123");
         bcrypt.compare(password, this.password, (err, isMatch) => {
           done(err, isMatch);
         });
