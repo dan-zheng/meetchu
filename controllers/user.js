@@ -18,14 +18,21 @@ exports.getSignup = (req, res) => {
  * POST /signup
  * User signup.
  */
-exports.postSignup = (req, res) => {
+exports.postSignup = (req, res, next) => {
   models.User.create({
     firstName: req.body.firstName,
     lastName: req.body.lastName,
     email: req.body.email,
     password: req.body.password
-  }).then(() => {
-    return res.redirect('/');
+  }).then((user) => {
+    req.logIn(user, (err) => {
+      if (err) {
+        return next(err);
+      }
+      req.session.save(() => {
+        return res.redirect('/');
+      });
+    });
   });
 };
 
@@ -50,12 +57,10 @@ exports.postLogin = (req, res, next) => {
   passport.authenticate('local', (err1, user, info) => {
     if (err1) { return next(err1); }
     if (!user) {
-      console.log('user doesn\'t exist');
       return res.redirect('/login');
     }
     req.login(user, (err2) => {
       if (err2) { return next(err2); }
-      console.log(req.session);
       req.session.save(() => {
         return res.redirect('/');
       });
