@@ -35,8 +35,6 @@ const sequelizeStore = new SequelizeStore({
   db: models.sequelize
 });
 
-// models.User.belongsTo(sequelizeStore.Session, { foreignKeyConstraint: true });
-
 /**
  * Express configuration.
  */
@@ -79,6 +77,7 @@ app.get('/signup', userController.getSignup);
 app.post('/signup', userController.postSignup);
 app.get('/login', userController.getLogin);
 app.post('/login', userController.postLogin);
+app.get('/logout', userController.getLogout);
 app.get('/addCourses', userController.getAddCourse);
 app.post('/addCourses', userController.postAddCourse);
 
