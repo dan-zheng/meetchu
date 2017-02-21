@@ -5,6 +5,8 @@
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
+    "algolia": "node config/algolia.js",
+	"clean": "rimraf ./public/css",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -16,6 +18,7 @@
   ],
   "license": "MIT",
   "dependencies": {
+    "algoliasearch": "^3.21.1",
     "bcrypt-nodejs": "0.0.3",
     "body-parser": "^1.16.1",
     "compression": "^1.6.2",
@@ -24,16 +27,19 @@
     "express-minify": "^0.2.0",
     "express-session": "^1.15.1",
     "express-session-sequelize": "^1.1.0",
+    "lodash": "^4.17.4",
     "mysql": "^2.13.0",
     "node-sass-middleware": "^0.11.0",
     "passport": "^0.3.2",
     "passport-local": "^1.0.0",
     "pug": "^2.0.0-beta11",
-    "sequelize": "^3.30.2"
+    "sequelize": "^3.30.2",
+    "superagent": "^3.4.4"
   },
   "devDependencies": {
     "eslint": "^3.15.0",
     "eslint-config-airbnb-base": "^11.1.0",
-    "eslint-plugin-import": "^2.2.0"
+    "eslint-plugin-import": "^2.2.0",
+    "rimraf": "^2.6.0"
   }
 }

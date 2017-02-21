@@ -78,8 +78,8 @@ app.post('/signup', userController.postSignup);
 app.get('/login', userController.getLogin);
 app.post('/login', userController.postLogin);
 app.get('/logout', userController.getLogout);
-app.get('/addCourses', userController.getAddCourse);
-app.post('/addCourses', userController.postAddCourse);
+app.get('/courses', userController.getCourses);
+app.post('/courses', userController.postCourses);
 
 /**
  * Create any missing database tables and start Express server.
@@ -87,77 +87,6 @@ app.post('/addCourses', userController.postAddCourse);
 models.sequelize.sync().then(() => {
   app.listen(app.get('port'), () => {
     console.log('Express server listening on port %d in %s mode', app.get('port'), app.get('env'));
-  });
-
-  // Database test
-  const user = models.User.findOrCreate({
-    where: {
-      email: 'student@purdue.edu',
-      firstName: 'Jack',
-      lastName: 'Smith',
-      password: 'password123'
-    }
-  }).spread((user) => {
-    console.log(user);
-  });
-
-  const group = models.Group.findOrCreate({
-    where: {
-      name: 'CS 252 Students',
-      groupType: 'group',
-      description: 'A study group for CS 252 students'
-    }
-  }).catch((err) => {
-    console.log(err);
-  });
-
-  // Course test
-  const course = models.Course.findOrCreate({
-    where: {
-      name: 'Programming in C',
-      department: 'CS',
-      courseNumber: '240',
-      description: 'The UNIX environment, C development cycle, data representation, operators, program structure, recursion, macros, C preprocessor, pointers and addresses, dynamic memory allocation, structures, unions, typedef, bit-fields, pointer/structure applications, UNIX file abstraction, file access, low-level I/O, concurrency.'
-    }
-  }).catch((err) => {
-    console.log(err);
-  });
-
-  const prof1 = models.Instructor.findOrCreate({
-    where: {
-      email: 'grr@purdue.edu',
-      name: 'Gustavo Rodriquez'
-    }
-  }).catch((err) => {
-    console.log(err);
-  });
-
-  const prof2 = models.Instructor.findOrCreate({
-    where: {
-      email: 'gba@purdue.edu',
-      name: 'George Adams'
-    }
-  }).catch((err) => {
-    console.log(err);
-  });
-
-  Promise.all([user, group]).then((data) => {
-    const newUser = data[0];
-    const newGroup = data[1];
-    newUser.addGroup(newGroup);
-  });
-
-  Promise.all([course, prof1, prof2]).then((data) => {
-    const newCourse = data[0];
-    const newProf1 = data[1];
-    const newProf2 = data[2];
-    newCourse.addInstructor([newProf1, newProf2]);
-  });
-
-  Promise.all([course, user]).then((data) => {
-    const newCourse = data[0];
-    const newUser = data[1];
-    newUser.addCourse(newCourse);
   });
 });
 

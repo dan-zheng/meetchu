@@ -73,7 +73,6 @@ exports.postLogin = (req, res, next) => {
  * Log out.
  */
 exports.getLogout = (req, res) => {
-  console.log('hi');
   req.logout();
   req.session.destroy(() => {
     res.redirect('/');
@@ -81,21 +80,20 @@ exports.getLogout = (req, res) => {
 };
 
 /**
- * GET /addCourses
- * Course adding page
+ * GET /courses
+ * Course page.
  */
-exports.getAddCourse = (req, res) => {
-  res.render('account/addCourses', {
-    title: 'Add Courses',
+exports.getCourses = (req, res) => {
+  return res.render('courses/index', {
+    title: 'Courses'
   });
 }
 
 /**
- * POST /addCourses
- * Add the course
+ * POST /courses
  */
-exports.postAddCourse = (req, res) => {
+exports.postCourses = (req, res) => {
   console.log('adding course: ' + req.course);
   req.body.user.addCourse(req.body.course);
-  res.redirect('account/addCourses');
+  return res.redirect('/courses');
 }

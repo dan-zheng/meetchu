@@ -6,14 +6,14 @@ const LocalStrategy = require('passport-local').Strategy;
 const models = require('../models');
 
 passport.serializeUser((user, done) => {
-  done(null, user.id);
+  return done(null, user.id);
 });
 
 passport.deserializeUser((id, done) => {
   models.User.find({ where: { id } }).then((user) => {
-    done(null, user);
+    return done(null, user);
   }).catch((err) => {
-    done(err, null);
+    return done(err, null);
   });
 });
 
@@ -23,7 +23,7 @@ passport.deserializeUser((id, done) => {
 passport.use(new LocalStrategy({ usernameField: 'email' }, (email, password, done) => {
   models.User.find({ where: { email } }).then((user) => {
     if (!user) {
-      done(null, false, { message: `Email #{email} not found.` });
+      return done(null, false, { message: `Email #{email} not found.` });
     }
     user.verifyPassword(password, (err, isMatch) => {
       if (err) { return done(err); }
@@ -33,7 +33,7 @@ passport.use(new LocalStrategy({ usernameField: 'email' }, (email, password, don
       return done(null, false, { msg: 'Invalid email or password.' });
     });
   }).catch((err) => {
-    done(err);
+    return done(err);
   });
 }));
 

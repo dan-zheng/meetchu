@@ -4,6 +4,8 @@ html
     meta(charset='utf-8')
     title #{title} - Meetchu
     meta(name='viewport', content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no')
+      
+    // Stylesheets
     link(rel='stylesheet', type='text/css', href='/css/main.css')
     if title == 'Home'
       link(rel='stylesheet', type='text/css', href='/css/home.css')
@@ -11,9 +13,6 @@ html
       link(rel='stylesheet', type='text/css', href='/css/sidebar.css')
     else
       link(rel='stylesheet', type='text/css', href='/css/navbar-footer.css')
-    script(src='js/lib/jquery.min.js', defer)
-    script(src='js/lib/bootstrap.min.js', defer)
-    script(src='js/main.js', defer)
     
   body
     if user
@@ -28,3 +27,13 @@ html
       
       #main.container
         block content
+    
+    // Scripts
+    script(src='js/lib/jquery.min.js')
+    script(src='js/lib/bootstrap.min.js')
+    script(src='js/main.js')
+    if title == 'Courses'
+      // Include AlgoliaSearch JS Client and autocomplete.js library
+      script(src='https://cdn.jsdelivr.net/algoliasearch/3/algoliasearch.min.js')
+      script(src='https://cdn.jsdelivr.net/autocomplete.js/0/autocomplete.jquery.min.js')
+      script(src='js/courses.js')

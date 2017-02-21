@@ -1,5 +1,6 @@
 @import '_variables';
 @import 'lib/bootstrap/bootstrap/_variables.scss';
+@import '_search';
 
 @mixin styling($sidebar-width, $icon-padding) {
   #wrapper {
