@@ -13,6 +13,7 @@
   -webkit-transition: 0.2s;
   transition: 0.2s;
   font-family: "Montserrat", sans-serif;
+  box-shadow: 4px 4px 0 rgba(241, 241, 241, 0.35);
   font-size: 11px;
   box-sizing: border-box;
   color: #333;
@@ -31,6 +32,7 @@
 .aa-input-search:focus {
   outline: 0;
   border-color: #3a96cf;
+  box-shadow: 4px 4px 0 rgba(58, 150, 207, 0.1);
 }
 
 .aa-input-icon {
@@ -98,4 +100,33 @@
   font-style: normal;
   background-color: rgba(58, 150, 207, 0.1);
   padding: 2px 0 2px 2px;
+}
+
+.input-has-value .aa-input-icon {
+  opacity: 0;
+}
+
+.aa-input-close {
+  height: 12px;
+  width: 12px;
+  position: absolute;
+  top: 50%;
+  right: 16px;
+  -webkit-transform: translateY(-50%);
+  transform: translateY(-50%);
+  fill: #e4e4e4;
+  visibility: hidden;
+  opacity: 0;
+}
+
+.input-has-value .aa-input-close {
+  opacity: 1;
+  visibility: visible;
+  cursor: pointer;
+  -webkit-transition: 0.2s ease-in;
+  transition: 0.2s ease-in;
+}
+
+.input-has-value .aa-input-close:hover {
+  fill: #333;
 }

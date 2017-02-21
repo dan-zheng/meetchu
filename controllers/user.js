@@ -30,7 +30,7 @@ exports.postSignup = (req, res, next) => {
         return next(err);
       }
       req.session.save(() => {
-        return res.redirect('/');
+        return res.redirect(req.session.returnTo || '/');
       });
     });
   });

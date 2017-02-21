@@ -10,6 +10,8 @@ const path = require('path');
 const compression = require('compression');
 const bodyParser = require('body-parser');
 const sass = require('node-sass-middleware');
+const flash = require('express-flash');
+const validator = require('express-validator');
 
 /**
  * Load environment variables from .env file.
@@ -66,8 +68,20 @@ app.use(session({
 }));
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(flash());
 app.use((req, res, next) => {
   res.locals.user = req.user;
+  next();
+});
+app.use((req, res, next) => {
+    // After successful login, redirect back to the intended page
+  if (!req.user &&
+      req.path !== '/login' &&
+      req.path !== '/signup' &&
+      !req.path.match(/^\/auth/) &&
+      !req.path.match(/\./)) {
+    req.session.returnTo = req.path;
+  }
   next();
 });
 app.use(express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 }));
@@ -83,8 +97,8 @@ app.get('/auth/google/callback', userController.getGoogleAuthCallback);
 app.get('/login', userController.getLogin);
 app.post('/login', userController.postLogin);
 app.get('/logout', userController.getLogout);
-app.get('/courses', userController.getCourses);
-app.post('/courses', userController.postCourses);
+app.get('/courses', passportConfig.isAuthenticated, userController.getCourses);
+app.post('/courses', passportConfig.isAuthenticated, userController.postCourses);
 
 /**
  * Create any missing database tables and start Express server.
