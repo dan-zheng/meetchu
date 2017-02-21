@@ -9,12 +9,12 @@ module.exports = (sequelize, Sequelize) => {
       type: Sequelize.STRING,
       allowNull: false
     },
-    department: {
+    subject: {
       type: Sequelize.STRING,
       allowNull: false,
       unique: 'courseIndex'
     },
-    courseNumber: {
+    number: {
       type: Sequelize.INTEGER,
       allowNull: false,
       unique: 'courseIndex'

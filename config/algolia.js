@@ -19,34 +19,6 @@ request
       }
     });
   })
-  .then((res) => {
-    console.log('HI');
-  })
   .catch((err) => {
     console.log(err);
   });
-
-/*
-const students = request
-  .get('http://api.purdue.io/odata/Subjects')
-  .query({ $select: 'Name,Abbreviation' })
-  .then((res) => {
-    return res.body;
-  })
-  .catch((err) => {
-    console.log(err);
-  });
-
-console.log(students);
-*/
-
-/*
-const index = client.initIndex('contacts');
-const contacts = require('./contact.json');
-
-index.addObjects(contacts, (err, content) => {
-  if (err) {
-    console.error(err);
-  }
-});
-*/

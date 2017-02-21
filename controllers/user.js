@@ -87,7 +87,7 @@ exports.getCourses = (req, res) => {
   return res.render('courses/index', {
     title: 'Courses'
   });
-}
+};
 
 /**
  * POST /courses
@@ -96,4 +96,4 @@ exports.postCourses = (req, res) => {
   console.log('adding course: ' + req.course);
   req.body.user.addCourse(req.body.course);
   return res.redirect('/courses');
-}
+};
