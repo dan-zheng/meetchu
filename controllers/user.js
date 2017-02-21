@@ -36,6 +36,35 @@ exports.postSignup = (req, res, next) => {
   });
 };
 
+function loginCallback(strategy, req, res, next) {
+  passport.authenticate(strategy, (err1, user, info) => {
+    if (err1) { return next(err1); }
+    if (!user) {
+      return res.redirect('/login');
+    }
+    req.login(user, (err2) => {
+      if (err2) { return next(err2); }
+      req.session.save(() => {
+        return res.redirect('/');
+      });
+    });
+  })(req, res, next);
+}
+
+/**
+ * GET /auth/google
+ * User authentication from Google.
+ */
+exports.getGoogleAuth = passport.authenticate('google', { scope: ['profile', 'email'] });
+
+/**
+ * GET /auth/google/callback
+ * User authentication callback from Google.
+ */
+exports.getGoogleAuthCallback = (req, res, next) => {
+  loginCallback('google', req, res, next);
+};
+
 /**
  * GET /login
  * Login page.
@@ -54,18 +83,7 @@ exports.getLogin = (req, res) => {
  * User login.
  */
 exports.postLogin = (req, res, next) => {
-  passport.authenticate('local', (err1, user, info) => {
-    if (err1) { return next(err1); }
-    if (!user) {
-      return res.redirect('/login');
-    }
-    req.login(user, (err2) => {
-      if (err2) { return next(err2); }
-      req.session.save(() => {
-        return res.redirect('/');
-      });
-    });
-  })(req, res, next);
+  loginCallback('local', req, res, next);
 };
 
 /**

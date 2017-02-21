@@ -49,6 +49,9 @@ app.use(sass({
   prefix: '/css',
   outputStyle: process.env.NODE_ENV === 'production' ? 'compressed' : 'nested'
 }));
+if (process.env.NODE_ENV !== 'production') {
+  app.locals.pretty = true;
+}
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(session({
@@ -75,6 +78,8 @@ app.use(express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 }))
 app.get('/', homeController.index);
 app.get('/signup', userController.getSignup);
 app.post('/signup', userController.postSignup);
+app.get('/auth/google', userController.getGoogleAuth);
+app.get('/auth/google/callback', userController.getGoogleAuthCallback);
 app.get('/login', userController.getLogin);
 app.post('/login', userController.postLogin);
 app.get('/logout', userController.getLogout);

@@ -7,6 +7,11 @@ module.exports = (sequelize, Sequelize) => {
       autoIncrement: true,
       primaryKey: true
     },
+    googleId: {
+      type: Sequelize.STRING,
+      unique: true,
+      allowNull: true
+    },
     email: {
       type: Sequelize.STRING,
       validate: {
@@ -24,11 +29,12 @@ module.exports = (sequelize, Sequelize) => {
       allowNull: false
     },
     major: {
-      type: Sequelize.STRING
+      type: Sequelize.STRING,
+      allowNull: true
     },
     password: {
       type: Sequelize.STRING,
-      allowNull: false
+      allowNull: true
     }
   }, {
     hooks: {

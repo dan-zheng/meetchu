@@ -3,7 +3,14 @@
  */
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
+const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 const models = require('../models');
+const dotenv = require('dotenv');
+
+/**
+ * Load environment variables from .env file
+ */
+dotenv.load({ path: '.env' });
 
 passport.serializeUser((user, done) => {
   return done(null, user.id);
@@ -16,6 +23,37 @@ passport.deserializeUser((id, done) => {
     return done(err, null);
   });
 });
+
+/**
+ * Google Login/Signup
+ */
+passport.use(new GoogleStrategy({
+  clientID: process.env.GOOGLE_AUTH_CLIENT_ID,
+  clientSecret: process.env.GOOGLE_AUTH_CLIENT_SECRET,
+  callbackURL: process.env.GOOGLE_AUTH_CALLBACK_URL
+}, (accessToken, refreshToken, profile, done) => {
+  process.nextTick(() => {
+    models.User.find({ where: { googleId: profile.id } })
+      .then((existingUser) => {
+        if (existingUser) {
+          return done(null, existingUser);
+        }
+        models.User.create({
+          googleId: profile.id,
+          email: profile.emails[0].value,
+          firstName: profile.name.givenName,
+          lastName: profile.name.familyName
+        }).then((newUser) => {
+          return done(null, newUser);
+        })
+        .catch((err2) => {
+          return done(err2);
+        });
+      }).catch((err1) => {
+        return done(null, false, { message: `Google account not found for email #{profile.email}.` });
+      });
+  });
+}));
 
 /**
  * Sign in using email and password.

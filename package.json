@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node app.js",
     "algolia": "node config/algolia.js",
-	"clean": "rimraf ./public/css",
+    "clean": "rimraf ./public/css",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -31,6 +31,7 @@
     "mysql": "^2.13.0",
     "node-sass-middleware": "^0.11.0",
     "passport": "^0.3.2",
+    "passport-google-oauth": "^1.0.0",
     "passport-local": "^1.0.0",
     "pug": "^2.0.0-beta11",
     "sequelize": "^3.30.2",
