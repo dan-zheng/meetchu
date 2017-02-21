@@ -39,14 +39,18 @@ module.exports = (sequelize, Sequelize) => {
   }, {
     hooks: {
       beforeCreate: (model, options, done) => {
-        return bcrypt.genSalt(10, (err1, salt) => {
-          if (err1) { return done(err1); }
-          return bcrypt.hash(model.password, salt, null, (err2, hash) => {
-            if (err2) { return done(err2); }
-            model.password = hash;
-            return done(null, options);
+        if (model.password) {
+          bcrypt.genSalt(10, (err1, salt) => {
+            if (err1) { return done(err1); }
+            bcrypt.hash(model.password, salt, null, (err2, hash) => {
+              if (err2) { return done(err2); }
+              model.password = hash;
+              return done(null, options);
+            });
           });
-        });
+        } else {
+          return done(null, options);
+        }
       }
     },
     getterMethods: {

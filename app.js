@@ -28,6 +28,7 @@ const models = require('./models');
  */
 const homeController = require('./controllers/home');
 const userController = require('./controllers/user');
+const authController = require('./controllers/auth');
 
 /**
  * Passport configuration.
@@ -92,13 +93,17 @@ app.use(express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 }))
 app.get('/', homeController.index);
 app.get('/signup', userController.getSignup);
 app.post('/signup', userController.postSignup);
-app.get('/auth/google', userController.getGoogleAuth);
-app.get('/auth/google/callback', userController.getGoogleAuthCallback);
 app.get('/login', userController.getLogin);
 app.post('/login', userController.postLogin);
 app.get('/logout', userController.getLogout);
 app.get('/courses', passportConfig.isAuthenticated, userController.getCourses);
 app.post('/courses', passportConfig.isAuthenticated, userController.postCourses);
+
+/**
+ * OAuth authentication routes.
+ */
+app.get('/auth/google', authController.getAuthGoogle);
+app.get('/auth/google/callback', authController.getAuthGoogleCallback);
 
 /**
  * Create any missing database tables and start Express server.

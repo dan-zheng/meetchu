@@ -1,5 +1,5 @@
 // Initialize autocomplete menu
-const client = algoliasearch('8NC5DAIBAS', '90e970160f1e67e1ee19fe02af4ea530');
+const client = algoliasearch('4977PJKR36', '01af7222321161de5a290b840b90b456');
 const index = client.initIndex('subjects');
 
 // DOM Binding

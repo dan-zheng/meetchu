@@ -25,13 +25,34 @@ passport.deserializeUser((id, done) => {
 });
 
 /**
- * Google Login/Signup
+ * Sign in using email and password.
+ */
+passport.use(new LocalStrategy({ usernameField: 'email' }, (email, password, done) => {
+  models.User.find({ where: { email } }).then((user) => {
+    if (!user) {
+      return done(null, false, { message: `Email #{email} not found.` });
+    }
+    user.verifyPassword(password, (err, isMatch) => {
+      if (err) { return done(err); }
+      if (isMatch) {
+        return done(null, user);
+      }
+      return done(null, false, { msg: 'Invalid email or password.' });
+    });
+  }).catch((err) => {
+    return done(err);
+  });
+}));
+
+/**
+ * Sign in with Google.
  */
 passport.use(new GoogleStrategy({
-  clientID: process.env.GOOGLE_AUTH_CLIENT_ID,
-  clientSecret: process.env.GOOGLE_AUTH_CLIENT_SECRET,
-  callbackURL: process.env.GOOGLE_AUTH_CALLBACK_URL
-}, (accessToken, refreshToken, profile, done) => {
+  clientID: process.env.GOOGLE_ID,
+  clientSecret: process.env.GOOGLE_SECRET,
+  callbackURL: '/auth/google/callback',
+  passReqToCallback: true
+}, (req, accessToken, refreshToken, profile, done) => {
   process.nextTick(() => {
     models.User.find({ where: { googleId: profile.id } })
       .then((existingUser) => {
@@ -52,26 +73,6 @@ passport.use(new GoogleStrategy({
       }).catch((err1) => {
         return done(null, false, { message: `Google account not found for email #{profile.email}.` });
       });
-  });
-}));
-
-/**
- * Sign in using email and password.
- */
-passport.use(new LocalStrategy({ usernameField: 'email' }, (email, password, done) => {
-  models.User.find({ where: { email } }).then((user) => {
-    if (!user) {
-      return done(null, false, { message: `Email #{email} not found.` });
-    }
-    user.verifyPassword(password, (err, isMatch) => {
-      if (err) { return done(err); }
-      if (isMatch) {
-        return done(null, user);
-      }
-      return done(null, false, { msg: 'Invalid email or password.' });
-    });
-  }).catch((err) => {
-    return done(err);
   });
 }));
 
