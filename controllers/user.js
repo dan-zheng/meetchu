@@ -62,7 +62,7 @@ exports.postLogin = (req, res, next) => {
     req.login(user, (err2) => {
       if (err2) { return next(err2); }
       req.session.save(() => {
-        return res.redirect('/');
+        return res.redirect(req.session.returnTo || '/');
       });
     });
   })(req, res, next);

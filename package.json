@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node app.js",
     "algolia": "node config/algolia.js",
-	"clean": "rimraf ./public/css",
+    "clean": "rimraf ./public/css",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -24,9 +24,11 @@
     "compression": "^1.6.2",
     "dotenv": "^4.0.0",
     "express": "^4.14.1",
+    "express-flash": "0.0.2",
     "express-minify": "^0.2.0",
     "express-session": "^1.15.1",
     "express-session-sequelize": "^1.1.0",
+    "express-validator": "^3.1.2",
     "lodash": "^4.17.4",
     "mysql": "^2.13.0",
     "node-sass-middleware": "^0.11.0",
