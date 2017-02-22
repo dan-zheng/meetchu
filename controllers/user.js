@@ -74,8 +74,22 @@ exports.getLogout = (req, res) => {
  * Course page.
  */
 exports.getCourses = (req, res) => {
-  return res.render('courses/index', {
-    title: 'Courses'
+  models.Course.findAll({
+    include: [{
+      model: models.User,
+      where: {
+        id: req.user.dataValues.id
+      }
+    }]
+  }).then((courses) => {
+    courses = courses.map((course) => {
+      return course.dataValues;
+    });
+    console.log(courses);
+    return res.render('courses/index', {
+      title: 'Courses',
+      courses
+    });
   });
 };
 
