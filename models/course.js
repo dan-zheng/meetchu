@@ -5,24 +5,31 @@ module.exports = (sequelize, Sequelize) => {
       autoIncrement: true,
       primaryKey: true
     },
-    name: {
+    title: {
       type: Sequelize.STRING,
       allowNull: false
     },
     subject: {
       type: Sequelize.STRING,
       allowNull: false,
-      unique: 'courseIndex'
+      // BUG: unique key causes UniqueConstraintIssue
+      // unique: 'courseIndex'
     },
     number: {
-      type: Sequelize.INTEGER,
+      type: Sequelize.STRING,
       allowNull: false,
-      unique: 'courseIndex'
+      // unique: 'courseIndex'
     },
     description: {
       type: Sequelize.STRING,
       allowNull: true
+    },
+    creditHours: {
+      type: Sequelize.INTEGER,
+      allowNull: false
     }
+  }, {
+    timestamps: false
   });
   return Course;
 };

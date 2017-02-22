@@ -1,6 +1,7 @@
 // Initialize autocomplete menu
-const client = algoliasearch('4977PJKR36', '01af7222321161de5a290b840b90b456');
-const index = client.initIndex('subjects');
+// const client = algoliasearch('4977PJKR36', '01af7222321161de5a290b840b90b456');
+const client = algoliasearch('8NC5DAIBAS', '17a1d9aa3e455702917e6237891af591');
+const index = client.initIndex('courses');
 
 // DOM Binding
 const searchInput = $('#aa-search-input');
@@ -18,7 +19,10 @@ searchInput.autocomplete({
   templates: {
     // 'suggestion' templating function used to render a single suggestion
     suggestion(suggestion) {
-      return '<span>' + suggestion._highlightResult.Name.value + '</span><span>' + suggestion._highlightResult.Abbreviation.value + '</span>';
+      console.log(suggestion._highlightResult);
+      return '<span>' + suggestion._highlightResult.title.value + '</span><span>' +
+        suggestion._highlightResult.subject.value + ' ' + suggestion._highlightResult.number.value +
+        '</span>';
     }
   }
 }]);
@@ -37,7 +41,7 @@ searchInput.on('autocomplete:updated', () => {
 // Event handler:
 // When autocomplete is selected, set the value of searchInput to the suggestion.
 searchInput.on('autocomplete:selected', (event, suggestion, dataset) => {
-  searchInput.autocomplete('val', suggestion.Name);
+  searchInput.autocomplete('val', suggestion._highlightResult.title.value);
 });
 
 // Event handler:
