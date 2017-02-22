@@ -7,6 +7,11 @@ const index = client.initIndex('courses');
 const searchInput = $('#aa-search-input');
 const inputContainer = $('#aa-input-container');
 
+// Helper function for removing HTML tags
+const removeTags = ((input) => {
+  return input.replace(/(<([^>]+)>)/ig, "");
+});
+
 // Initialize autocomplete on search input (ID selector must match)
 searchInput.autocomplete({
   autoselect: true,
@@ -41,7 +46,7 @@ searchInput.on('autocomplete:updated', () => {
 // Event handler:
 // When autocomplete is selected, set the value of searchInput to the suggestion.
 searchInput.on('autocomplete:selected', (event, suggestion, dataset) => {
-  searchInput.autocomplete('val', suggestion._highlightResult.title.value);
+  searchInput.autocomplete('val', removeTags(suggestion._highlightResult.title.value));
 });
 
 // Event handler:
