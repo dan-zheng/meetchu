@@ -78,7 +78,6 @@ exports.getCourses = (req, res) => {
     title: 'Courses'
   });
 };
-
 /**
  * POST /courses
  */
@@ -87,3 +86,21 @@ exports.postCourses = (req, res) => {
   req.body.user.addCourse(req.body.course);
   return res.redirect('/courses');
 };
+/*
+ * GET /updateprofile
+ * Update profile page
+ */
+exports.updateProfile = (req, res) => {
+  return res.render('account/updateprofile', {
+    title: 'Update profile'
+  });
+};
+/*
+ * POST /updateprofile
+ */
+exports.postProfile = (req, res) => {
+  console.log(req.user.firstName);
+  return res.redirect('/updateprofile'); 
+
+};
+
