@@ -30,7 +30,7 @@ request
         })
         .catch((err) => {
           console.log(err);
-        })
+        });
     }
     /*
     subjectIndex.addObjects(subjects, (err, content) => {

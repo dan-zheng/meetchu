@@ -2,6 +2,7 @@
 @import '_variables';
 
 @import 'lib/bootstrap/bootstrap';
+@import "lib/bootstrap-social/bootstrap-social";
 @import 'lib/font-awesome/scss/font-awesome';
 
 // Scaffolding
@@ -38,6 +39,23 @@ p {
   padding: 10px 16px;
   border-radius: 3px;
   transition: all .4s cubic-bezier(.24,.45,.46,.92);
+}
+
+.btn-social {
+  padding: 10px 50px;
+
+  :first-child {
+    width: 38px;
+    line-height: 38px;
+  }
+}
+
+.btn-link {
+  &:hover {
+    color: $gray-darker;
+    text-decoration: none;
+    background-color: transparent;
+  }
 }
 
 // Font Icons
