@@ -85,7 +85,6 @@ exports.getCourses = (req, res) => {
     courses = courses.map((course) => {
       return course.dataValues;
     });
-    console.log(courses);
     return res.render('courses/index', {
       title: 'Courses',
       courses
@@ -98,7 +97,6 @@ exports.getCourses = (req, res) => {
  * Add a course.
  */
 exports.postAddCourses = (req, res) => {
-  console.log(req.body);
   models.Course.findOne({
     where: {
       title: req.body.search
