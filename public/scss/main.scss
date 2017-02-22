@@ -10,6 +10,7 @@
 html {
   min-width: 100%;
   min-height: 100%;
+  overflow-y: scroll;
 }
 
 body {
@@ -17,6 +18,17 @@ body {
   min-width: 100%;
   min-height: 100%;
 }
+
+.container-full {
+  margin-right: auto;
+  margin-left: auto;
+  padding-left: 0px;
+  padding-right: 0px; }
+  .container-full:before, .container-full:after {
+    content: " ";
+    display: table; }
+  .container-full:after {
+    clear: both; }
 
 // Typography
 
@@ -56,6 +68,12 @@ p {
     text-decoration: none;
     background-color: transparent;
   }
+}
+
+// List groups
+
+.list-group {
+  display: inline-block;
 }
 
 // Font Icons

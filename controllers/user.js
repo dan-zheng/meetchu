@@ -99,7 +99,7 @@ exports.getCourses = (req, res) => {
 exports.postAddCourses = (req, res) => {
   models.Course.findOne({
     where: {
-      title: req.body.search
+      title: req.body.title
     }
   }).then((course) => {
     req.user.addCourse(course);

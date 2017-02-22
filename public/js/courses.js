@@ -5,6 +5,7 @@ const index = client.initIndex('courses');
 
 // DOM Binding
 const searchInput = $('#aa-search-input');
+const hiddenInput = $('#aa-search-hidden');
 const inputContainer = $('#aa-input-container');
 
 // Helper function for removing HTML tags
@@ -24,9 +25,9 @@ searchInput.autocomplete({
   templates: {
     // 'suggestion' templating function used to render a single suggestion
     suggestion(suggestion) {
-      console.log(suggestion._highlightResult);
+      // console.log(suggestion._highlightResult);
       return '<span>' + suggestion._highlightResult.title.value + '</span><span>' +
-        suggestion._highlightResult.subject.value + ' ' + suggestion._highlightResult.number.value +
+        suggestion._highlightResult.courseID.value +
         '</span>';
     }
   }
@@ -46,7 +47,8 @@ searchInput.on('autocomplete:updated', () => {
 // Event handler:
 // When autocomplete is selected, set the value of searchInput to the suggestion.
 searchInput.on('autocomplete:selected', (event, suggestion, dataset) => {
-  searchInput.autocomplete('val', removeTags(suggestion._highlightResult.title.value));
+  searchInput.autocomplete('val', removeTags(suggestion._highlightResult.courseID.value));
+  hiddenInput.val(removeTags(suggestion._highlightResult.title.value));
 });
 
 // Event handler:
@@ -54,5 +56,6 @@ searchInput.on('autocomplete:selected', (event, suggestion, dataset) => {
 // This changes the icon from 'close' to 'search'.
 $('#icon-close').on('click', () => {
   searchInput.val('');
+  hiddenInput.val('');
   inputContainer.removeClass('input-has-value');
 });
