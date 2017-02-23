@@ -29,6 +29,7 @@ const models = require('./models');
 const homeController = require('./controllers/home');
 const userController = require('./controllers/user');
 const authController = require('./controllers/auth');
+const courseController = require('./controllers/course');
 
 /**
  * Passport configuration.
@@ -96,8 +97,9 @@ app.post('/signup', userController.postSignup);
 app.get('/login', userController.getLogin);
 app.post('/login', userController.postLogin);
 app.get('/logout', userController.getLogout);
-app.get('/courses', passportConfig.isAuthenticated, userController.getCourses);
-app.post('/courses/add', passportConfig.isAuthenticated, userController.postAddCourses);
+app.get('/courses', passportConfig.isAuthenticated, courseController.getCourses);
+app.post('/courses/add', passportConfig.isAuthenticated, courseController.postAddCourse);
+app.post('/courses/remove/:id', passportConfig.isAuthenticated, courseController.postRemoveCourse);
 
 /**
  * OAuth authentication routes.
