@@ -26,7 +26,7 @@
   }
 
   #sidebar {
-    position: absolute;
+    position: fixed;
     left: $sidebar-width;
     width: $sidebar-width;
     height: 100vh;
@@ -42,7 +42,6 @@
     left: $sidebar-width;
     padding: 20px;
     width: calc(100vw - #{$sidebar-width});
-    transition: all 0.5s ease;
   }
 
   .nav > li > a {
