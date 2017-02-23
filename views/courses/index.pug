@@ -1,6 +1,9 @@
 extends ../base
 
 block content
+  - const coursesUnit = courses.length == 1 ? 'course' : 'courses';
+  - const totalCreditHours = courses.reduce((sum, course) => { return sum + course.creditHours }, 0);
+  - const totalCreditHoursUnit = totalCreditHours == 1 ? 'credit hour' : 'credit hours';
   .page-header
     h1 Courses
   
@@ -8,8 +11,7 @@ block content
     .col-md-12
       h3 Overview
       if courses.length > 0
-        - const totalCreditHours = courses.reduce((sum, course) => { return sum + course.creditHours }, 0);
-        h4 You are currently in #{courses.length} courses (#{totalCreditHours} credit hours).
+        h4 You are currently in #{courses.length} #{coursesUnit} (#{totalCreditHours} #{totalCreditHoursUnit}).
       else
         h4 You are currently in no courses.
     .col-md-6
@@ -17,12 +19,12 @@ block content
       if courses.length > 0
         ul.list-group
           each course in courses
+            - const creditHourUnits = course.creditHours == 1 ? 'credit hour' : 'credit hours';
             form.list-group-item.form-horizontal(method='POST', action=`/courses/remove/${course.id}`)
                 input(type='hidden', name='course', value=course.title)
                 .list-group-col
                   h4.list-group-item-heading #{course.subject} #{course.number}
                   p.list-group-item-text #{course.title}
-                  - const creditHourUnits = course.creditHours == 1 ? 'credit hour' : 'credit hours';
                   p.list-group-item-text #{course.creditHours} #{creditHourUnits}
                 button.btn.transparent.red(type='submits')
                   i.fa.fa-times-circle-o
