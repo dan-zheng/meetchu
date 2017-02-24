@@ -22,7 +22,7 @@ block content
             - const creditHourUnits = course.creditHours == 1 ? 'credit hour' : 'credit hours';
             form.list-group-item(method='POST')
               input(type='hidden', name='course', value=course.title)
-              a.col-xs-9.flex-column.border-right
+              a.col-xs-9.course-box.flex-column.border-right
                 h4.list-group-item-heading #{course.subject} #{course.number}
                 p.list-group-item-text #{course.title}
                 p.list-group-item-text #{course.creditHours} #{creditHourUnits}
