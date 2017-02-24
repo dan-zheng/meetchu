@@ -8,31 +8,34 @@ block content
     h1 Courses
   
   .container-full
-    .col-md-12
+    .col-sm-12
       h3 Overview
       if courses.length > 0
         h4 You are currently in #{courses.length} #{coursesUnit} (#{totalCreditHours} #{totalCreditHoursUnit}).
       else
         h4 You are currently in no courses.
-    .col-md-6
+    .col-sm-6
       h3 Your Courses
       if courses.length > 0
         ul.list-group
           each course in courses
             - const creditHourUnits = course.creditHours == 1 ? 'credit hour' : 'credit hours';
-            form.list-group-item.form-horizontal(method='POST', action=`/courses/remove/${course.id}`)
-                input(type='hidden', name='course', value=course.title)
-                .list-group-col
-                  h4.list-group-item-heading #{course.subject} #{course.number}
-                  p.list-group-item-text #{course.title}
-                  p.list-group-item-text #{course.creditHours} #{creditHourUnits}
-                button.btn.transparent.red(type='submits')
-                  i.fa.fa-times-circle-o
+            form.list-group-item(method='POST')
+              input(type='hidden', name='course', value=course.title)
+              a.col-xs-9.flex-column.border-right
+                h4.list-group-item-heading #{course.subject} #{course.number}
+                p.list-group-item-text #{course.title}
+                p.list-group-item-text #{course.creditHours} #{creditHourUnits}
+              .col-xs-3.flex-center.flex-btn-group
+                a.btn.transparent(href=`/courses/${course.id}`)
+                  i.blue.fa.fa-info-circle
+                button.btn.transparent(type='submit', formaction=`/courses/remove/${course.id}`)
+                  i.red.fa.fa-times-circle
       else
         h4 None. 
           i.fa.fa-smile-o
         
-    .col-md-6
+    .col-sm-6
       h3 Add a Course
       form.form-horizontal(method='POST', action='/courses/add')
         #aa-input-container.aa-input-container

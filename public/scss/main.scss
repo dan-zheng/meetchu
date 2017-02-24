@@ -1,5 +1,6 @@
 @import '_fonts';
 @import '_variables';
+@import '_colors';
 @import 'lib/bootstrap/bootstrap';
 @import "lib/bootstrap-social/bootstrap-social";
 @import 'lib/font-awesome/scss/font-awesome';
@@ -8,15 +9,6 @@
 
 .transparent {
   background-color: transparent;
-}
-
-.red {
-  color: $brand-danger;
-
-  &:hover,
-  &:active {
-    color: darken($brand-danger, 10%);
-  }
 }
 
 // Scaffolding
@@ -102,53 +94,81 @@ ul {
   padding: 0.5rem 0;
 }
 
-.list-group-col {
-  flex-direction: column;
-  min-width: 0;
-}
-
-.list-group-col,
 .list-group-item {
   display: flex;
-}
 
-.list-group-item {
-  flex-flow: row wrap;
-  align-items: center;
-  padding: 1rem;
-  line-height: 1;
-
-  .list-group-item-text {
-    color: $gray;
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  a:first-of-type {
+    padding-left: 0;
   }
 
-  :first-child {
-    margin-right: 2rem;
+  :last-child {
+    padding-right: 0;
   }
 
   button, .btn {
-    padding: 0;
+    display: block;
+    padding: 0 8%;
 
     &:focus {
       outline: none;
     }
 
     i {
-      font-size: 21px;
-    }
-  }
-
-  > *~ {
-    .label:last-child,
-    button:last-child,
-    .btn:last-child {
+      font-size: 32px;
       margin-right: 0;
-      margin-left: auto;
     }
   }
+}
+
+.list-group-item-text {
+  color: $gray;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.list-group-item-heading {
+  color: $gray-darker;
+  text-overflow: ellipsis;
+}
+
+// Flex box
+
+.flex {
+  display: flex;
+}
+
+.flex-column {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@media (max-width: 600px) {
+  .flex-btn-group {
+    flex-direction: column;
+  }
+}
+
+.flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+// Borders
+
+.badge {
+  font-size: 21px;
+}
+.border-right {
+  border-right: 1px solid #ddd;
 }
 
 // Font Icons
