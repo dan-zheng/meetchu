@@ -98,6 +98,7 @@ app.post('/signup', userController.postSignup);
 app.get('/login', userController.getLogin);
 app.post('/login', userController.postLogin);
 app.get('/logout', userController.getLogout);
+app.get('/forgot', userController.getForgot);
 app.get('/courses', passportConfig.isAuthenticated, courseController.getCourses);
 app.post('/courses/add', passportConfig.isAuthenticated, courseController.postAddCourse);
 app.post('/courses/remove/:id', passportConfig.isAuthenticated, courseController.postRemoveCourse);

@@ -68,3 +68,13 @@ exports.getLogout = (req, res) => {
     res.redirect('/');
   });
 };
+
+/**
+ * GET /forgot
+ * Password recovery.
+ */
+exports.getForgot = (req, res) => {
+  return res.render('account/forgot', {
+    title: 'Forgot Password'
+  });
+};
