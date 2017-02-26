@@ -25,9 +25,9 @@ html
             a#sidebar-toggle.btn.btn-default(href='#sidebar-toggle') Toggle Sidebar
     else
       include includes/navbar
-      include includes/flash
 
       #main.container
+        include includes/flash
         block content
 
     // Scripts

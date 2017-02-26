@@ -8,9 +8,9 @@ const pug = require('pug');
 const resetTemplate = pug.compileFile('views/email/reset.pug');
 
 /**
- * Smtp transport configuration.
+ * Nodemailer transport configuration.
  */
-const smtpTransport = nodemailer.createTransport({
+const transporter = nodemailer.createTransport({
   service: 'SendGrid',
   auth: {
     user: process.env.SENDGRID_USERNAME,
@@ -131,9 +131,9 @@ exports.postForgot = (req, res, next) => {
         subject: 'Meetchu Password Reset',
         html: resetTemplate({ user, resetURL })
       };
-      smtpTransport.sendMail(mailOpts, (err) => {
+      transporter.sendMail(mailOpts, (err) => {
         req.flash('info', `A password recovery email has been sent to ${user.email}.`);
-        done(null, 'done');
+        done(err);
       });
     }
   ], (err) => {
@@ -154,7 +154,7 @@ exports.getPasswordReset = (req, res) => {
     }
   }).then((user) => {
     if (!user) {
-      req.flash('error', 'Invalid password reset token');
+      req.flash('error', 'Password reset token is invalid or has expired..');
       return res.redirect('/forgot');
     }
     return res.render('account/reset', {
@@ -175,14 +175,14 @@ exports.postPasswordReset = (req, res, next) => {
     }
   }).then((user) => {
     if (!user) {
-      req.flash('error', 'Invalid password reset token');
+      req.flash('error', 'Password reset token is invalid or has expired..');
       return res.redirect('/');
     }
     user.resetPasswordToken = null;
     user.resetPasswordExpires = null;
     user.setPassword(req.body.password, () => {
       user.save().then(() => {
-        req.flash('info', 'Password updated');
+        req.flash('success', 'Success! Your password has been updated.');
         return res.redirect('/login');
       });
     });
