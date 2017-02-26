@@ -12,6 +12,7 @@ const bodyParser = require('body-parser');
 const sass = require('node-sass-middleware');
 const flash = require('express-flash');
 const validator = require('express-validator');
+const nodemailer = require('nodemailer');
 
 /**
  * Load environment variables from .env file.
@@ -61,7 +62,8 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(session({
   secret: process.env.SESSION_SECRET,
-  store: sequelizeStore,
+  // express-flash not working with sequelizeStore
+  // store: sequelizeStore,
   cookie: {
     maxAge: 1000 * 60 * 60 * 24 * 7
   },
@@ -81,6 +83,7 @@ app.use((req, res, next) => {
   if (!req.user &&
       req.path !== '/login' &&
       req.path !== '/signup' &&
+      !req.path.match(/^\/reset/) &&
       !req.path.match(/^\/auth/) &&
       !req.path.match(/\./)) {
     req.session.returnTo = req.path;
@@ -99,6 +102,9 @@ app.get('/login', userController.getLogin);
 app.post('/login', userController.postLogin);
 app.get('/logout', userController.getLogout);
 app.get('/forgot', userController.getForgot);
+app.post('/forgot', userController.postForgot);
+app.get('/reset/:token', userController.getPasswordReset);
+app.post('/reset/:token', userController.postPasswordReset);
 app.get('/courses', passportConfig.isAuthenticated, courseController.getCourses);
 app.post('/courses/add', passportConfig.isAuthenticated, courseController.postAddCourse);
 app.post('/courses/remove/:id', passportConfig.isAuthenticated, courseController.postRemoveCourse);

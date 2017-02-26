@@ -30,7 +30,7 @@ passport.deserializeUser((id, done) => {
 passport.use(new LocalStrategy({ usernameField: 'email' }, (email, password, done) => {
   models.User.find({ where: { email } }).then((user) => {
     if (!user) {
-      return done(null, false, { message: `Email #{email} not found.` });
+      return done(null, false, { message: `Email ${email} not found.` });
     }
     user.verifyPassword(password, (err, isMatch) => {
       if (err) { return done(err); }
@@ -71,7 +71,7 @@ passport.use(new GoogleStrategy({
           return done(err2);
         });
       }).catch((err1) => {
-        return done(null, false, { message: `Google account not found for email #{profile.email}.` });
+        return done(null, false, { message: `Google account not found for email ${profile.emails[0].value}.` });
       });
   });
 }));

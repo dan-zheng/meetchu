@@ -35,6 +35,15 @@ module.exports = (sequelize, Sequelize) => {
     password: {
       type: Sequelize.STRING,
       allowNull: true
+    },
+    resetPasswordToken: {
+      type: Sequelize.STRING,
+      allowNull: true,
+      unique: true
+    },
+    resetPasswordExpires: {
+      type: Sequelize.DATE,
+      allowNull: true
     }
   }, {
     hooks: {
@@ -65,7 +74,7 @@ module.exports = (sequelize, Sequelize) => {
       setPassword(password, next) {
         return bcrypt.genSalt(10, (err1, salt) => {
           if (err1) { return next(err1); }
-          return bcrypt.hash(this.password, salt, null, (err2, hash) => {
+          return bcrypt.hash(password, salt, null, (err2, hash) => {
             if (err2) { return next(err2); }
             this.password = hash;
             return next();
