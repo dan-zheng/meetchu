@@ -115,7 +115,7 @@ exports.postForgot = (req, res, next) => {
         }
         // Recovery token will expire in one hour
         const expirationDate = new Date();
-        expirationDate.setHours(expirationDate.getHours() + 24);
+        expirationDate.setHours(expirationDate.getHours() + 1);
         user.resetPasswordToken = token;
         user.resetPasswordExpires = expirationDate;
         user.save().then(() => {
