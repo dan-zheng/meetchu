@@ -138,7 +138,9 @@ exports.postForgot = (req, res, next) => {
     }
   ], (err) => {
     if (err) { return next(err); }
-    res.redirect('/forgot');
+    req.session.save(() => {
+      return res.redirect('/forgot');
+    });
   });
 };
 
@@ -154,8 +156,10 @@ exports.getPasswordReset = (req, res) => {
     }
   }).then((user) => {
     if (!user) {
-      req.flash('error', 'Password reset token is invalid or has expired..');
-      return res.redirect('/forgot');
+      req.flash('error', 'Password reset token is invalid or has expired.');
+      req.session.save(() => {
+        return res.redirect('/forgot');
+      });
     }
     return res.render('account/reset', {
       title: 'Reset password'
@@ -175,18 +179,22 @@ exports.postPasswordReset = (req, res, next) => {
     }
   }).then((user) => {
     if (!user) {
-      req.flash('error', 'Password reset token is invalid or has expired..');
-      return res.redirect('/');
+      req.flash('error', 'Password reset token is invalid or has expired.');
+      req.session.save(() => {
+        return res.redirect('/');
+      });
     }
     user.resetPasswordToken = null;
     user.resetPasswordExpires = null;
     user.setPassword(req.body.password, () => {
       user.save().then(() => {
         req.flash('success', 'Success! Your password has been updated.');
-        return res.redirect('/login');
+        req.session.save(() => {
+          return res.redirect('/login');
+        });
       });
     });
   }).catch((err) => {
-    res.redirect('/');
+    return res.redirect('/');
   });
 };

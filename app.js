@@ -62,8 +62,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(session({
   secret: process.env.SESSION_SECRET,
-  // express-flash not working with sequelizeStore
-  // store: sequelizeStore,
+  store: sequelizeStore,
   cookie: {
     maxAge: 1000 * 60 * 60 * 24 * 7
   },
