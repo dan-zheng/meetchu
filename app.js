@@ -104,10 +104,12 @@ app.get('/forgot', userController.getForgot);
 app.post('/forgot', userController.postForgot);
 app.get('/reset/:token', userController.getPasswordReset);
 app.post('/reset/:token', userController.postPasswordReset);
+app.get('/chats', passportConfig.isAuthenticated, chatController.getChats);
+app.post('/chats/:id/invite', passportConfig.isAuthenticated, chatController.postInviteChatGroup);
+app.post('/chats/:id/leave', passportConfig.isAuthenticated, chatController.postLeaveChatGroup);
 app.get('/courses', passportConfig.isAuthenticated, courseController.getCourses);
 app.post('/courses/add', passportConfig.isAuthenticated, courseController.postAddCourse);
 app.post('/courses/remove/:id', passportConfig.isAuthenticated, courseController.postRemoveCourse);
-app.get('/chats', passportConfig.isAuthenticated, chatController.getChats);
 
 /**
  * OAuth authentication routes.
