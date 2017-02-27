@@ -71,11 +71,11 @@ exports.postCreateChatGroup = (req, res) => {
     groupType: req.body.groupType
   }).then(() => {
     req.flash('success', 'Success! Your group has been created');
-    req.session.save() {
+    req.session.save(() => { 
       //redirect to return page. 
-      return res.redirect('/');    
-    });'
-  });
+      return res.redirect('/');
+      });
+    });
 };
 
 
@@ -83,12 +83,14 @@ exports.postCreateChatGroup = (req, res) => {
  * POST /chats/delete group
  * delete a chat group. 
  */
+/*
 exports.postDeleteChatGroup = (req, res) => {
     req.group.destroy().then() => {
       req.flash('sucess', 'Sucess! Your group has been deleted');
-      req.session.save() {
-      //redirect to diff page maybe. 
-        return.redirect('/');
+      req.session.save(() => {
+        //redirect to diff page maybe. 
+        return res.redirect('/');
+      });
     });
   }); 
-};
+};*/ 
