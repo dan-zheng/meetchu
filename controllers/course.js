@@ -97,7 +97,6 @@ exports.postAuthCourses = (req, res, next) => {
     .then((res2) => {
       const term = 'spring 2017';
       const courses = res2.body[term];
-      console.log(courses);
       async.each(courses, ((courseID, callback2) => {
         request
           .get('https://api.purdue.io/odata/Sections')

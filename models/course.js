@@ -6,8 +6,7 @@ module.exports = (sequelize, Sequelize) => {
     },
     title: {
       type: Sequelize.STRING,
-      allowNull: false,
-      unique: true
+      allowNull: false
     },
     subject: {
       type: Sequelize.STRING,
@@ -21,7 +20,7 @@ module.exports = (sequelize, Sequelize) => {
       // unique: 'courseIndex'
     },
     description: {
-      type: Sequelize.STRING,
+      type: Sequelize.TEXT,
       allowNull: true
     },
     creditHours: {
