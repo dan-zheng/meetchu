@@ -37,12 +37,25 @@ exports.postInviteChatGroup = (req, res) => {
  */
 exports.postLeaveChatGroup = (req, res) => {
   const groupId = req.params.id;
-  models.Group.findById(groupId).then((group) => {
+  models.Group.findOne({
+    where: {
+      id: groupId
+    },
+    include: [{
+      model: models.User
+    }]
+  }).then((group) => {
     if (!group) {
       return res.redirect('/chats');
     }
     group.removeUser(req.user);
-    // TODO: if group size is 0, delete group
+    group = group.dataValues;
+    group.Users = group.Users.map((user) => {
+      return user.dataValues;
+    });
+    if (group.Users.length <= 0) {
+      group.destroy();
+    }
     return res.redirect('/chats');
   });
 };
