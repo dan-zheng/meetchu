@@ -4,7 +4,7 @@ const models = require('../models');
 
 /**
  * GET /courses
- * Course page.
+ * Courses page.
  */
 exports.getCourses = (req, res) => {
   models.Course.findAll({
@@ -21,6 +21,34 @@ exports.getCourses = (req, res) => {
     return res.render('courses/index', {
       title: 'Courses',
       courses
+    });
+  });
+};
+
+/**
+ * GET /course
+ * Course info page.
+ */
+exports.getCourse = (req, res) => {
+  const courseId = req.params.id;
+  console.log(courseId);
+  // models.Course.findById(courseId).then((course) => {
+  models.Course.findOne({
+    where: {
+      id: courseId
+    },
+    include: [{
+      model: models.User
+    }]
+  }).then((course) => {
+    course = course.dataValues;
+    course.Users = course.Users.map((user) => {
+      return user.dataValues;
+    });
+    console.log(course);
+    return res.render('courses/course', {
+      title: course.Title,
+      course
     });
   });
 };
