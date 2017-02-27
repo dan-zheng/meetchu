@@ -115,6 +115,8 @@ app.post('/chats/:id/leave', passportConfig.isAuthenticated, chatController.post
 app.get('/courses', passportConfig.isAuthenticated, courseController.getCourses);
 app.post('/courses/add', passportConfig.isAuthenticated, courseController.postAddCourse);
 app.post('/courses/remove/:id', passportConfig.isAuthenticated, courseController.postRemoveCourse);
+// app.post('/courses/auth', passportConfig.isAuthenticated, courseController.postAuthCourses);
+app.post('/courses/auth', courseController.postAuthCourses);
 
 /**
  * OAuth authentication routes.

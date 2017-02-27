@@ -111,7 +111,9 @@ exports.postForgot = (req, res, next) => {
       models.User.findOne({ where: { email: req.body.email } }).then((user) => {
         if (!user) {
           req.flash('error', 'Could not find an account under that email address.');
-          return res.redirect('/forgot');
+          req.session.save(() => {
+            return res.redirect('/forgot');
+          });
         }
         // Recovery token will expire in one hour
         const expirationDate = new Date();
