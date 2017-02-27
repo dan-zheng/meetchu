@@ -31,8 +31,6 @@ exports.getCourses = (req, res) => {
  */
 exports.getCourse = (req, res) => {
   const courseId = req.params.id;
-  console.log(courseId);
-  // models.Course.findById(courseId).then((course) => {
   models.Course.findOne({
     where: {
       id: courseId
