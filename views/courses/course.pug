@@ -1,0 +1,9 @@
+extends ../base
+
+block content
+  .page-header
+    h1 #{course.title}
+
+  ul
+    each user in course.Users
+      li #{user.firstName} #{user.lastName}
