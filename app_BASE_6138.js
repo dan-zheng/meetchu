@@ -97,14 +97,7 @@ app.get('/login', userController.getLogin);
 app.post('/login', userController.postLogin);
 app.get('/logout', userController.getLogout);
 app.get('/courses', passportConfig.isAuthenticated, userController.getCourses);
-<<<<<<< HEAD
 app.post('/courses', passportConfig.isAuthenticated, userController.postCourses);
-/*test*/ 
-app.get('/updateprofile', passportConfig.isAuthenticated, userController.updateProfile); 
-app.post('/updateprofile', passportConfig.isAuthenticated, userController.postProfile); 
-=======
-app.post('/courses/add', passportConfig.isAuthenticated, userController.postAddCourses);
->>>>>>> 274d26f158cdd1bfa37c758e33553d4a8c43e92d
 
 /**
  * OAuth authentication routes.

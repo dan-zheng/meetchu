@@ -79,12 +79,19 @@ exports.getCourses = (req, res) => {
   });
 };
 /**
- * POST /courses
+ * POST /courses/
+ * Add a course.
  */
-exports.postCourses = (req, res) => {
-  console.log('adding course: ' + req.course);
-  req.body.user.addCourse(req.body.course);
-  return res.redirect('/courses');
+exports.postAddCourses = (req, res) => {
+  console.log(req.body);
+  models.Course.findOne({
+    where: {
+      title: req.body.search
+    }
+  }).then((course) => {
+    req.user.addCourse(course);
+    return res.redirect('/courses');
+  });
 };
 /*
  * GET /updateprofile
