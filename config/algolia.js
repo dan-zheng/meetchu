@@ -99,6 +99,7 @@ const updateAlgolia = (() => {
     courses = courses.map((course) => {
       course = course.dataValues;
       course.objectID = course.id;
+      course.courseID = `${course.subject} ${course.number}`;
       delete course.id;
       return course;
     });
@@ -153,8 +154,8 @@ dbQueue.drain = (() => {
   }
 });
 
-models.sequelize.sync().then(() => {
-  prompt();
+prompt();
+models.sequelize.sync({ force: doUpdateDb }).then(() => {
   if (doUpdateDb) {
     updateDb();
   } else if (doUpdateAlgolia) {

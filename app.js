@@ -12,6 +12,7 @@ const bodyParser = require('body-parser');
 const sass = require('node-sass-middleware');
 const flash = require('express-flash');
 const validator = require('express-validator');
+const nodemailer = require('nodemailer');
 
 /**
  * Load environment variables from .env file.
@@ -29,6 +30,8 @@ const models = require('./models');
 const homeController = require('./controllers/home');
 const userController = require('./controllers/user');
 const authController = require('./controllers/auth');
+const chatController = require('./controllers/chat');
+const courseController = require('./controllers/course');
 
 /**
  * Passport configuration.
@@ -79,6 +82,7 @@ app.use((req, res, next) => {
   if (!req.user &&
       req.path !== '/login' &&
       req.path !== '/signup' &&
+      !req.path.match(/^\/reset/) &&
       !req.path.match(/^\/auth/) &&
       !req.path.match(/\./)) {
     req.session.returnTo = req.path;
@@ -97,14 +101,20 @@ app.get('/login', userController.getLogin);
 app.post('/login', userController.postLogin);
 app.get('/logout', userController.getLogout);
 app.get('/courses', passportConfig.isAuthenticated, userController.getCourses);
-<<<<<<< HEAD
 app.post('/courses', passportConfig.isAuthenticated, userController.postCourses);
-/*test*/ 
 app.get('/updateprofile', passportConfig.isAuthenticated, userController.updateProfile); 
 app.post('/updateprofile', passportConfig.isAuthenticated, userController.postProfile); 
-=======
 app.post('/courses/add', passportConfig.isAuthenticated, userController.postAddCourses);
->>>>>>> 274d26f158cdd1bfa37c758e33553d4a8c43e92d
+app.get('/forgot', userController.getForgot);
+app.post('/forgot', userController.postForgot);
+app.get('/reset/:token', userController.getPasswordReset);
+app.post('/reset/:token', userController.postPasswordReset);
+app.get('/chats', passportConfig.isAuthenticated, chatController.getChats);
+app.post('/chats/:id/invite', passportConfig.isAuthenticated, chatController.postInviteChatGroup);
+app.post('/chats/:id/leave', passportConfig.isAuthenticated, chatController.postLeaveChatGroup);
+app.get('/courses', passportConfig.isAuthenticated, courseController.getCourses);
+app.post('/courses/add', passportConfig.isAuthenticated, courseController.postAddCourse);
+app.post('/courses/remove/:id', passportConfig.isAuthenticated, courseController.postRemoveCourse);
 
 /**
  * OAuth authentication routes.

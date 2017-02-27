@@ -10,7 +10,7 @@ $gray: #737373;
 $gray-dark: #404040;
 $gray-darker: #121212;
 
-$brand-primary: #58498e;
+$brand-primary: #584cfd;
 $brand-success: #0f9d58;
 $brand-warning: #f4b400;
 $brand-danger: #d80017;
@@ -40,10 +40,21 @@ $input-height-base: 44px;
 
 // Form states and alerts
 
-$state-success-bg: $brand-success;
-$state-info-bg: $brand-info;
-$state-warning-bg: $brand-warning;
-$state-danger-bg: $brand-danger;
+$state-success-text: #569845;
+$state-success-bg: #dbf5d3;
+$state-success-border: #aed3a5;
+
+$state-info-text: #3a87ad;
+$state-info-bg: #d9edf7;
+$state-info-border: #98cce7;
+
+$state-warning-text: #bf9853;
+$state-warning-bg: #fdf8e2;
+$state-warning-border: #f2daab;
+
+$state-danger-text: #b94a48;
+$state-danger-bg: #f2dede;
+$state-danger-border: #e0b1b8;
 
 // Navbar
 
@@ -54,11 +65,11 @@ $navbar-default-link-active-color: $brand-primary;
 $navbar-default-link-active-bg: transparent;
 $navbar-default-link-hover-color: $brand-primary;
 $navbar-default-link-hover-bg: transparent;
-$navbar-default-brand-color: $gray-darker;
-$navbar-default-brand-hover-color: $brand-primary;
+$navbar-default-brand-color: $brand-primary;
+$navbar-default-brand-hover-color: darken($brand-primary, 20%);
 $navbar-default-brand-size: 28px;
 
 // Buttons
 
-$btn-primary-bg: #784cab;
+$btn-primary-bg: #7166ff;
 $btn-primary-color: #fff;

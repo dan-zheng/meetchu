@@ -1,15 +1,22 @@
 @import '_fonts';
 @import '_variables';
-
+@import '_colors';
 @import 'lib/bootstrap/bootstrap';
 @import "lib/bootstrap-social/bootstrap-social";
 @import 'lib/font-awesome/scss/font-awesome';
+
+// General
+
+.transparent {
+  background-color: transparent;
+}
 
 // Scaffolding
 
 html {
   min-width: 100%;
   min-height: 100%;
+  overflow-y: scroll;
 }
 
 body {
@@ -18,18 +25,36 @@ body {
   min-height: 100%;
 }
 
+.container-full {
+  margin-right: auto;
+  margin-left: auto;
+  padding-left: 0;
+  padding-right: 0;
+
+  &:before {
+    content: " ";
+    display: table;
+  }
+
+  &:after {
+    content: " ";
+    display: table;
+    clear: both;
+  }
+}
+
 // Typography
 
 a {
-  transition: all .4s cubic-bezier(.24,.45,.46,.92);
+  transition: all 0.4s cubic-bezier(.24,.45,.46,.92);
 
   &:hover {
     text-decoration: none;
   }
 }
 
-ul,
-p {
+p,
+ul {
   font-size: 14px;
 }
 
@@ -38,7 +63,7 @@ p {
 .btn {
   padding: 10px 16px;
   border-radius: 3px;
-  transition: all .4s cubic-bezier(.24,.45,.46,.92);
+  transition: all 0.4s cubic-bezier(.24,.45,.46,.92);
 }
 
 .btn-social {
@@ -58,9 +83,102 @@ p {
   }
 }
 
+// List groups
+
+.list-group {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  flex-shrink: 1;
+  flex-basis: auto;
+  padding: 0.5rem 0;
+}
+
+.list-group-item {
+  display: flex;
+
+  .course-info:first-of-type {
+    padding-left: 0;
+  }
+
+  :last-child {
+    padding-right: 0;
+  }
+
+  button, .btn {
+    display: block;
+    padding: 0 8%;
+
+    &:focus {
+      outline: none;
+    }
+
+    i {
+      font-size: 32px;
+      margin-right: 0;
+    }
+  }
+}
+
+.list-group-item-text {
+  color: $gray;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.list-group-item-heading {
+  color: $gray-darker;
+  text-overflow: ellipsis;
+}
+
+// Flex box
+
+.flex {
+  display: flex;
+}
+
+.flex-column {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@media (max-width: 600px) {
+  .flex-btn-group {
+    flex-direction: column;
+  }
+}
+
+.flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+// Alerts
+
+.alert {
+  margin-top: 20px;
+}
+
+// Borders
+
+.badge {
+  font-size: 21px;
+}
+.border-right {
+  border-right: 1px solid #ddd;
+}
+
 // Font Icons
 
 .fa {
-  margin-left: 6px;
   margin-right: 6px;
 }

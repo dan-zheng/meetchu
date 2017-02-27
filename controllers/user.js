@@ -1,6 +1,22 @@
 const models = require('../models');
 const passport = require('passport');
 const auth = require('./auth');
+const async = require('async');
+const crypto = require('crypto');
+const nodemailer = require('nodemailer');
+const pug = require('pug');
+const resetTemplate = pug.compileFile('views/email/reset.pug');
+
+/**
+ * Nodemailer transport configuration.
+ */
+const transporter = nodemailer.createTransport({
+  service: 'SendGrid',
+  auth: {
+    user: process.env.SENDGRID_USERNAME,
+    pass: process.env.SENDGRID_PASSWORD
+  }
+});
 
 /**
  * GET /signup
@@ -70,27 +86,115 @@ exports.getLogout = (req, res) => {
 };
 
 /**
- * GET /courses
- * Course page.
+ * GET /forgot
+ * Password recovery.
  */
-exports.getCourses = (req, res) => {
-  return res.render('courses/index', {
-    title: 'Courses'
+exports.getForgot = (req, res) => {
+  return res.render('account/forgot', {
+    title: 'Forgot Password'
+  });
+};
+
+/**
+ * POST /login
+ * Send password recovery email.
+ */
+exports.postForgot = (req, res, next) => {
+  async.waterfall([
+    (done) => {
+      crypto.randomBytes(20, (err, buf) => {
+        const token = buf.toString('hex');
+        done(err, token);
+      });
+    },
+    (token, done) => {
+      models.User.findOne({ where: { email: req.body.email } }).then((user) => {
+        if (!user) {
+          req.flash('error', 'Could not find an account under that email address.');
+          return res.redirect('/forgot');
+        }
+        // Recovery token will expire in one hour
+        const expirationDate = new Date();
+        expirationDate.setHours(expirationDate.getHours() + 1);
+        user.resetPasswordToken = token;
+        user.resetPasswordExpires = expirationDate;
+        user.save().then(() => {
+          done(null, token, user);
+        });
+      });
+    },
+    (token, user, done) => {
+      const resetURL = `http://${req.headers.host}/reset/${token}`;
+      const mailOpts = {
+        to: user.email,
+        from: process.env.SENDGRID_USERNAME,
+        subject: 'Meetchu Password Reset',
+        html: resetTemplate({ user, resetURL })
+      };
+      transporter.sendMail(mailOpts, (err) => {
+        req.flash('info', `A password recovery email has been sent to ${user.email}.`);
+        done(err);
+      });
+    }
+  ], (err) => {
+    if (err) { return next(err); }
+    req.session.save(() => {
+      return res.redirect('/forgot');
+    });
+  });
+};
+
+/**
+ * GET /reset
+ * Password reset page.
+ */
+exports.getPasswordReset = (req, res) => {
+  models.User.findOne({
+    where: {
+      resetPasswordToken: req.params.token,
+      resetPasswordExpires: { $gt: Date.now() }
+    }
+  }).then((user) => {
+    if (!user) {
+      req.flash('error', 'Password reset token is invalid or has expired.');
+      req.session.save(() => {
+        return res.redirect('/forgot');
+      });
+    }
+    return res.render('account/reset', {
+      title: 'Reset password'
+    });
   });
 };
 /**
- * POST /courses/
- * Add a course.
+ * POST /reset
+ * Reset password.
  */
-exports.postAddCourses = (req, res) => {
-  console.log(req.body);
-  models.Course.findOne({
+exports.postPasswordReset = (req, res, next) => {
+  models.User.findOne({
     where: {
-      title: req.body.search
+      resetPasswordToken: req.params.token,
+      resetPasswordExpires: { $gt: Date.now() }
     }
-  }).then((course) => {
-    req.user.addCourse(course);
-    return res.redirect('/courses');
+  }).then((user) => {
+    if (!user) {
+      req.flash('error', 'Password reset token is invalid or has expired.');
+      req.session.save(() => {
+        return res.redirect('/');
+      });
+    }
+    user.resetPasswordToken = null;
+    user.resetPasswordExpires = null;
+    user.setPassword(req.body.password, () => {
+      user.save().then(() => {
+        req.flash('success', 'Success! Your password has been updated.');
+        req.session.save(() => {
+          return res.redirect('/login');
+        });
+      });
+    });
+  }).catch((err) => {
+    return res.redirect('/');
   });
 };
 /*

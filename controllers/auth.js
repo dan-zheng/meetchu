@@ -13,7 +13,7 @@ exports.loginCallback = ((strategy, req, res, next) => {
     req.login(user, (err2) => {
       if (err2) { return next(err2); }
       req.session.save(() => {
-        return res.redirect(req.session.returnTo || '/');
+        return res.redirect('/');
       });
     });
   })(req, res, next);

@@ -26,14 +26,14 @@
   }
 
   #sidebar {
-    position: absolute;
+    position: fixed;
     left: $sidebar-width;
     width: $sidebar-width;
     height: 100vh;
     margin-left: -$sidebar-width;
     overflow-y: auto;
     background: #EBEBEB;
-    transition: all 0.5s ease;
+    transition: all 0.4s ease;
   }
 
   #content {
@@ -42,7 +42,7 @@
     left: $sidebar-width;
     padding: 20px;
     width: calc(100vw - #{$sidebar-width});
-    transition: all 0.5s ease;
+    transition: all 0.4s ease;
   }
 
   .nav > li > a {
@@ -88,8 +88,8 @@
   }
 }
 @media (max-width: $screen-xs-max) {
-   @include styling($sidebar-width: 60px, $icon-padding: 3px);
+  @include styling($sidebar-width: 60px, $icon-padding: 3px);
 }
 @media (min-width: $screen-sm-min) {
-   @include styling($sidebar-width: 100px, $icon-padding: 5px);
+  @include styling($sidebar-width: 100px, $icon-padding: 5px);
 }
