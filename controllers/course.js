@@ -30,9 +30,10 @@ exports.getCourses = (req, res) => {
  * Add a course.
  */
 exports.postAddCourse = (req, res) => {
+  const courseId = req.body.courseId;
   models.Course.findOne({
     where: {
-      title: req.body.title
+      id: courseId
     }
   }).then((course) => {
     req.user.addCourse(course);
@@ -84,7 +85,7 @@ exports.postAuthCourses = (req, res, next) => {
             const course = _class.Course;
             models.Course.findOne({
               where: {
-                title: course.Title
+                id: course.CourseId
               }
             }).then((_course) => {
               req.user.addCourse(_course);

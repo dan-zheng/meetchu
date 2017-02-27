@@ -100,8 +100,8 @@ app.post('/signup', userController.postSignup);
 app.get('/login', userController.getLogin);
 app.post('/login', userController.postLogin);
 app.get('/logout', userController.getLogout);
-app.get('/updateprofile', passportConfig.isAuthenticated, userController.updateProfile); 
-app.post('/updateprofile', passportConfig.isAuthenticated, userController.postProfile); 
+app.get('/updateprofile', passportConfig.isAuthenticated, userController.updateProfile);
+app.post('/updateprofile', passportConfig.isAuthenticated, userController.postProfile);
 app.get('/forgot', userController.getForgot);
 app.post('/forgot', userController.postForgot);
 app.get('/reset/:token', userController.getPasswordReset);
@@ -112,8 +112,8 @@ app.post('/chats/:id/leave', passportConfig.isAuthenticated, chatController.post
 app.get('/courses', passportConfig.isAuthenticated, courseController.getCourses);
 app.post('/courses/add', passportConfig.isAuthenticated, courseController.postAddCourse);
 app.post('/courses/remove/:id', passportConfig.isAuthenticated, courseController.postRemoveCourse);
-// app.post('/courses/auth', passportConfig.isAuthenticated, courseController.postAuthCourses);
-app.post('/courses/auth', courseController.postAuthCourses);
+app.post('/courses/auth', passportConfig.isAuthenticated, courseController.postAuthCourses);
+// app.post('/courses/auth', courseController.postAuthCourses);
 
 /**
  * OAuth authentication routes.

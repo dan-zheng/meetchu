@@ -50,6 +50,7 @@ const dbQueue = async.queue((subject, callback1) => {
       async.each(courses, ((course, callback2) => {
         course.subject = subjectAbbr;
         models.Course.create({
+          id: course.CourseId,
           title: course.Title,
           subject: course.subject,
           number: course.Number,

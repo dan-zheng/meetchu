@@ -25,7 +25,6 @@ searchInput.autocomplete({
   templates: {
     // 'suggestion' templating function used to render a single suggestion
     suggestion(suggestion) {
-      // console.log(suggestion._highlightResult);
       return '<span>' + suggestion._highlightResult.title.value + '</span><span>' +
         suggestion._highlightResult.courseID.value +
         '</span>';
@@ -48,7 +47,7 @@ searchInput.on('autocomplete:updated', () => {
 // When autocomplete is selected, set the value of searchInput to the suggestion.
 searchInput.on('autocomplete:selected', (event, suggestion, dataset) => {
   searchInput.autocomplete('val', removeTags(suggestion._highlightResult.courseID.value));
-  hiddenInput.val(removeTags(suggestion._highlightResult.title.value));
+  hiddenInput.val(removeTags(suggestion.objectID));
 });
 
 // Event handler:
