@@ -60,7 +60,6 @@ block content
             label.control-label(for='password') Password
             input.form-control(type='password', name='password', id='password', placeholder='Password', required)
           .form-group
-            .col-sm-offset-3.col-sm-7
-              button.btn.btn-primary(formaction='/courses/auth', type='submit')
-                i.fa.fa-user
-                | Login
+            button.btn.btn-primary(formaction='/courses/auth', type='submit')
+              i.fa.fa-user
+              | Login

@@ -26,7 +26,7 @@ exports.getCourses = (req, res) => {
 };
 
 /**
- * GET /course
+ * GET /course/:id
  * Course info page.
  */
 exports.getCourse = (req, res) => {
@@ -63,7 +63,9 @@ exports.postAddCourse = (req, res) => {
     }
   }).then((course) => {
     req.user.addCourse(course);
-    return res.redirect('/courses');
+    req.session.save(() => {
+      return res.redirect('/courses');
+    });
   });
 };
 
@@ -78,7 +80,9 @@ exports.postRemoveCourse = (req, res) => {
       return res.redirect('/courses');
     }
     req.user.removeCourse(course);
-    return res.redirect('/courses');
+    req.session.save(() => {
+      return res.redirect('/courses');
+    });
   });
 };
 
