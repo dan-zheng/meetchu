@@ -50,16 +50,15 @@ block content
           i.fa.fa-plus
           | Add course
           
-      .col-sm-6
-        h3 Sync with Purdue
-        form.form-horizontal(method='POST')
-          .form-group
-            label.control-label(for='username') Username
-            input.form-control(type='username', name='username', id='username', placeholder='Username', autofocus, required)
-          .form-group
-            label.control-label(for='password') Password
-            input.form-control(type='password', name='password', id='password', placeholder='Password', required)
-          .form-group
-            button.btn.btn-primary(formaction='/courses/auth', type='submit')
-              i.fa.fa-user
-              | Login
+      h3 Sync with Purdue
+      form.form-horizontal(method='POST')
+        .form-group
+          label.control-label(for='username') Username
+          input.col-sm-7.form-control(type='username', name='username', id='username', placeholder='Username', autofocus, required)
+        .form-group
+          label.control-label(for='password') Password
+          input.col-sm-7.form-control(type='password', name='password', id='password', placeholder='Password', required)
+        .form-group
+          button.btn.btn-primary(formaction='/courses/auth', type='submit')
+            i.fa.fa-user
+            | Login
