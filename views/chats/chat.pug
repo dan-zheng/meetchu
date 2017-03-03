@@ -1,0 +1,43 @@
+extends ../base
+
+block content
+  .page-header
+    h1 #{group.name}
+    
+  .container-full
+    .col-sm-4
+      h4 Members
+      
+      ul.list-group
+        each user in group.Users
+          .list-group-item
+            .col-xs-9.course-box.flex-column
+              h4.list-group-item-heading #{user.firstName} #{user.lastName}
+              p.list-group-item-text #{user.email}
+
+    .col-sm-8
+      .col-sm-12
+        h4 Invite a user
+        
+        form.form-horizontal(method='POST', action='/chats/' + group.id + '/invite')
+          .form-group
+            label.col-sm-2.control-label(for='email') Email
+            .col-sm-6
+              input.form-control(type='email', name='email', id='email', placeholder='Email', autofocus, required)
+          .form-group
+            .col-sm-offset-2.col-sm-6
+              button.btn.btn-primary(type='submit')
+                i.fa.fa-plus
+                | Invite
+
+      .col-sm-12
+        h4 Delete chat
+
+        form.form-horizontal(method='POST', action='/chats/' + group.id + '/delete')
+          .form-group
+            p.col-sm-offset-2.col-sm-5 You can delete a chat group, but keep in mind this action is irreversible.
+            input(type='hidden', name='_csrf', value=_csrf)
+            .col-sm-offset-2.col-sm-5
+              button.btn.btn-danger(type='submit')
+                i.fa.fa-trash
+                | Delete chat

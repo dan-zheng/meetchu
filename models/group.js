@@ -15,6 +15,7 @@ module.exports = (sequelize, Sequelize) => {
     groupType: {
       type: Sequelize.ENUM,
       values: ['group', 'private-message'],
+      defaultValue: 'private-message',
       allowNull: false
     }
   });

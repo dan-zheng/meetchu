@@ -5,16 +5,30 @@ block content
     h1 Chats
     
   .container-full
-    .col-sm-12
-      h3 Invite a user
-      
-      form.form-horizontal(method='POST')
+    .col-sm-3
+      h3 Your Chats
+      if groups && groups.length > 0
+        ul.list-group
+          each group in groups
+            .list-group-item
+              a.col-xs-12.course-box.flex-column(href='/chats/' + group.id)
+                h4.list-group-item-heading #{group.name}
+                p.list-group-item-text #{group.description}
+      else
+        p You are not in any chats.
+    .col-sm-9
+      h3 Create a chat
+      form.form-horizontal(method='POST', action='/chats/create')
         .form-group
-          label.col-sm-3.control-label(for='email') Email
-          .col-sm-7
-            input.form-control(type='email', name='email', id='email', placeholder='Email', autofocus, required)
+          label.col-sm-2.control-label(for='name') Name
+          .col-sm-6
+            input.form-control(type='name', name='name', id='name', placeholder='Name', autofocus, required)
         .form-group
-          .col-sm-offset-3.col-sm-6
-            button.btn.btn-success(type='submit')
+          label.col-sm-2.control-label(for='description') Description
+          .col-sm-6
+            input.form-control(type='description', name='description', id='description', placeholder='A short description')
+        .form-group
+          .col-sm-offset-2.col-sm-6
+            button.btn.btn-primary(type='submit')
               i.fa.fa-user-plus
               | Invite

@@ -5,14 +5,86 @@ const models = require('../models');
  * Chats page.
  */
 exports.getChats = (req, res) => {
-  return res.render('chats/index', {
-    title: 'Chats'
+  models.Group.findAll({
+    include: [{
+      model: models.User,
+      where: {
+        id: req.user.dataValues.id
+      }
+    }]
+  }).then((groups) => {
+    if (groups) {
+      groups = groups.map((group) => {
+        return group.dataValues;
+      });
+      return res.render('chats/index', {
+        title: 'Chats',
+        groups
+      });
+    }
+    return res.render('chats/index', {
+      title: 'Chats'
+    });
   });
 };
 
 /**
- * POST /chats/:id/leave
- * Leave a chat group.
+ * GET /chats/:id
+ * Chat page.
+ */
+exports.getChat = (req, res) => {
+  const groupId = req.params.id;
+  models.Group.findOne({
+    where: {
+      id: groupId
+    },
+    include: [{
+      model: models.User
+    }]
+  }).then((group) => {
+    group = group.dataValues;
+    group.Users = group.Users.map((user) => {
+      return user.dataValues;
+    });
+    console.log(group);
+    return res.render('chats/chat', {
+      title: group.Title,
+      group
+    });
+  });
+};
+
+/**
+ * POST /chats/create
+ * Create a chat group.
+ */
+exports.postCreateChatGroup = (req, res) => {
+  req.assert('name', 'Group name is empty.').notEmpty();
+  const errors = req.validationErrors();
+
+  if (errors) {
+    req.flash('errors', errors);
+    req.session.save(() => {
+      return res.redirect('/chats');
+    });
+  }
+
+  models.Group.create({
+    name: req.body.name,
+    description: req.body.description || '',
+    // groupType: req.body.groupType
+  }).then((group) => {
+    group.addUser(req.user);
+    req.flash('success', 'Success! Your group has been created.');
+    req.session.save(() => {
+      return res.redirect('/chats');
+    });
+  });
+};
+
+/**
+ * POST /chats/:id/invite
+ * Invite a user to a chat group.
  */
 exports.postInviteChatGroup = (req, res) => {
   const groupId = req.params.id;
@@ -61,36 +133,20 @@ exports.postLeaveChatGroup = (req, res) => {
 };
 
 /**
- * POST/chats/create group
- * create a chat group
+ * POST /chats/:id/delete
+ * delete a chat group.
  */
-exports.postCreateChatGroup = (req, res) => {
-  models.Group.create({
-    name: req.body.name,
-    description: req.body.description, 
-    groupType: req.body.groupType
-  }).then(() => {
-    req.flash('success', 'Success! Your group has been created');
-    req.session.save(() => { 
-      //redirect to return page. 
-      return res.redirect('/');
-      });
-    });
-};
-
-
-/**
- * POST /chats/delete group
- * delete a chat group. 
- */
-/*
 exports.postDeleteChatGroup = (req, res) => {
-    req.group.destroy().then() => {
-      req.flash('sucess', 'Sucess! Your group has been deleted');
+  const groupId = req.params.id;
+  models.Group.findById(groupId).then((group) => {
+    if (!group) {
+      return res.redirect('/chats');
+    }
+    group.destroy().then(() => {
+      req.flash('success', 'Your group has been deleted.');
       req.session.save(() => {
-        //redirect to diff page maybe. 
-        return res.redirect('/');
+        return res.redirect('/chats');
       });
     });
-  }); 
-};*/ 
+  });
+};

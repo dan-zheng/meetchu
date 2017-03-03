@@ -2,8 +2,16 @@ extends ../base
 
 block content
   .page-header
-    h1 #{course.title}
+    h1 #{course.subject} #{course.number}
+    h3 #{course.title}
 
-  ul
-    each user in course.Users
-      li #{user.firstName} #{user.lastName}
+  .container-full
+    .col-sm-4
+      h4 Students
+      
+      ul.list-group
+        each user in course.Users
+          .list-group-item
+            .col-xs-9.course-box.flex-column
+              h4.list-group-item-heading #{user.firstName} #{user.lastName}
+              p.list-group-item-text #{user.email}

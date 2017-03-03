@@ -3,29 +3,31 @@ extends ../base
 block content
   .page-header
     h3 Update Profile
+
   form.form-horizontal(method='POST', action='account/profile')
     .form-group
       label.col-sm-3.control-label(for='firstName') Name
       .col-sm-3
         input.form-control(type='firstName', name='firstName', id='firstName', placeholder='First', value=user.firstName, autofocus, required)
       .col-sm-3
-        input.form-control(type='lastName', name='lastName', id='lastName', placeholder='Last', value=user.lastName, autofocus, required)
+        input.form-control(type='lastName', name='lastName', id='lastName', placeholder='Last', value=user.lastName, required)
     .form-group
       label.col-sm-3.control-label(for='email') Email
       .col-sm-6
-        input.form-control(type='email', name='email', id='email', value=user.email, autofocus, required)
+        input.form-control(type='email', name='email', id='email', value=user.email, required)
     .form-group
        label.col-sm-3.control-label(for='major') Major
        .col-sm-6
-        input.form-control(type='major', name='major', id='major', value=user.major, autofocus)
+        input.form-control(type='major', name='major', id='major', value=user.major)
     .form-group
       .col-sm-offset-3.col-sm-6
         button.btn.btn-primary(type='submit')
           i.fa.fa-user
           | Update
-  
+
   .page-header
     h3 Change Password
+
   form.form-horizontal(method='POST', action='account/password')
     .form-group
       label.col-sm-3.control-label(for='password') New Password
