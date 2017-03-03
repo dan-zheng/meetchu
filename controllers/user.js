@@ -46,7 +46,7 @@ exports.postSignup = (req, res, next) => {
   if (errors) {
     req.flash('error', errors);
     req.session.save(() => {
-      return res.redirect('/account');
+      return res.redirect('/signup');
     });
   }
 
