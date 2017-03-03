@@ -43,7 +43,6 @@ exports.getCourse = (req, res) => {
     course.Users = course.Users.map((user) => {
       return user.dataValues;
     });
-    console.log(course);
     return res.render('courses/course', {
       title: course.Title,
       course
@@ -83,7 +82,6 @@ exports.postRemoveCourse = (req, res) => {
     req.user.removeCourse(course);
     req.flash('success', 'Your course has been removed.');
     req.session.save(() => {
-      console.log(req.messages);
       return res.redirect('/courses');
     });
   });
@@ -94,7 +92,18 @@ exports.postRemoveCourse = (req, res) => {
  * Authenticate with Purdue and add courses.
  */
 exports.postAuthCourses = (req, res, next) => {
-  const username = req.body.username;
+  req.assert('username', 'Purdue username is empty.').notEmpty();
+  req.assert('password', 'Purdue password is empty.').notEmpty();
+  const errors = req.validationErrors();
+
+  if (errors) {
+    req.flash('errors', errors);
+    req.session.save(() => {
+      return res.redirect('/chats');
+    });
+  }
+
+  const username = req.body.username.replace('@purdue.edu', '');
   const password = req.body.password;
   const encodedString = Buffer.from(`${username}:${password}`).toString('base64');
 
@@ -138,7 +147,7 @@ exports.postAuthCourses = (req, res, next) => {
           });
         }
         // If success
-        req.flash('success', 'Your Purdue courses have been added successfully!');
+        req.flash('success', 'Your Purdue courses have been added successfully.');
         req.session.save(() => {
           return res.redirect('/courses');
         });

@@ -46,7 +46,6 @@ block content
         form.form-horizontal(method='POST', action='/chats/' + group.id + '/delete')
           .form-group
             p.col-sm-offset-2.col-sm-5 You can delete a chat group, but keep in mind this action is irreversible.
-            input(type='hidden', name='_csrf', value=_csrf)
             .col-sm-offset-2.col-sm-5
               button.btn.btn-danger(type='submit')
                 i.fa.fa-trash

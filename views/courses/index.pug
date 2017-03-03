@@ -13,7 +13,7 @@ block content
       if courses.length > 0
         h4 You are currently in #{courses.length} #{coursesUnit} (#{totalCreditHours} #{totalCreditHoursUnit}).
       else
-        h4 You are currently in no courses.
+        h4 You are currently not in any courses.
     .col-sm-6
       h3 Your Courses
       if courses.length > 0
@@ -32,7 +32,7 @@ block content
                 button.btn.transparent(type='submit', formaction=`/courses/remove/${course.id}`)
                   i.red.fa.fa-times-circle
       else
-        h4 None. 
+        h4 None!
           i.fa.fa-smile-o
         
     .col-sm-6
@@ -55,12 +55,14 @@ block content
       form(method='POST')
         .form-group
           label.control-label(for='username') Username
-          
             input.form-control(type='username', name='username', id='username', placeholder='Username', autofocus, required)
         .form-group
           label.control-label(for='password') Password
-          
             input.form-control(type='password', name='password', id='password', placeholder='Password', required)
+        .form-group
+          .col-sm-12.no-padding
+            .col-sm-8.no-padding
+              p Note: Meetchu does not store your Purdue credentials for any amount of time. They are only used for fetching class schedules. Meetchu will not use your credentials for any other purpose.
         .form-group
           button.btn.btn-primary(formaction='/courses/auth', type='submit')
             i.fa.fa-user
