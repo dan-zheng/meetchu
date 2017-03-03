@@ -8,14 +8,18 @@ exports.loginCallback = ((strategy, req, res, next) => {
   passport.authenticate(strategy, (err1, user, info) => {
     if (err1) { return next(err1); }
     if (!user) {
-      return res.redirect('/login');
-    }
-    req.login(user, (err2) => {
-      if (err2) { return next(err2); }
+      req.flash('error', info.msg);
       req.session.save(() => {
-        return res.redirect('/');
+        return res.redirect('/login');
       });
-    });
+    } else {
+      req.login(user, (err2) => {
+        if (err2) { return next(err2); }
+        req.session.save(() => {
+          return res.redirect('/');
+        });
+      });
+    }
   })(req, res, next);
 });
 

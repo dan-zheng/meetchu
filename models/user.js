@@ -70,17 +70,14 @@ module.exports = (sequelize, Sequelize) => {
         return this.fullName + ' <' + this.email + '>';
       }
     },
+    setterMethods: {
+      password(password) {
+        const salt = bcrypt.genSaltSync(10);
+        const hash = bcrypt.hashSync(password, salt);
+        this.setDataValue('password', hash);
+      }
+    },
     instanceMethods: {
-      setPassword(password, next) {
-        return bcrypt.genSalt(10, (err1, salt) => {
-          if (err1) { return next(err1); }
-          return bcrypt.hash(password, salt, null, (err2, hash) => {
-            if (err2) { return next(err2); }
-            this.password = hash;
-            return next();
-          });
-        });
-      },
       verifyPassword(password, done) {
         bcrypt.compare(password, this.password, (err, isMatch) => {
           done(err, isMatch);

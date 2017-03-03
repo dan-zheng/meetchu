@@ -44,7 +44,7 @@ exports.postSignup = (req, res, next) => {
   const errors = req.validationErrors();
 
   if (errors) {
-    req.flash('errors', errors);
+    req.flash('error', errors);
     req.session.save(() => {
       return res.redirect('/account');
     });
@@ -252,16 +252,17 @@ exports.postUpdatePassword = (req, res) => {
   const errors = req.validationErrors();
 
   if (errors) {
-    req.flash('errors', errors);
+    req.flash('error', errors);
     req.session.save(() => {
       return res.redirect('/account');
+    });
+  } else {
+    req.user.set('password', req.body.password);
+    req.user.save().then(() => {
+      req.flash('success', 'Your password has been changed.');
+      req.session.save(() => {
+        return res.redirect('/account');
+      });
     });
   }
-
-  req.user.save().then(() => {
-    req.flash('success', 'Your password has been changed.');
-    req.session.save(() => {
-      return res.redirect('/account');
-    });
-  });
 };

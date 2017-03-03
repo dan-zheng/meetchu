@@ -12,11 +12,9 @@ $('button[type="submit"]').click((e) => {
 */
 
 $('form').submit(() => {
-  // On submit disable its submit button
-  console.log('hi');
+  // On form submit disable submit buttons
   const btns = $('button[type="submit"]');
   btns.each((i, btn) => {
     $(btn).prop('disabled', true);
-    // $(btn).removeAttr('type');
   });
 });

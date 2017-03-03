@@ -3,16 +3,25 @@ if messages.error
     button.close(type='button', data-dismiss='alert')
       i.fa.fa-times-circle-o
     for error in messages.error
-      div= error
+      if error.msg
+        div= error.msg
+      else
+        div= error
 if messages.info
   .alert.alert-info.fade.in
     button.close(type='button', data-dismiss='alert')
       i.fa.fa-times-circle-o
     for info in messages.info
-      div= info
+      if info.msg
+        div= info.msg
+      else
+        div= info
 if messages.success
   .alert.alert-success.fade.in
     button.close(type='button', data-dismiss='alert')
       i.fa.fa-times-circle-o
     for success in messages.success
-      div= success
+      if success.msg
+        div= success.msg
+      else
+        div= success
