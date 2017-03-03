@@ -122,11 +122,14 @@ exports.postInviteChatGroup = (req, res) => {
           req.session.save(() => {
             return res.redirect(`/chats/${groupId}`);
           });
+        /*
+        BUG: group.hasUser() doesn't work as intended
         } else if (group.hasUser(user)) {
           req.flash('error', 'The user you tried to invite is already in the chat.');
           req.session.save(() => {
             return res.redirect(`/chats/${groupId}`);
           });
+        */
         } else {
           group.addUser(user);
           req.flash('success', `${user.firstName} has been invited.`);
