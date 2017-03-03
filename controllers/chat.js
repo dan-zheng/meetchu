@@ -46,9 +46,8 @@ exports.getChat = (req, res) => {
     group.Users = group.Users.map((user) => {
       return user.dataValues;
     });
-    console.log(group);
     return res.render('chats/chat', {
-      title: group.Title,
+      title: group.name,
       group
     });
   });
@@ -59,7 +58,7 @@ exports.getChat = (req, res) => {
  * Create a chat group.
  */
 exports.postCreateChatGroup = (req, res) => {
-  req.assert('name', 'Group name is empty.').notEmpty();
+  req.assert('name', 'Chat name is empty.').notEmpty();
   const errors = req.validationErrors();
 
   if (errors) {
@@ -75,7 +74,7 @@ exports.postCreateChatGroup = (req, res) => {
     // groupType: req.body.groupType
   }).then((group) => {
     group.addUser(req.user);
-    req.flash('success', 'Success! Your group has been created.');
+    req.flash('success', 'Your chat has been created.');
     req.session.save(() => {
       return res.redirect('/chats');
     });
@@ -87,19 +86,56 @@ exports.postCreateChatGroup = (req, res) => {
  * Invite a user to a chat group.
  */
 exports.postInviteChatGroup = (req, res) => {
-  const groupId = req.params.id;
-  const userId = req.body.userId;
-  models.Group.findById(groupId).then((group) => {
-    if (!group) {
-      return res.redirect('/chats');
-    }
-    models.User.findById(userId).then((user) => {
-      if (!user) {
-        return res.redirect('/chats');
-      }
-      group.addUser(user);
+  req.assert('email', 'Invitee email is empty.').notEmpty();
+  const errors = req.validationErrors();
+
+  if (errors) {
+    req.flash('errors', errors);
+    req.session.save(() => {
       return res.redirect('/chats');
     });
+  }
+
+  const groupId = req.params.id;
+  const userEmail = req.body.email;
+  models.Group.findOne({
+    where: {
+      id: groupId
+    },
+    include: [{
+      model: models.User
+    }]
+  }).then((group) => {
+    if (!group) {
+      req.flash('error', 'The chat does not exist.');
+      req.session.save(() => {
+        return res.redirect('/chats');
+      });
+    } else {
+      models.User.findOne({
+        where: {
+          email: req.body.email
+        }
+      }).then((user) => {
+        if (!user) {
+          req.flash('error', 'No user with that email exists.');
+          req.session.save(() => {
+            return res.redirect(`/chats/${groupId}`);
+          });
+        } else if (group.hasUser(user)) {
+          req.flash('error', 'The user you tried to invite is already in the chat.');
+          req.session.save(() => {
+            return res.redirect(`/chats/${groupId}`);
+          });
+        } else {
+          group.addUser(user);
+          req.flash('success', `${user.firstName} has been invited.`);
+          req.session.save(() => {
+            return res.redirect(`/chats/${groupId}`);
+          });
+        }
+      });
+    }
   });
 };
 
@@ -118,17 +154,29 @@ exports.postLeaveChatGroup = (req, res) => {
     }]
   }).then((group) => {
     if (!group) {
-      return res.redirect('/chats');
+      req.flash('error', 'The chat does not exist.');
+      req.session.save(() => {
+        return res.redirect('/chats');
+      });
+    } else if (!group.hasUser(req.user)) {
+      req.flash('error', 'You are not in the chat.');
+      req.session.save(() => {
+        return res.redirect('/chats');
+      });
+    } else {
+      group.removeUser(req.user);
+      if (group.Users.length <= 0) {
+        req.flash('info', 'Your chat has been deleted.');
+        req.session.save(() => {
+          return res.redirect('/chats');
+        });
+      } else {
+        req.flash('info', 'You have left the chat.');
+        req.session.save(() => {
+          return res.redirect('/chats');
+        });
+      }
     }
-    group.removeUser(req.user);
-    group = group.dataValues;
-    group.Users = group.Users.map((user) => {
-      return user.dataValues;
-    });
-    if (group.Users.length <= 0) {
-      group.destroy();
-    }
-    return res.redirect('/chats');
   });
 };
 
@@ -140,10 +188,13 @@ exports.postDeleteChatGroup = (req, res) => {
   const groupId = req.params.id;
   models.Group.findById(groupId).then((group) => {
     if (!group) {
-      return res.redirect('/chats');
+      req.flash('error', 'The chat does not exist.');
+      req.session.save(() => {
+        return res.redirect('/chats');
+      });
     }
     group.destroy().then(() => {
-      req.flash('success', 'Your group has been deleted.');
+      req.flash('info', 'Your group has been deleted.');
       req.session.save(() => {
         return res.redirect('/chats');
       });

@@ -31,6 +31,16 @@ block content
                 | Invite
 
       .col-sm-12
+        h4 Leave chat
+        
+        form.form-horizontal(method='POST', action='/chats/' + group.id + '/leave')
+          .form-group
+            .col-sm-offset-2.col-sm-6
+              button.btn.btn-danger(type='submit')
+                i.fa.fa-minus-square
+                | Leave
+
+      .col-sm-12
         h4 Delete chat
 
         form.form-horizontal(method='POST', action='/chats/' + group.id + '/delete')
