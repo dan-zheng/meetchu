@@ -64,7 +64,7 @@ module.exports = (sequelize, Sequelize) => {
     },
     getterMethods: {
       fullName() {
-        return this.firstName + ' ' + this.lastName;
+        return `${this.firstName} ${this.lastName}`;
       },
       emailFullName() {
         return this.fullName + ' <' + this.email + '>';

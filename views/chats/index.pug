@@ -13,7 +13,8 @@ block content
             .list-group-item
               a.col-xs-12.course-box.flex-column(href='/chats/' + group.id)
                 h4.list-group-item-heading #{group.name}
-                p.list-group-item-text #{group.description}
+                if group.description
+                  p.list-group-item-text #{group.description}
       else
         p You are not in any chats.
     .col-sm-9

@@ -48,23 +48,23 @@ exports.postSignup = (req, res, next) => {
     req.session.save(() => {
       return res.redirect('/signup');
     });
-  }
-
-  models.User.create({
-    firstName: req.body.firstName,
-    lastName: req.body.lastName,
-    email: req.body.email,
-    password: req.body.password
-  }).then((user) => {
-    req.logIn(user, (err) => {
-      if (err) {
-        return next(err);
-      }
-      req.session.save(() => {
-        return res.redirect(req.session.returnTo || '/');
+  } else {
+    models.User.create({
+      firstName: req.body.firstName,
+      lastName: req.body.lastName,
+      email: req.body.email,
+      password: req.body.password
+    }).then((user) => {
+      req.logIn(user, (err) => {
+        if (err) {
+          return next(err);
+        }
+        req.session.save(() => {
+          return res.redirect(req.session.returnTo || '/');
+        });
       });
     });
-  });
+  }
 };
 
 /**
@@ -176,10 +176,11 @@ exports.getPasswordReset = (req, res) => {
       req.session.save(() => {
         return res.redirect('/forgot');
       });
+    } else {
+      return res.render('account/reset', {
+        title: 'Reset password'
+      });
     }
-    return res.render('account/reset', {
-      title: 'Reset password'
-    });
   });
 };
 /**
@@ -198,17 +199,18 @@ exports.postPasswordReset = (req, res, next) => {
       req.session.save(() => {
         return res.redirect('/');
       });
-    }
-    user.resetPasswordToken = null;
-    user.resetPasswordExpires = null;
-    user.setPassword(req.body.password, () => {
-      user.save().then(() => {
-        req.flash('success', 'Success! Your password has been updated.');
-        req.session.save(() => {
-          return res.redirect('/login');
+    } else {
+      user.resetPasswordToken = null;
+      user.resetPasswordExpires = null;
+      user.setPassword(req.body.password, () => {
+        user.save().then(() => {
+          req.flash('success', 'Success! Your password has been updated.');
+          req.session.save(() => {
+            return res.redirect('/login');
+          });
         });
       });
-    });
+    }
   }).catch((err) => {
     return res.redirect('/');
   });

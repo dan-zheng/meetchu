@@ -19,7 +19,7 @@ block content
       .col-sm-12
         h4 Invite a user
         
-        form.form-horizontal(method='POST', action='/chats/' + group.id + '/invite')
+        form.form-horizontal(method='POST', action=`/chats/${group.id}/invite`)
           .form-group
             label.col-sm-2.control-label(for='email') Email
             .col-sm-6
@@ -33,20 +33,21 @@ block content
       .col-sm-12
         h4 Leave chat
         
-        form.form-horizontal(method='POST', action='/chats/' + group.id + '/leave')
+        form.form-horizontal(method='POST', action=`/chats/${group.id}/leave`)
           .form-group
             .col-sm-offset-2.col-sm-6
               button.btn.btn-danger(type='submit')
                 i.fa.fa-minus-square
                 | Leave
 
-      .col-sm-12
-        h4 Delete chat
+      if isAdmin
+        .col-sm-12
+          h4 Delete chat
 
-        form.form-horizontal(method='POST', action='/chats/' + group.id + '/delete')
-          .form-group
-            p.col-sm-offset-2.col-sm-5 You can delete a chat group, but keep in mind this action is irreversible.
-            .col-sm-offset-2.col-sm-5
-              button.btn.btn-danger(type='submit')
-                i.fa.fa-trash
-                | Delete chat
+          form.form-horizontal(method='POST', action=`/chats/${group.id}/delete`)
+            .form-group
+              p.col-sm-offset-2.col-sm-5 You can delete a chat group, but keep in mind this action is irreversible.
+              .col-sm-offset-2.col-sm-5
+                button.btn.btn-danger(type='submit')
+                  i.fa.fa-trash
+                  | Delete chat

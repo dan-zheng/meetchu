@@ -46,9 +46,14 @@ exports.getChat = (req, res) => {
     group.Users = group.Users.map((user) => {
       return user.dataValues;
     });
+    // NOTE: A user is given admin status based on
+    // whether or not they are first in group.Users.
+    // This may not work as intended.
+    const isAdmin = group.Users[0].id === req.user.id;
     return res.render('chats/chat', {
       title: group.name,
-      group
+      group,
+      isAdmin
     });
   });
 };
@@ -122,19 +127,20 @@ exports.postInviteChatGroup = (req, res) => {
           req.session.save(() => {
             return res.redirect(`/chats/${groupId}`);
           });
-        /*
-        BUG: group.hasUser() doesn't work as intended
-        } else if (group.hasUser(user)) {
-          req.flash('error', 'The user you tried to invite is already in the chat.');
-          req.session.save(() => {
-            return res.redirect(`/chats/${groupId}`);
-          });
-        */
         } else {
-          group.addUser(user);
-          req.flash('success', `${user.firstName} has been invited.`);
-          req.session.save(() => {
-            return res.redirect(`/chats/${groupId}`);
+          group.hasUser(user).then((exists) => {
+            if (exists) {
+              req.flash('error', 'The user you tried to invite is already in the chat.');
+              req.session.save(() => {
+                return res.redirect(`/chats/${groupId}`);
+              });
+            } else {
+              group.addUser(user);
+              req.flash('success', `${user.firstName} has been invited.`);
+              req.session.save(() => {
+                return res.redirect(`/chats/${groupId}`);
+              });
+            }
           });
         }
       });
@@ -161,24 +167,28 @@ exports.postLeaveChatGroup = (req, res) => {
       req.session.save(() => {
         return res.redirect('/chats');
       });
-    } else if (!group.hasUser(req.user)) {
-      req.flash('error', 'You are not in the chat.');
-      req.session.save(() => {
-        return res.redirect('/chats');
-      });
     } else {
-      group.removeUser(req.user);
-      if (group.Users.length <= 0) {
-        req.flash('info', 'Your chat has been deleted.');
-        req.session.save(() => {
-          return res.redirect('/chats');
-        });
-      } else {
-        req.flash('info', 'You have left the chat.');
-        req.session.save(() => {
-          return res.redirect('/chats');
-        });
-      }
+      group.hasUser(req.user).then((exists) => {
+        if (!exists) {
+          req.flash('error', 'You are not in the chat.');
+          req.session.save(() => {
+            return res.redirect('/chats');
+          });
+        } else {
+          group.removeUser(req.user);
+          if (group.Users.length <= 0) {
+            req.flash('info', 'Your chat has been deleted.');
+            req.session.save(() => {
+              return res.redirect('/chats');
+            });
+          } else {
+            req.flash('info', 'You have left the chat.');
+            req.session.save(() => {
+              return res.redirect('/chats');
+            });
+          }
+        }
+      });
     }
   });
 };
@@ -195,12 +205,13 @@ exports.postDeleteChatGroup = (req, res) => {
       req.session.save(() => {
         return res.redirect('/chats');
       });
-    }
-    group.destroy().then(() => {
-      req.flash('info', 'Your group has been deleted.');
-      req.session.save(() => {
-        return res.redirect('/chats');
+    } else {
+      group.destroy().then(() => {
+        req.flash('info', 'Your group has been deleted.');
+        req.session.save(() => {
+          return res.redirect('/chats');
+        });
       });
-    });
+    }
   });
 };
