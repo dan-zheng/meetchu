@@ -36,6 +36,20 @@ exports.getSignup = (req, res) => {
  * User signup.
  */
 exports.postSignup = (req, res, next) => {
+  req.assert('email', 'Email is not valid.').isEmail();
+  req.assert('password', 'Password must be at least 4 characters long.').len(4);
+  req.assert('confirmPassword', 'Passwords do not match.').equals(req.body.password);
+  req.sanitize('email').normalizeEmail({ remove_dots: false });
+
+  const errors = req.validationErrors();
+
+  if (errors) {
+    req.flash('errors', errors);
+    req.session.save(() => {
+      return res.redirect('/account');
+    });
+  }
+
   models.User.create({
     firstName: req.body.firstName,
     lastName: req.body.lastName,
@@ -199,31 +213,55 @@ exports.postPasswordReset = (req, res, next) => {
     return res.redirect('/');
   });
 };
+
 /*
- * GET /updateprofile
- * Update profile page
+ * GET /account
+ * Account page.
  */
-exports.updateProfile = (req, res) => {
-  return res.render('account/updateprofile', {
+exports.getProfile = (req, res) => {
+  return res.render('account/profile', {
     title: 'Update profile'
   });
 };
+
 /*
- * POST /updateprofile
+ * POST /account/profile
+ * Update profile information.
  */
-exports.postProfile = (req, res) => {
-  console.log(req.user.firstName);
-  req.user.firstName = req.body.firstName;
-  req.user.lastName = req.body.lastName;
+exports.postUpdateProfile = (req, res) => {
+  req.user.firstName = req.body.firstName || '';
+  req.user.lastName = req.body.lastName || '';
   req.user.email = req.body.email;
+  req.user.major = req.body.major;
   req.user.save().then(() => {
-    req.flash('success', 'Success! Your profile has been updated.');
+    req.flash('success', 'Your profile information has been updated.');
     req.session.save(() => {
-      return res.redirect('/updateprofile');
+      return res.redirect('/account');
     });
   });
 };
 
 /*
- * POST
+ * POST /account/password
+ * Update password.
  */
+exports.postUpdatePassword = (req, res) => {
+  req.assert('password', 'Password must be at least 4 characters long.').len(4);
+  req.assert('confirmPassword', 'Passwords do not match.').equals(req.body.password);
+
+  const errors = req.validationErrors();
+
+  if (errors) {
+    req.flash('errors', errors);
+    req.session.save(() => {
+      return res.redirect('/account');
+    });
+  }
+
+  req.user.save().then(() => {
+    req.flash('success', 'Your password has been changed.');
+    req.session.save(() => {
+      return res.redirect('/account');
+    });
+  });
+};

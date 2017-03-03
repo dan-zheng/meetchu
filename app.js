@@ -31,6 +31,7 @@ const homeController = require('./controllers/home');
 const userController = require('./controllers/user');
 const authController = require('./controllers/auth');
 const chatController = require('./controllers/chat');
+const meetingController = require('./controllers/meeting');
 const courseController = require('./controllers/course');
 
 /**
@@ -60,6 +61,7 @@ if (process.env.NODE_ENV !== 'production') {
 }
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(validator());
 app.use(session({
   secret: process.env.SESSION_SECRET,
   store: sequelizeStore,
@@ -100,8 +102,9 @@ app.post('/signup', userController.postSignup);
 app.get('/login', userController.getLogin);
 app.post('/login', userController.postLogin);
 app.get('/logout', userController.getLogout);
-app.get('/updateprofile', passportConfig.isAuthenticated, userController.updateProfile);
-app.post('/updateprofile', passportConfig.isAuthenticated, userController.postProfile);
+app.get('/account', passportConfig.isAuthenticated, userController.getProfile);
+app.post('/account/profile', passportConfig.isAuthenticated, userController.postUpdateProfile);
+app.post('/account/password', passportConfig.isAuthenticated, userController.postUpdatePassword);
 app.get('/forgot', userController.getForgot);
 app.post('/forgot', userController.postForgot);
 app.get('/reset/:token', userController.getPasswordReset);
@@ -114,6 +117,7 @@ app.get('/courses/:id', passportConfig.isAuthenticated, courseController.getCour
 app.post('/courses/add', passportConfig.isAuthenticated, courseController.postAddCourse);
 app.post('/courses/remove/:id', passportConfig.isAuthenticated, courseController.postRemoveCourse);
 app.post('/courses/auth', passportConfig.isAuthenticated, courseController.postAuthCourses);
+app.get('/meetings', passportConfig.isAuthenticated, meetingController.getMeetings);
 // app.post('/courses/auth', courseController.postAuthCourses);
 
 /**
