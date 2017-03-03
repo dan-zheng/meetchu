@@ -63,6 +63,7 @@ exports.postAddCourse = (req, res) => {
     }
   }).then((course) => {
     req.user.addCourse(course);
+    req.flash('success', 'Your course has been added.');
     req.session.save(() => {
       return res.redirect('/courses');
     });
@@ -80,7 +81,9 @@ exports.postRemoveCourse = (req, res) => {
       return res.redirect('/courses');
     }
     req.user.removeCourse(course);
+    req.flash('success', 'Your course has been removed.');
     req.session.save(() => {
+      console.log(req.messages);
       return res.redirect('/courses');
     });
   });
@@ -129,12 +132,22 @@ exports.postAuthCourses = (req, res, next) => {
       }), ((err) => {
         // If error
         if (err) {
-          return next(err);
+          req.flash('error', 'A database error occured. Please try again.');
+          req.session.save(() => {
+            return res.redirect('/courses');
+          });
         }
         // If success
+        req.flash('success', 'Your Purdue courses have been added successfully!');
         req.session.save(() => {
           return res.redirect('/courses');
         });
       }));
+    })
+    .catch((err) => {
+      req.flash('error', 'Your Purdue credentials are invalid. Please try again.');
+      req.session.save(() => {
+        return res.redirect('/courses');
+      });
     });
 };

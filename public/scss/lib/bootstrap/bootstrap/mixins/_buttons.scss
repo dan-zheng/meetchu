@@ -39,6 +39,8 @@
   .open > &.dropdown-toggle {
     background-image: none;
   }
+  // NOTE: Bad practice: edited Bootstrap library
+  /*
   &.disabled,
   &[disabled],
   fieldset[disabled] & {
@@ -49,6 +51,7 @@
           border-color: $border;
     }
   }
+  */
 
   .badge {
     color: $background;

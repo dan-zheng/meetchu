@@ -215,15 +215,15 @@ exports.postProfile = (req, res) => {
   console.log(req.user.firstName);
   req.user.firstName = req.body.firstName;
   req.user.lastName = req.body.lastName;
-  req.user.email = req.body.email; 
+  req.user.email = req.body.email;
   req.user.save().then(() => {
-    req.flash('sucess', 'Success! Your profile has been updated.'); 
+    req.flash('success', 'Success! Your profile has been updated.');
     req.session.save(() => {
-      return res.redirect('/updateprofile'); 
+      return res.redirect('/updateprofile');
     });
   });
 };
 
 /*
- * POST 
+ * POST
  */
