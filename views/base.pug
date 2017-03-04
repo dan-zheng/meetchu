@@ -25,11 +25,19 @@ html
           .container-full
             a#sidebar-toggle.btn.btn-default(href='#sidebar-toggle') Toggle Sidebar
     else
-      include includes/navbar
+      if title == 'Home'
+        include includes/navbar
 
-      #main.container
-        include includes/flash
-        block content
+        .container
+          include includes/flash
+          #main
+            block content
+      else
+        include includes/navbar
+
+        #main.container
+          include includes/flash
+          block content
 
     // Scripts
     script(src='/js/lib/jquery.min.js')

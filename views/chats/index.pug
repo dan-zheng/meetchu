@@ -11,7 +11,7 @@ block content
         ul.list-group
           each group in groups
             .list-group-item
-              a.col-xs-12.course-box.flex-column(href='/chats/' + group.id)
+              a.col-xs-12.course-box.flex-column(href=`/chats/${group.id}`)
                 h4.list-group-item-heading #{group.name}
                 if group.description
                   p.list-group-item-text #{group.description}

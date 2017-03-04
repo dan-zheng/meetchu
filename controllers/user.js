@@ -306,3 +306,21 @@ exports.postUpdatePassword = (req, res) => {
     });
   }
 };
+
+/**
+ * POST /account/delete
+ * Delete user account.
+ */
+exports.postDeleteAccount = (req, res, next) => {
+  userIndex.deleteObject(req.user.id, (err) => {
+    if (err) {
+      return next(err);
+    }
+  });
+  req.user.destroy().then(() => {
+    req.flash('info', 'Your account has been deleted.');
+    req.session.save(() => {
+      return res.redirect('/');
+    });
+  });
+};
