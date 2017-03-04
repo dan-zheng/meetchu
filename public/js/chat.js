@@ -19,10 +19,9 @@ const removeTags = ((input) => {
 // Initialize autocomplete on search input (ID selector must match)
 searchInput.textcomplete([{
     // Regular expression used to trigger the autocomplete dropdown
-    match: /(^|\s)(\S*@?\S*)$/,
+    match: /(^)(.*)$/,
     // Function called at every new keystroke
-    search: function(query, callback) {
-      console.log(query);
+    search: (query, callback) => {
       lastQuery = query;
       index.search(lastQuery, { hitsPerPage: numOfResultsDisplayed })
         .then((content) => {
@@ -37,7 +36,6 @@ searchInput.textcomplete([{
     // Template used to display each result obtained by the Algolia API
     template: (hit) => {
       // Returns the highlighted version of the name attribute
-      // return hit._highlightResult.email.value;
       return '<span>' + hit._highlightResult.email.value + ' </span><span class="hspace"></spam><span>' +
         hit._highlightResult.firstName.value + ' ' + hit._highlightResult.lastName.value +
         '</span>';
