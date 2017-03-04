@@ -20,8 +20,8 @@ block content
         ul.list-group
           each course in courses
             - const creditHourUnits = course.creditHours == 1 ? 'credit hour' : 'credit hours';
-            form.list-group-item(method='POST')
-              input(type='hidden', name='course', value=course.title)
+            form.list-group-item(method='POST', action=`/courses/remove/${course.id}`)
+              input(type='hidden', name='course', value=course.title, required)
               a.col-xs-9.course-box.flex-column.border-right
                 h4.list-group-item-heading #{course.subject} #{course.number}
                 p.list-group-item-text #{course.title}
@@ -29,7 +29,7 @@ block content
               .col-xs-3.flex-center.flex-btn-group
                 a.btn.transparent(href=`/courses/${course.id}`)
                   i.blue.fa.fa-info-circle
-                button.btn.transparent(type='submit', formaction=`/courses/remove/${course.id}`)
+                button.btn.transparent(type='submit')
                   i.red.fa.fa-times-circle
       else
         h4 None! 
@@ -52,10 +52,10 @@ block content
           | Add course
           
       h3 Sync with Purdue
-      form(method='POST')
+      form(method='POST', action='/courses/auth')
         .form-group
           label.control-label(for='username') Username
-            input.form-control(type='username', name='username', id='username', placeholder='Username', autofocus, required)
+            input.form-control(type='username', name='username', id='username', placeholder='Username', required)
         .form-group
           label.control-label(for='password') Password
             input.form-control(type='password', name='password', id='password', placeholder='Password', required)
@@ -64,6 +64,6 @@ block content
             .col-sm-8.no-padding
               p Note: Meetchu does not store your Purdue credentials for any amount of time. They are only used for fetching class schedules. Meetchu will not use your credentials for any other purpose.
         .form-group
-          button.btn.btn-primary(formaction='/courses/auth', type='submit')
+          button.btn.btn-primary(type='submit')
             i.fa.fa-user
             | Login

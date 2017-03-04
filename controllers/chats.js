@@ -72,19 +72,19 @@ exports.postCreateChatGroup = (req, res) => {
     req.session.save(() => {
       return res.redirect('/chats');
     });
-  }
-
-  models.Group.create({
-    name: req.body.name,
-    description: req.body.description || '',
-    // groupType: req.body.groupType
-  }).then((group) => {
-    group.addUser(req.user);
-    req.flash('success', 'Your chat has been created.');
-    req.session.save(() => {
-      return res.redirect('/chats');
+  } else {
+    models.Group.create({
+      name: req.body.name,
+      description: req.body.description || '',
+      // groupType: req.body.groupType
+    }).then((group) => {
+      group.addUser(req.user);
+      req.flash('success', 'Your chat has been created.');
+      req.session.save(() => {
+        return res.redirect('/chats');
+      });
     });
-  });
+  }
 };
 
 /**
@@ -103,51 +103,51 @@ exports.postInviteChatGroup = (req, res) => {
     req.session.save(() => {
       return res.redirect(`/chats/${groupId}`);
     });
+  } else {
+    models.Group.findOne({
+      where: {
+        id: groupId
+      },
+      include: [{
+        model: models.User
+      }]
+    }).then((group) => {
+      if (!group) {
+        req.flash('error', 'The chat does not exist.');
+        req.session.save(() => {
+          return res.redirect('/chats');
+        });
+      } else {
+        models.User.findOne({
+          where: {
+            email: userEmail
+          }
+        }).then((user) => {
+          if (!user) {
+            req.flash('error', 'No user with that email exists.');
+            req.session.save(() => {
+              return res.redirect(`/chats/${groupId}`);
+            });
+          } else {
+            group.hasUser(user).then((exists) => {
+              if (exists) {
+                req.flash('error', 'The user you tried to invite is already in the chat.');
+                req.session.save(() => {
+                  return res.redirect(`/chats/${groupId}`);
+                });
+              } else {
+                group.addUser(user);
+                req.flash('success', `${user.firstName} has been invited.`);
+                req.session.save(() => {
+                  return res.redirect(`/chats/${groupId}`);
+                });
+              }
+            });
+          }
+        });
+      }
+    });
   }
-
-  models.Group.findOne({
-    where: {
-      id: groupId
-    },
-    include: [{
-      model: models.User
-    }]
-  }).then((group) => {
-    if (!group) {
-      req.flash('error', 'The chat does not exist.');
-      req.session.save(() => {
-        return res.redirect('/chats');
-      });
-    } else {
-      models.User.findOne({
-        where: {
-          email: userEmail
-        }
-      }).then((user) => {
-        if (!user) {
-          req.flash('error', 'No user with that email exists.');
-          req.session.save(() => {
-            return res.redirect(`/chats/${groupId}`);
-          });
-        } else {
-          group.hasUser(user).then((exists) => {
-            if (exists) {
-              req.flash('error', 'The user you tried to invite is already in the chat.');
-              req.session.save(() => {
-                return res.redirect(`/chats/${groupId}`);
-              });
-            } else {
-              group.addUser(user);
-              req.flash('success', `${user.firstName} has been invited.`);
-              req.session.save(() => {
-                return res.redirect(`/chats/${groupId}`);
-              });
-            }
-          });
-        }
-      });
-    }
-  });
 };
 
 /**
