@@ -14,6 +14,9 @@ const models = require('../models');
  */
 dotenv.load({ path: '.env' });
 
+/*
+ * Algolia configuration.
+ */
 // const client = algoliasearch(process.env.ALGOLIA_ID, process.env.ALGOLIA_ADMIN_KEY);
 const client = algoliasearch(process.env.ALGOLIA_ID_OLD, process.env.ALGOLIA_ADMIN_KEY_OLD);
 

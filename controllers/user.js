@@ -4,6 +4,7 @@ const auth = require('./auth');
 const async = require('async');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
+const algoliasearch = require('algoliasearch');
 const pug = require('pug');
 const resetTemplate = pug.compileFile('views/email/reset.pug');
 
@@ -17,6 +18,14 @@ const transporter = nodemailer.createTransport({
     pass: process.env.SENDGRID_PASSWORD
   }
 });
+
+/*
+ * Algolia configuration.
+ */
+// const client = algoliasearch(process.env.ALGOLIA_ID, process.env.ALGOLIA_ADMIN_KEY);
+const client = algoliasearch(process.env.ALGOLIA_ID_OLD, process.env.ALGOLIA_ADMIN_KEY_OLD);
+
+const userIndex = client.initIndex('users');
 
 /**
  * GET /signup
@@ -49,19 +58,48 @@ exports.postSignup = (req, res, next) => {
       return res.redirect('/signup');
     });
   } else {
-    models.User.create({
-      firstName: req.body.firstName,
-      lastName: req.body.lastName,
-      email: req.body.email,
-      password: req.body.password
-    }).then((user) => {
-      req.logIn(user, (err) => {
-        if (err) {
-          return next(err);
-        }
+    models.User.findOrCreate({
+      where: {
+        email: req.body.email
+      },
+      defaults: {
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
+        password: req.body.password
+      }
+    }).spread((user, wasCreated) => {
+      if (!wasCreated) {
+        req.flash('error', 'An account with that email already exists.');
         req.session.save(() => {
-          return res.redirect(req.session.returnTo || '/');
+          return res.redirect('/signup');
         });
+      } else {
+        // Add user to Algolia index
+        const userValues = {
+          objectID: user.dataValues.id,
+          firstName: user.dataValues.firstName,
+          lastName: user.dataValues.lastName,
+          email: user.dataValues.email
+        };
+        userIndex.addObjects([userValues], (err, content) => {
+          if (err) {
+            return next(err);
+          }
+        });
+        // Log in with Passport
+        req.logIn(user, (err) => {
+          if (err) {
+            return next(err);
+          }
+          req.session.save(() => {
+            return res.redirect(req.session.returnTo || '/');
+          });
+        });
+      }
+    }).catch((err) => {
+      req.flash('error', 'Database error: user was not created.');
+      req.session.save(() => {
+        return res.redirect('/signup');
       });
     });
   }
@@ -124,7 +162,7 @@ exports.postForgot = (req, res, next) => {
     (token, done) => {
       models.User.findOne({ where: { email: req.body.email } }).then((user) => {
         if (!user) {
-          req.flash('error', 'Could not find an account under that email address.');
+          req.flash('error', 'An account with that email address could not be found.');
           req.session.save(() => {
             return res.redirect('/forgot');
           });
@@ -204,7 +242,7 @@ exports.postPasswordReset = (req, res, next) => {
       user.resetPasswordExpires = null;
       user.setPassword(req.body.password, () => {
         user.save().then(() => {
-          req.flash('success', 'Success! Your password has been updated.');
+          req.flash('success', 'Your password has been updated.');
           req.session.save(() => {
             return res.redirect('/login');
           });
@@ -261,7 +299,7 @@ exports.postUpdatePassword = (req, res) => {
   } else {
     req.user.set('password', req.body.password);
     req.user.save().then(() => {
-      req.flash('success', 'Your password has been changed.');
+      req.flash('success', 'Your password has been updated.');
       req.session.save(() => {
         return res.redirect('/account');
       });

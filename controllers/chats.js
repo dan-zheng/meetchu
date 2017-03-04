@@ -53,7 +53,8 @@ exports.getChat = (req, res) => {
     return res.render('chats/chat', {
       title: group.name,
       group,
-      isAdmin
+      isAdmin,
+      tag: 'Chat'
     });
   });
 };
@@ -91,18 +92,19 @@ exports.postCreateChatGroup = (req, res) => {
  * Invite a user to a chat group.
  */
 exports.postInviteChatGroup = (req, res) => {
-  req.assert('email', 'Invitee email is empty.').notEmpty();
+  const groupId = req.params.id;
+  const userEmail = req.body.email;
+
+  req.assert('email', 'Invitee field is not an email.').isEmail();
   const errors = req.validationErrors();
 
   if (errors) {
     req.flash('errors', errors);
     req.session.save(() => {
-      return res.redirect('/chats');
+      return res.redirect(`/chats/${groupId}`);
     });
   }
 
-  const groupId = req.params.id;
-  const userEmail = req.body.email;
   models.Group.findOne({
     where: {
       id: groupId
@@ -119,7 +121,7 @@ exports.postInviteChatGroup = (req, res) => {
     } else {
       models.User.findOne({
         where: {
-          email: req.body.email
+          email: userEmail
         }
       }).then((user) => {
         if (!user) {
