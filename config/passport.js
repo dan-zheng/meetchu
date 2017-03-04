@@ -1,16 +1,24 @@
 /**
  * Module dependencies.
  */
+ const dotenv = require('dotenv');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
+const algoliasearch = require('algoliasearch');
 const models = require('../models');
-const dotenv = require('dotenv');
 
 /**
  * Load environment variables from .env file
  */
 dotenv.load({ path: '.env' });
+
+/*
+ * Algolia configuration.
+ */
+// const client = algoliasearch(process.env.ALGOLIA_ID, process.env.ALGOLIA_ADMIN_KEY);
+const client = algoliasearch(process.env.ALGOLIA_ID_OLD, process.env.ALGOLIA_ADMIN_KEY_OLD);
+const userIndex = client.initIndex('users');
 
 passport.serializeUser((user, done) => {
   return done(null, user.id);
@@ -65,6 +73,18 @@ passport.use(new GoogleStrategy({
           firstName: profile.name.givenName,
           lastName: profile.name.familyName
         }).then((newUser) => {
+          // Add user to Algolia index
+          const userValues = {
+            objectID: newUser.dataValues.id,
+            firstName: newUser.dataValues.firstName,
+            lastName: newUser.dataValues.lastName,
+            email: newUser.dataValues.email
+          };
+          userIndex.addObjects([userValues], (err, content) => {
+            if (err) {
+              return done(err);
+            }
+          });
           return done(null, newUser);
         })
         .catch((err2) => {

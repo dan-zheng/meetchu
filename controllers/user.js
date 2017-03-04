@@ -24,7 +24,6 @@ const transporter = nodemailer.createTransport({
  */
 // const client = algoliasearch(process.env.ALGOLIA_ID, process.env.ALGOLIA_ADMIN_KEY);
 const client = algoliasearch(process.env.ALGOLIA_ID_OLD, process.env.ALGOLIA_ADMIN_KEY_OLD);
-
 const userIndex = client.initIndex('users');
 
 /**
