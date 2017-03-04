@@ -1,7 +1,7 @@
 /**
  * Module dependencies.
  */
- const dotenv = require('dotenv');
+const dotenv = require('dotenv');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;

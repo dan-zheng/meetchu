@@ -7,8 +7,12 @@ block content
     h3 Hello, #{user.dataValues.firstName}!
     p Your email is #{user.dataValues.email}.
     .btn-group
-      a.btn.btn-primary(href='/account', role='button') Profile
-      a.btn.btn-primary(href='/logout', role='button') Log out
+      a.btn.btn-primary(href='/account', role='button')
+        i.fa.fa-id-card-o
+        | Profile
+      a.btn.btn-primary(href='/logout', role='button')
+        i.fa.fa-sign-out
+        | Log out
     hr
   else
     .text-center
