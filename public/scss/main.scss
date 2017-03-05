@@ -132,6 +132,10 @@ fieldset[disabled] {
       outline: none;
     }
 
+    &:active {
+      box-shadow: none;
+    }
+
     i {
       font-size: 32px;
       margin-right: 0;
