@@ -91,31 +91,21 @@ exports.postAddCourse = (req, res) => {
  * Remove a course.
  */
 exports.postRemoveCourse = (req, res) => {
-  req.assert('courseId', 'Course field is empty.').notEmpty();
-  const errors = req.validationErrors();
-
-  if (errors) {
-    req.flash('error', errors);
-    req.session.save(() => {
-      return res.redirect('/courses');
-    });
-  } else {
-    const courseId = req.params.id;
-    models.Course.findById(courseId).then((course) => {
-      if (!course) {
-        req.flash('error', 'Database error: course does not exist.');
-        req.session.save(() => {
-          return res.redirect('/courses');
-        });
-      } else {
-        req.user.removeCourse(course);
-        req.flash('success', 'Your course has been removed.');
-        req.session.save(() => {
-          return res.redirect('/courses');
-        });
-      }
-    });
-  }
+  const courseId = req.params.id;
+  models.Course.findById(courseId).then((course) => {
+    if (!course) {
+      req.flash('error', 'Database error: course does not exist.');
+      req.session.save(() => {
+        return res.redirect('/courses');
+      });
+    } else {
+      req.user.removeCourse(course);
+      req.flash('success', 'Your course has been removed.');
+      req.session.save(() => {
+        return res.redirect('/courses');
+      });
+    }
+  });
 };
 
 /**
