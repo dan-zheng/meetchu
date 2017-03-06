@@ -8,7 +8,7 @@ exports.loginCallback = ((strategy, req, res, next) => {
   passport.authenticate(strategy, (err1, user, info) => {
     if (err1) { return next(err1); }
     if (!user) {
-      req.flash('error', info.msg);
+      req.flash('error', info.message);
       req.session.save(() => {
         return res.redirect('/login');
       });
@@ -35,4 +35,18 @@ exports.getAuthGoogle = passport.authenticate('google', { scope: ['profile', 'em
  */
 exports.getAuthGoogleCallback = (req, res, next) => {
   this.loginCallback('google', req, res, next);
+};
+
+/**
+ * GET /auth/facebook
+ * Facebook user authentication.
+ */
+exports.getAuthFacebook = passport.authenticate('facebook', { scope: ['public_profile', 'email'] });
+
+/**
+ * GET /auth/facebook/callback
+ * Facebook user authentication callback.
+ */
+exports.getAuthFacebookCallback = (req, res, next) => {
+  this.loginCallback('facebook', req, res, next);
 };

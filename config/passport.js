@@ -5,6 +5,7 @@ const dotenv = require('dotenv');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
+const FacebookStrategy = require('passport-facebook').Strategy;
 const algoliasearch = require('algoliasearch');
 const models = require('../models');
 
@@ -31,6 +32,50 @@ passport.deserializeUser((id, done) => {
     return done(err, null);
   });
 });
+
+/**
+ * Add user to Algolia.
+ */
+const addUserToAlgolia = (user, done) => {
+  // Add user to Algolia index
+  const userValues = {
+    objectID: user.dataValues.id,
+    firstName: user.dataValues.firstName,
+    lastName: user.dataValues.lastName,
+    email: user.dataValues.email
+  };
+  userIndex.addObjects([userValues], (err, content) => {
+    if (err) {
+      return done(err);
+    }
+  });
+  return done(null, user);
+};
+
+const oauthLogin = (oauthId, profile, done) => {
+  const newUserFields = {
+    email: profile.emails[0].value,
+    firstName: profile.name.givenName,
+    lastName: profile.name.familyName
+  };
+  const query = {};
+  query[oauthId] = profile.id;
+  const opts = {};
+  opts.where = query;
+  opts.defaults = newUserFields;
+  models.User.findOrCreate(opts)
+    .spread((user, userWasCreated) => {
+      if (userWasCreated) {
+        return addUserToAlgolia(user, done);
+      }
+      return done(null, user);
+    })
+    .catch((err) => {
+      return done(null, false, {
+        message: `${profile.provider} account not found for email ${profile.emails[0].value}`
+      });
+    });
+};
 
 /**
  * Sign in using email and password.
@@ -62,37 +107,22 @@ passport.use(new GoogleStrategy({
   passReqToCallback: true
 }, (req, accessToken, refreshToken, profile, done) => {
   process.nextTick(() => {
-    models.User.find({ where: { googleId: profile.id } })
-      .then((existingUser) => {
-        if (existingUser) {
-          return done(null, existingUser);
-        }
-        models.User.create({
-          googleId: profile.id,
-          email: profile.emails[0].value,
-          firstName: profile.name.givenName,
-          lastName: profile.name.familyName
-        }).then((newUser) => {
-          // Add user to Algolia index
-          const userValues = {
-            objectID: newUser.dataValues.id,
-            firstName: newUser.dataValues.firstName,
-            lastName: newUser.dataValues.lastName,
-            email: newUser.dataValues.email
-          };
-          userIndex.addObjects([userValues], (err, content) => {
-            if (err) {
-              return done(err);
-            }
-          });
-          return done(null, newUser);
-        })
-        .catch((err2) => {
-          return done(err2);
-        });
-      }).catch((err1) => {
-        return done(null, false, { message: `Google account not found for email ${profile.emails[0].value}.` });
-      });
+    oauthLogin('googleId', profile, done);
+  });
+}));
+
+/**
+ * Sign in with Facebook.
+ */
+passport.use(new FacebookStrategy({
+  clientID: process.env.FACEBOOK_ID,
+  clientSecret: process.env.FACEBOOK_SECRET,
+  callbackURL: '/auth/facebook/callback',
+  passReqToCallback: true,
+  profileFields: ['id', 'email', 'first_name', 'last_name']
+}, (req, accessToken, refreshToken, profile, done) => {
+  process.nextTick(() => {
+    oauthLogin('facebookId', profile, done);
   });
 }));
 

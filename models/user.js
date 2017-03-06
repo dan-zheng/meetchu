@@ -12,6 +12,11 @@ module.exports = (sequelize, Sequelize) => {
       unique: true,
       allowNull: true
     },
+    facebookId: {
+      type: Sequelize.STRING,
+      unique: true,
+      allowNull: true
+    },
     email: {
       type: Sequelize.STRING,
       validate: {

@@ -128,7 +128,8 @@ app.get('/meetings', passportConfig.isAuthenticated, meetingController.getMeetin
  */
 app.get('/auth/google', authController.getAuthGoogle);
 app.get('/auth/google/callback', authController.getAuthGoogleCallback);
-
+app.get('/auth/facebook', authController.getAuthFacebook);
+app.get('/auth/facebook/callback', authController.getAuthFacebookCallback);
 /**
  * Create any missing database tables and start Express server.
  */
