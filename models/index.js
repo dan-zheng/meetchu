@@ -47,6 +47,8 @@ db.Instructor.belongsToMany(db.Course, { through: 'CourseInstructor' });
 db.Course.belongsToMany(db.User, { through: 'CourseUser' });
 db.User.belongsToMany(db.Course, { through: 'CourseUser' });
 
+db.Notification.belongsTo(db.User, { through: 'Owner' });
+
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
