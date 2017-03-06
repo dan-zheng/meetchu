@@ -10,7 +10,7 @@ module.exports = (sequelize, Sequelize) => {
     }
   }, {
     timestamps: true,
-    createdAt: 'timeSent',
+    createdAt: true,
     updatedAt: false
   });
   return Notification;
