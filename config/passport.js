@@ -53,16 +53,15 @@ const addUserToAlgolia = (user, done) => {
 };
 
 const oauthLogin = (oauthId, profile, done) => {
-  const newUserFields = {
-    email: profile.emails[0].value,
-    firstName: profile.name.givenName,
-    lastName: profile.name.familyName
-  };
   const query = {};
   query[oauthId] = profile.id;
   const opts = {};
   opts.where = query;
-  opts.defaults = newUserFields;
+  opts.defaults = {
+    email: profile.emails[0].value,
+    firstName: profile.name.givenName,
+    lastName: profile.name.familyName
+  };
   models.User.findOrCreate(opts)
     .spread((user, userWasCreated) => {
       if (userWasCreated) {
