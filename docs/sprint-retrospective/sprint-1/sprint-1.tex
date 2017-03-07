@@ -1,0 +1,221 @@
+\documentclass[12pt]{article}
+
+\usepackage[margin=1in, headheight=15.05pt]{geometry}
+\usepackage{indentfirst}
+\usepackage{xcolor}
+\usepackage{soul}
+\usepackage{enumitem}
+\usepackage{url}
+\usepackage{tabularx}
+\usepackage{fancyhdr}
+
+\makeatletter
+\g@addto@macro\bfseries{\boldmath}
+\makeatother
+
+\newcommand{\br}{\vspace{2mm}}
+\newcommand{\brbig}{\vspace{4mm}}
+
+\definecolor{light-gray}{gray}{0.93}
+\DeclareRobustCommand{\hlgray}[1]{{\sethlcolor{light-gray}\hl{#1}}}
+\newcommand{\code}[1]{{\fontsize{11pt}{11pt}\selectfont\hlgray{\hbox{\texttt{#1}}}}}
+
+\newcolumntype{C}[1]{>{\centering}p{#1}}
+\newcolumntype{Y}{>{\centering\arraybackslash}X}
+
+\linespread{1.05}
+
+\newcommand{\hwTitle}{Sprint 1 Retrospective Document}
+\newcommand{\courseTitle}{CS 307 (Spring 2017)}
+\newcommand{\projectName}{Meetchu}
+\newcommand{\teamName}{Team 17}
+\newcommand{\authorName}{Eric Aguilera, Justin Bonner, Carson Harmon, Dan Zheng}
+
+\lhead{\fontsize{14pt}{14pt}\selectfont{}\courseTitle}
+\chead{\fontsize{14pt}{14pt}\selectfont{}\textbf{\projectName}}
+\rhead{\fontsize{14pt}{14pt}\selectfont{}\teamName}
+
+\pagestyle{fancy}
+
+\begin{document}
+
+\section*{\Large \centering \hwTitle}
+{\centering \authorName \par}
+
+\subsection*{What went well?}
+
+During sprint 1, we finished all of the user stories listed in our sprint 1 planning document. We even finished some stretch goals and are ready to hit the ground running for sprint 2.
+
+\brbig
+
+\begin{tabularx}{.96\textwidth}{|C{0.02\textwidth}|X|C{0.12\textwidth}|c|}
+\hline
+\textbf{\#} & \textbf{Task description} & \textbf{Estimated Time} & \textbf{Owner} \\ \hline
+1 & Set up back end server and deploy to Heroku & 1 hr & Dan \\ \hline
+2 & Set up database & 1 hr & Dan \\ \hline
+3 & Create database model for users & 2 hrs & Eric \\ \hline
+4 & Add back-end controller for user account creation with input validation & 2 hrs & Justin \\ \hline
+5 & Add front-end view for user account creation with input validation & 2 hrs & Carson \\ \hline
+\end{tabularx}
+
+\brbig
+
+\textbf{Completed.} We successfully deployed our Node.js server to Heroku: pushing updates is simple and convenient. We used the Heroku add-on JawsDB MySQL to host our database. A \code{Sequelize} database model for users was created along with the associated front-end and back-end controllers.
+
+\brbig
+
+\begin{tabularx}{.96\textwidth}{|C{0.02\textwidth}|X|C{0.12\textwidth}|c|}
+\hline
+\textbf{\#} & \textbf{Task description} & \textbf{Estimated Time} & \textbf{Owner} \\ \hline
+1 & Implement user authentication using username and password & 3 hrs & Justin \\ \hline
+2 & Add back-end authentication middleware & 3 hrs & Dan \\ \hline
+3 & Add front-end view for login & 2 hrs & Eric \\ \hline
+\end{tabularx}
+
+\brbig
+
+\textbf{Completed.} User authentication works successfully. In addition, we used \code{express-flash} and \code{express-validator} to validate the login form and display feedback notifications. Password are hashed and salted using \code{bcrypt}. We also added support for external login providers such as Google and Facebook.
+
+\brbig
+
+\begin{tabularx}{.96\textwidth}{|C{0.02\textwidth}|X|C{0.12\textwidth}|c|}
+\hline
+\textbf{\#} & \textbf{Task description} & \textbf{Estimated Time} & \textbf{Owner} \\ \hline
+1 & Create database model for recovery tokens & 1 hr & Eric \\ \hline
+2 & Add back-end controller for recovery process & 3 hrs & Dan \\ \hline
+3 & Add front-end interfaces for recovery process & 3 hrs & Justin \\ \hline
+\end{tabularx}
+
+\brbig
+
+\textbf{Completed.} The \code{Sequelize} model for recovery tokens was successfully created. Using the crypto package, we generate recovery tokens for users that expire after one hour. Using nodemailer, can email the user a link, with the recovery token in the url, to reset their password. Upon visiting the link. a user may reset their password until the token is no longer valid.
+
+\brbig
+
+\begin{tabularx}{.96\textwidth}{|C{0.02\textwidth}|X|C{0.12\textwidth}|c|}
+\hline
+\textbf{\#} & \textbf{Task description} & \textbf{Estimated Time} & \textbf{Owner} \\ \hline
+1 & Add back-end controller for adding/updating profile information & 2 hrs & Carson \\ \hline
+2 & Add front-end view for adding/updating profile information & 2 hrs & Carson \\ \hline
+\end{tabularx}
+
+\brbig
+
+\textbf{Completed.} After logging in, users can visit their profile page to edit their user information. From the profile page, a user can modify the fields they want and submit the changes to the database.
+
+\brbig
+
+\begin{tabularx}{.96\textwidth}{|C{0.02\textwidth}|X|C{0.12\textwidth}|c|}
+\hline
+\textbf{\#} & \textbf{Task description} & \textbf{Estimated Time} & \textbf{Owner} \\ \hline
+1 & Create database model for courses & 1 hr & Eric \\ \hline
+2 & Add back-end logic that uses Purdue course API (purdue.io) to populate database with courses & 3 hrs & Dan \\ \hline
+3 & Add back-end controller for searching courses & 3 hrs & Justin \\ \hline
+4 & Add front-end view for searching courses & 3 hrs & Carson \\ \hline
+\end{tabularx}
+
+\brbig
+
+\textbf{Completed.} The courses page contains a search bar which was implemented using Algolia to provide a convenient way to autocomplete course names. From the courses page, a user can input their Purdue career account credentials to automatically pull their courses using the Purdue.io API. Users can also manually input their courses using a search bar.
+
+\brbig
+
+\begin{tabularx}{.96\textwidth}{|C{0.02\textwidth}|X|C{0.12\textwidth}|c|}
+\hline
+\textbf{\#} & \textbf{Task description} & \textbf{Estimated Time} & \textbf{Owner} \\ \hline
+1 & Add back-end controller for adding a course to account & 1 hr & Justin \\ \hline
+2 & Add front-end interface for adding a course to account & 1 hr & Justin \\ \hline
+\end{tabularx}
+
+\brbig
+
+\textbf{Completed.} From the courses page, a user can search for their class in the search bar and manually add their courses.
+
+\brbig
+
+\begin{tabularx}{.96\textwidth}{|C{0.02\textwidth}|X|C{0.12\textwidth}|c|}
+\hline
+\textbf{\#} & \textbf{Task description} & \textbf{Estimated Time} & \textbf{Owner} \\ \hline
+1 & Add back-end controller for returning user courses & 1 hr & Eric \\ \hline
+2 & Add front-end view for viewing user courses & 1 hr & Justin \\ \hline
+\end{tabularx}
+
+\brbig
+
+\textbf{Completed.} From the courses page, a user can view a list of all their courses. For each course, there is an info button and a deletion button.
+
+\brbig
+
+\begin{tabularx}{.96\textwidth}{|C{0.02\textwidth}|X|C{0.12\textwidth}|c|}
+\hline
+\textbf{\#} & \textbf{Task description} & \textbf{Estimated Time} & \textbf{Owner} \\ \hline
+1 & Add back-end controller for viewing course students & 1 hr & Carson \\ \hline
+2 & Add front-end interface for viewing course students & 1 hr & Carson \\ \hline
+\end{tabularx}
+
+\brbig
+
+\textbf{Completed.} From the courses pages, a user can click on a course to navigate to a course page, which lists specific information about the course as well as a list of users in the course.
+
+\brbig
+
+\begin{tabularx}{.96\textwidth}{|C{0.02\textwidth}|X|C{0.12\textwidth}|c|}
+\hline
+\textbf{\#} & \textbf{Task description} & \textbf{Estimated Time} & \textbf{Owner} \\ \hline
+1 & Create database model for groups & 1 hr & Eric \\ \hline
+2 & Add back-end controller for creating a group & 3 hrs & Eric \\ \hline
+3 & Add front-end interface for creating a group & 3 hrs & Eric \\ \hline
+\end{tabularx}
+
+\brbig
+
+\textbf{Completed.} The \code{Sequelize} model for groups was successfully created. To create a group, a user can navigate to the chats page and enter a corresponding chat name and description. After creating the chat, their list of chats will be updated. A user can click on any of their chats to view their members and manage the chat.
+
+\brbig
+
+\begin{tabularx}{.96\textwidth}{|C{0.02\textwidth}|X|C{0.12\textwidth}|c|}
+\hline
+\textbf{\#} & \textbf{Task description} & \textbf{Estimated Time} & \textbf{Owner} \\ \hline
+1 & Add back-end controller for deleting a group & 1 hr & Carson \\ \hline
+2 & Add front-end interface for deleting a group & 1 hr & Carson \\ \hline
+\end{tabularx}
+
+\brbig
+
+\textbf{Completed.} From a chat page, a user can delete the chat and all of its associated data. In the next sprint, we plan on restricting who will be allowed to delete a chat to the oldest member of the chat.
+
+\brbig
+
+\begin{tabularx}{.96\textwidth}{|C{0.02\textwidth}|X|C{0.12\textwidth}|c|}
+\hline
+\textbf{\#} & \textbf{Task description} & \textbf{Estimated Time} & \textbf{Owner} \\ \hline
+1 & Add back-end controller for inviting people to a group & 2 hrs & Dan \\ \hline
+2 & Add front-end interface for inviting people to a group & 2 hrs & Dan \\ \hline
+\end{tabularx}
+
+\brbig
+
+\textbf{Completed.} From a chat page, a user can enter an email of another user that they want to invite. Once invited, the invited user will show up in the list of chat members. If the email doesn’t exist or the user is already in the chat, an error notification will be shown.
+
+\brbig
+
+\begin{tabularx}{.96\textwidth}{|C{0.02\textwidth}|X|C{0.12\textwidth}|c|}
+\hline
+\textbf{\#} & \textbf{Task description} & \textbf{Estimated Time} & \textbf{Owner} \\ \hline
+1 & Add back-end controller for leaving a group & 1 hr & Dan \\ \hline
+2 & Add front-end interface for leaving a group & 1 hr & Dan \\ \hline
+\end{tabularx}
+
+\brbig
+
+\textbf{Completed.} From a chat page, a user can leave the chat. If they are the last person in the chat, the chat will be deleted.
+
+\subsection*{What didn't go well?}
+
+In our sprint 1 planning document, we assigned parts of features between different team members. This created awkward problems when one team member couldn't start working because another part of a feature had to be done first. This happened frequently and limited the efficiency of our team.
+
+\subsection*{How should we improve?}
+
+In the future, we will improve our sprint planning by assigning full features to team members rather than partial features. During sprint 1, we found that it was difficult to collaborate at times because multiple members were assigned to different aspects of the same feature: for example, one person may have worked on front-end while the other worked on back-end. However, this was not ideal because we had to wait on each other to complete tasks. In future sprints, it will be more natural for one person to complete all aspects of a feature.
+
+\end{document}

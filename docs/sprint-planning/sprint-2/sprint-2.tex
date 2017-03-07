@@ -1,0 +1,324 @@
+\documentclass[12pt]{article}
+
+\usepackage[margin=1in, headheight=15.05pt]{geometry}
+\usepackage{indentfirst}
+\usepackage{xcolor}
+\usepackage{soul}
+\usepackage{enumitem}
+\usepackage{url}
+\usepackage{tabularx}
+\usepackage{fancyhdr}
+
+\makeatletter
+\g@addto@macro\bfseries{\boldmath}
+\makeatother
+
+\newcommand{\br}{\vspace{2mm}}
+\newcommand{\brbig}{\vspace{4mm}}
+
+\definecolor{light-gray}{gray}{0.93}
+\DeclareRobustCommand{\hlgray}[1]{{\sethlcolor{light-gray}\hl{#1}}}
+\newcommand{\code}[1]{{\fontsize{11pt}{11pt}\selectfont\hlgray{\hbox{\texttt{#1}}}}}
+
+\newcolumntype{C}[1]{>{\centering}p{#1}}
+\newcolumntype{Y}{>{\centering\arraybackslash}X}
+
+\linespread{1.05}
+
+\newcommand{\hwTitle}{Sprint 2 Planning Document}
+\newcommand{\courseTitle}{CS 307 (Spring 2017)}
+\newcommand{\projectName}{Meetchu}
+\newcommand{\teamName}{Team 17}
+\newcommand{\authorName}{Eric Aguilera, Justin Bonner, Carson Harmon, Dan Zheng}
+
+\lhead{\fontsize{14pt}{14pt}\selectfont{}\courseTitle}
+\chead{\fontsize{14pt}{14pt}\selectfont{}\textbf{\projectName}}
+\rhead{\fontsize{14pt}{14pt}\selectfont{}\teamName}
+
+\pagestyle{fancy}
+
+\begin{document}
+
+\section*{\Large \centering \hwTitle}
+{\centering \authorName \par}
+
+\section{Sprint Overview}
+For our second sprint, we will focus on the main features of our application: messaging, chat, notifications and privacy settings.
+
+By the end of our sprint, users will be able to view public profiles of other users. Users viewing a person’s public profile will be able to see their public information, such as their enrolled courses, as well as start a chat with the person.
+
+Users will be able to create a meeting, specify a name and location, suggest possible dates and times, and invite other users to respond. Meeting invitees can RSVP with their ideal times and the user interface will allow attendees to clearly visualize which times are the best. Meeting creators can finalize a date and time and notify all attendees.
+
+Users will also be to join chat groups and send and receive messages. Chat administrators (the first joining member) will be able to modify the privacy settings of the chat, in particular whether or not the chat is publicly visible. Notifications will help to update users about activities that have occurred in their chats and meetings.
+
+\section{Meeting Plans}
+Our SCRUM master will be Dan Zheng. We plan on meeting at least twice per week. We plan to meet on MWF at 11:30 AM for one to two hours.
+
+\section{Risks and Challenges}
+The biggest risk of this sprint is the large amount of work that needs to be done. Though it should be feasible to finish all of our tasks, there is the possibility that our features will be more difficult to implement than we think. We believe the biggest challenge in the upcoming sprint will be implementing the messaging. Messaging will require live updates to the chat page using Socket.io, which is a technology that our team is not familiar with and will need to learn.
+
+\newpage
+
+\section{Current Sprint Detail}
+
+\textbf{User story \#1}
+
+As a user, I would like to view my notifications.
+
+\brbig
+
+\begin{tabularx}{\textwidth}{|C{0.02\textwidth}|X|C{0.12\textwidth}|p{0.10\textwidth}|}
+\hline
+\textbf{\#} & \textbf{Task description} & \textbf{Estimated Time} & \textbf{Owner} \\ \hline
+
+1 & Create notification model and associate with user model & 2 hrs & Dan \\ \hline
+2 & Add back-end controller for adding user notifications & 2 hrs & Dan \\ \hline
+3 & Add front-end view for notifications & 2 hrs & Dan \\ \hline
+4 & Add logic to existing actions that require notifications & 2 hrs & Dan \\ \hline
+\end{tabularx}
+
+\brbig
+
+\textbf{Acceptance Criteria}
+\begin{itemize}
+\item Given that the back-end controller for notifications is completed, when an activity involving a user, such as a meeting creation, takes place, a notification will be saved to the account of the user.
+\item Given that the front-end view for notifications is completed, when a user navigates to their home page, they will see a list of recent activity notifications.
+\end{itemize}
+
+\br
+
+\textbf{User Story \#2}
+
+As a user, I would like to view public profiles of other users.
+
+\brbig
+
+\begin{tabularx}{\textwidth}{|C{0.02\textwidth}|X|C{0.12\textwidth}|p{0.10\textwidth}|}
+\hline
+\textbf{\#} & \textbf{Task description} & \textbf{Estimated Time} & \textbf{Owner} \\ \hline
+1 & Add front-end view for viewing public profiles. & 5 hrs & Justin \\ \hline
+2 & Add back-end controller for generating a public profile. & 5 hrs & Justin \\ \hline
+3 & Incorporate privacy settings into public profiles. & 5 hrs & Justin \\ \hline
+\end{tabularx}
+
+\brbig
+
+\textbf{Acceptance Criteria}
+\begin{itemize}
+\item Given that the back-end controller for user profiles is completed, when a \code{GET} request to a user profile page is sent, the relevant user information will be retrieved from the database and sent via \code{express} to the front-end view.
+\item Given that the front-end view for user profiles is completed, when a user navigates to a profile page, they will be able to see the public information of that user..
+\end{itemize}
+
+\br
+
+\textbf{User story \#3}
+
+As a user, I would like to view and change my profile privacy settings.
+
+\brbig
+
+\begin{tabularx}{\textwidth}{|C{0.02\textwidth}|X|C{0.12\textwidth}|p{0.10\textwidth}|}
+\hline
+\textbf{\#} & \textbf{Task description} & \textbf{Estimated Time} & \textbf{Owner} \\ \hline
+1 & Add a front-end interface for privacy settings in the user profile view. & 5 hrs & Eric \\ \hline
+2 & Add back-end controller for updating a user’s privacy settings. & 5 hrs & Eric \\ \hline
+\end{tabularx}
+
+\brbig
+
+\textbf{Acceptance Criteria}
+\begin{itemize}
+\item Given that the back-end controller for privacy settings is completed, when an authenticated request is sent to update a user's privacy settings, then the user's settings will be saved in the database and the information shown on the user's profile page will update accordingly.
+\item Given that the front-end view for privacy settings is completed, when a user navigates to their profile page, they will see buttons allowing them to change their privacy preferences.
+\end{itemize}
+
+\br
+
+\textbf{User story \#4}
+
+As a user, I would like to send and receive messages from my chats.
+
+\brbig
+
+\begin{tabularx}{\textwidth}{|C{0.02\textwidth}|X|C{0.12\textwidth}|p{0.10\textwidth}|}
+\hline
+\textbf{\#} & \textbf{Task description} & \textbf{Estimated Time} & \textbf{Owner} \\ \hline
+1 & Add messages model and associate with group model & 5 hrs & Eric \\ \hline
+2 & Create prototype front-end view for chats & 5 hrs & Carson \\ \hline
+3 & Add back-end logic using Socket.io & 5 hrs & Eric \\ \hline
+4 & Add front-end logic using Socket.io & 5 hrs & Eric \\ \hline
+\end{tabularx}
+
+\brbig
+
+\textbf{Acceptance Criteria}
+\begin{itemize}
+\item Given that the back-end logic for messaging is completed, when a ``send message'' request is sent to the server, the new message will be saved in the database and a socket event will be sent to the client. Also, when a ``get messages'' request is sent to the server, then the relevant messages will be found in the database and sent to the client.
+\item Given that the front-end view for messaging is completed, when a user visits a chat page, they will be able to type and send messages using an input box and view messages in the chat.
+\end{itemize}
+
+\br
+
+\textbf{User story \#5}
+
+As a user, I would like to be able to create a meeting, specify a name and location, and invite other users.
+
+\brbig
+
+\begin{tabularx}{\textwidth}{|C{0.02\textwidth}|X|C{0.12\textwidth}|p{0.10\textwidth}|}
+\hline
+\textbf{\#} & \textbf{Task description} & \textbf{Estimated Time} & \textbf{Owner} \\ \hline
+1 & Create meetings model and associate with user model & 3 hrs & Dan \\ \hline
+2 & Create back-end controller for creating meetings and inviting users & 3 hrs
+& Dan \\ \hline
+3 & Create front-end view for meetings page and inviting users & 3 hrs & Dan \\ \hline
+\end{tabularx}
+
+\brbig
+
+\textbf{Acceptance Criteria}
+\begin{itemize}
+\item Given that the front-end view for the meetings page is completed, when a user navigates to the page for creating an account, they will see a form containing fields for email and password. When they submit the form, the fields will be validated and the data will be sent to the back-end controller.
+\item Given that the meetings model and back-end controller for creating meetings is completed, when a request is sent to create an meeting with name, location, and date-time fields, then the fields will be validated and the meeting will be saved in the database. When the back-end controller for inviting users is completed, when a request is sent to invite a user to a meeting, then the user-meeting relation will be saved in the database and a notification will be sent to the user.
+\end{itemize}
+
+\br
+
+\textbf{User story \#6}
+
+As a meeting attendee, I would like to be able to RSVP to a meeting by selecting the dates and times that are best for me.
+
+\brbig
+
+\begin{tabularx}{\textwidth}{|C{0.02\textwidth}|X|C{0.12\textwidth}|p{0.10\textwidth}|}
+\hline
+\textbf{\#} & \textbf{Task description} & \textbf{Estimated Time} & \textbf{Owner} \\ \hline
+1 & Create back-end controller for meetings RSVP & 5 hrs & Dan \\ \hline
+2 & Create front-end view for meetings RSVP & 4 hrs & Dan \\ \hline
+3 & Add data visualization of available times for meetings & 5 hrs & Dan \\ \hline
+\end{tabularx}
+
+\brbig
+
+\textbf{Acceptance Criteria}
+\begin{itemize}
+\item Given that the front-end view for meetings RSVP is completed, when a meeting attendee navigates to a meetings page, they will see a calendar view allowing them to select the times and dates that they are available.
+\item Given that the data visualization of available tiems for meetings is completed, when a meeting attendee navigates to a meetings page, they will see a colored calendar view that will clearly display the best times for meeting for all attendees.
+\item Given that the back-end controller for meetings RSVP is completed, when a meetings RSVP request is sent by a meeting attendee, then the attendee's available times will be saved in the database.
+\end{itemize}
+
+\br
+
+\textbf{User story \#7}
+
+As a meeting creator, I would like to finalize a time and location for a meeting.
+
+\brbig
+
+\begin{tabularx}{\textwidth}{|C{0.02\textwidth}|X|C{0.12\textwidth}|p{0.10\textwidth}|}
+\hline
+\textbf{\#} & \textbf{Task description} & \textbf{Estimated Time} & \textbf{Owner} \\ \hline
+1 & Create back-end controller for finalizing time and location & 3 hrs & Carson \\ \hline
+2 & Create front-end view for finalizing time and location & 3 hrs & Carson \\ \hline
+3 & Add logic for notifying meeting attendees & 3 hrs & Carson \\ \hline
+\end{tabularx}
+
+\brbig
+
+\textbf{Acceptance Criteria}
+\begin{itemize}
+\item Given that the front-end view for finalizing a meeting's time and location is completed, when a meeting creator navigates to a meetings page, they will see a calendar view that allows them to select a final time and location and a submit button.
+\item Given that the back-end controller for finalizing a meeting's time and location is completed, when a request is finalize a meeting, then the meeting's fields will be updated in the database and notifications will be sent to all attendees.
+\end{itemize}
+
+\br
+
+\textbf{User story \#8}
+
+As a meeting creator, I would like to be able to cancel a meeting and notify participants.
+
+\brbig
+
+\begin{tabularx}{\textwidth}{|C{0.02\textwidth}|X|C{0.12\textwidth}|p{0.10\textwidth}|}
+\hline
+\textbf{\#} & \textbf{Task description} & \textbf{Estimated Time} & \textbf{Owner} \\ \hline
+1 & Add back-end controller for handling cancellation of meetings. & 3 hrs & Carson \\ \hline
+2 & Add back-end controller for sending notifications upon meeting cancellation.
+& 3 hrs & Carson \\ \hline
+\end{tabularx}
+
+\brbig
+
+\textbf{Acceptance Criteria}
+\begin{itemize}
+\item Given that the front-end view for cancelling a meeting is completed, when a meeting creator navigates to a meetings page, they will see a button allowing them to delete the meeting.
+\item Given that the back-end controller for cancelling a meeting is completed, when a request is sent to cancel a meeting, then meeting attendees will be notified and the meeting will be deleted in the database.
+\end{itemize}
+
+\newpage
+
+\section{Remaining Backlog}
+
+\subsubsection*{Note: the user stories that will be completed during this sprint are crossed out and bolded. Previously completed user stories are crossed out but not bolded.}
+
+\subsubsection*{As a user, I would like to:}
+
+\begin{enumerate}[nolistsep]
+    \item \st{create a Meetchu account using a valid email and password.}
+    \item \st{recover my password using my email.}
+    \item \st{add profile information (name, photo, major, phone number, short bio) to my account.}
+    \item \st{update my account information at any time.}
+    \item \st{search for courses by title and number.}
+    \item \st{add a course to my account.}
+    \item \st{view people in my courses.}
+    \item \st{view a list of my courses.}
+    \item \st{create and join study groups with people in my classes.}
+    \item \textbf{\st{send personal messages to any other user.}}
+    \item \textbf{\st{view message history with other users.}}
+    \item see users who are online (if time allows)
+    \item \st{link my account with and authenticate using Google and Facebook (if time allows).}
+    \item view my class schedule (if time allows).
+    \item search for people in my classes by name or email (if time allows).
+    \item view the schedules of members in my study groups (if time allows).
+\end{enumerate}
+
+\subsubsection*{As a meeting creator, I would like to:}
+
+\begin{enumerate}[nolistsep]
+    \item \textbf{\st{create a one-time meeting for a study group.}}
+    \item \textbf{\st{create a personal one-time meeting with selected members.}}
+    \item \textbf{\st{suggest possible dates and times for a meeting.}}
+    \item \textbf{\st{add a title, purpose, and location to a meeting.}}
+    \item \textbf{\st{add or remove people from a meeting and notify them.}}
+    \item \textbf{\st{cancel a meeting and notify participants.}}
+    \item \textbf{\st{finalize the date and time for a meeting and notify participants.}}
+    \item \textbf{\st{view participants who have RSVP'd to a meeting.}}
+    \item add an address to a meeting and view on Google Maps (if time allows).
+    \item view meeting attendance (if time allows).
+    \item create a recurring meeting for a study group (if time allows).
+\end{enumerate}
+
+\subsubsection*{As a meeting participant, I would like to:}
+
+\begin{enumerate}[nolistsep]
+    \item \textbf{\st{view my meetings.}}
+    \item \textbf{\st{indicate my preferred times for a meeting.}}
+    \item \textbf{\st{RSVP to a meeting after its date and time have been finalized.}}
+    \item \textbf{\st{set time preferences for group meetings.}}
+    \item \textbf{\st{receive email notifications about upcoming meetings.}}
+\end{enumerate}
+
+\subsubsection*{As a group creator, I would like to:}
+\begin{enumerate}[nolistsep]
+    \item \st{be able to delete the group and notify members.}
+\end{enumerate}
+
+\subsubsection*{As a group member, I would like to:}
+\begin{enumerate}[nolistsep]
+    \item \st{be able to leave the group.}
+    \item \st{invite people to the group.}
+    \item \textbf{\st{send messages to the group.}}
+    \item \textbf{\st{view group messages.}}
+\end{enumerate}
+
+\end{document}
