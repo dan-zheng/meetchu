@@ -54,7 +54,14 @@ const addUserToAlgolia = (user, done) => {
 
 const oauthLogin = (oauthId, profile, done) => {
   const query = {};
-  query[oauthId] = profile.id;
+  query.$or = [];
+  query.$or.push({
+    email: profile.emails[0].value
+  });
+  const temp = {};
+  temp[oauthId] = profile.id;
+  query.$or.push(temp);
+
   const opts = {};
   opts.where = query;
   opts.defaults = {
@@ -62,12 +69,20 @@ const oauthLogin = (oauthId, profile, done) => {
     firstName: profile.name.givenName,
     lastName: profile.name.familyName
   };
+  opts.defaults[oauthId] = profile.id;
+  
   models.User.findOrCreate(opts)
     .spread((user, userWasCreated) => {
       if (userWasCreated) {
         return addUserToAlgolia(user, done);
       }
-      return done(null, user);
+      if (user[oauthId]) {
+        return done(null, user);
+      }
+      user[oauthId] = profile.id;
+      user.save(() => {
+        return done(null, user);
+      });
     })
     .catch((err) => {
       return done(null, false, {
