@@ -281,6 +281,57 @@ exports.postUpdateProfile = (req, res) => {
 };
 
 /*
+ * GET /profile/:id
+ * Get user public profile.
+ */
+exports.getPublicProfile = (req, res) => {
+  const userId = req.params.id;
+  models.User.findOne({
+    where: {
+      id: userId
+    },
+    include: [{
+      model: models.Course
+    }]
+  }).then((user) => {
+    const courses = user.Courses.map((course) => {
+      return course.dataValues;
+    });
+    user = user.dataValues;
+    user.Courses = courses;
+    return res.render('account/public_profile', {
+      title: 'Public Profile',
+      user
+    });
+  }).catch((err) => {
+
+  });
+};
+
+exports.postPublicProfileCreateChat = (req, res) => {
+  const errors = req.validationErrors();
+
+  if (errors) {
+    req.flash('errors', errors);
+    req.session.save(() => {
+      return res.redirect('/chats');
+    });
+  } else {
+    models.Group.create({
+      name: 'Private Chat',
+      description: req.body.description || '',
+      // groupType: req.body.groupType
+    }).then((group) => {
+      group.addUser(req.user);
+      req.flash('success', 'Your chat has been created.');
+      req.session.save(() => {
+        return res.redirect('/chats');
+      });
+    });
+  }
+};
+
+/*
  * POST /account/password
  * Update password.
  */

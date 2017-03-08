@@ -106,6 +106,8 @@ app.get('/account', passportConfig.isAuthenticated, userController.getProfile);
 app.post('/account/profile', passportConfig.isAuthenticated, userController.postUpdateProfile);
 app.post('/account/password', passportConfig.isAuthenticated, userController.postUpdatePassword);
 app.post('/account/delete', passportConfig.isAuthenticated, userController.postDeleteAccount);
+app.get('/profile/:id', passportConfig.isAuthenticated, userController.getPublicProfile);
+app.post('/profile/:id/chat', passportConfig.isAuthenticated, userController.postPublicProfileCreateChat);
 app.get('/forgot', userController.getForgot);
 app.post('/forgot', userController.postForgot);
 app.get('/reset/:token', userController.getPasswordReset);
