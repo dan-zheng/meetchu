@@ -3,8 +3,8 @@ extends ../base
 block content
   .page-header
     h3 #{user.firstName} #{user.lastName}
-
-  h4 Email: #{user.email}
+  - const email = user.privacyShowEmail ? user.email : 'hidden'
+  h4 Email: #{email}
   - const major = user.major || 'unset'
   h4 Major: #{major}
   form.form-horizontal(method='POST', action=`/profile/${user.id}/chat`)

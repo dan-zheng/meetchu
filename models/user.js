@@ -49,6 +49,11 @@ module.exports = (sequelize, Sequelize) => {
     resetPasswordExpires: {
       type: Sequelize.DATE,
       allowNull: true
+    },
+    privacyShowEmail: {
+      type: Sequelize.BOOLEAN,
+      defaultValue: false,
+      allowNull: false
     }
   }, {
     hooks: {
