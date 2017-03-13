@@ -35,6 +35,11 @@ Object.keys(db).forEach((modelName) => {
 db.User.belongsToMany(db.Group, { through: 'UserGroup' });
 db.Group.belongsToMany(db.User, { through: 'UserGroup' });
 
+// Define a Many-to-Many Relationship for Users-Meetings
+// Relationship is defined in UserMeeting table
+db.User.belongsToMany(db.Meeting, { through: 'UserMeeting' });
+db.Meeting.belongsToMany(db.User, { through: 'UserMeeting' });
+
 // Define a Many-to-Many Relationship for Course-Instructor
 // This will allow us to efficiently search for courses based on instructor
 // Since courses may have more than one instructor

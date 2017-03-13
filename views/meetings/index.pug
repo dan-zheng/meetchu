@@ -3,3 +3,33 @@ extends ../base
 block content
   .page-header
     h1 Meetings
+
+  .container-full
+    .col-sm-3
+      h3 Your Meetings
+      if meetings && meetings.length > 0
+        ul.list-group
+          each meeting in meetings
+            .list-group-item
+              a.col-xs-12.course-box.flex-column(href=`/meetings/${meeting.id}`)
+                h4.list-group-item-heading #{meeting.name}
+                if meeting.description
+                  p.list-group-item-text #{meeting.description}
+      else
+        p You are not in any meetings.
+    .col-sm-9
+      h3 Create a meeting
+      form.form-horizontal(method='POST', action='/meetings/create')
+        .form-group
+          label.col-sm-2.control-label(for='name') Name
+          .col-sm-6
+            input.form-control(type='name', name='name', id='name', placeholder='Name', required)
+        .form-group
+          label.col-sm-2.control-label(for='description') Description
+          .col-sm-6
+            input.form-control(type='description', name='description', id='description', placeholder='A short description')
+        .form-group
+          .col-sm-offset-2.col-sm-6
+            button.btn.btn-primary(type='submit')
+              i.fa.fa-plus
+              | Create
