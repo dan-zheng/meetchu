@@ -15,6 +15,9 @@
 # Compiled output
 public/css
 
+# OSx
+.DS_Store
+
 # LaTeX-related
 *.aux
 *.glo

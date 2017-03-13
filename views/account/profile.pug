@@ -1,10 +1,10 @@
 extends ../base
 
 block content
-  .page-header
-    h3 Update Profile
-
   form.form-horizontal(method='POST', action='account/profile')
+    .page-header
+      h3 Update Profile
+
     .form-group
       label.col-sm-3.control-label(for='firstName') Name
       .col-sm-3
@@ -19,6 +19,19 @@ block content
        label.col-sm-3.control-label(for='major') Major
        .col-sm-6
         input.form-control(type='major', name='major', id='major', value=user.major)
+    .form-group
+      .col-sm-offset-3.col-sm-6
+        button.btn.btn-primary(type='submit')
+          i.fa.fa-pencil
+          | Update
+
+    .page-header
+      h3 Privacy Settings
+
+    .form-group
+      label.col-sm-3.control-label(for='privacyShowEmail') Show Email
+      .col-sm-6
+        input(type='checkbox', name='privacyShowEmail', data-toggle='toggle', checked)
     .form-group
       .col-sm-offset-3.col-sm-6
         button.btn.btn-primary(type='submit')
@@ -42,7 +55,7 @@ block content
         button.btn.btn-primary(type='submit')
           i.fa.fa-lock
           | Change password
-          
+
   .page-header
     h3 Delete Account
 

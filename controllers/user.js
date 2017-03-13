@@ -272,6 +272,7 @@ exports.postUpdateProfile = (req, res) => {
   req.user.lastName = req.body.lastName || '';
   req.user.email = req.body.email;
   req.user.major = req.body.major;
+  req.user.privacyShowEmail = req.body.privacyShowEmail === 'on';
   req.user.save().then(() => {
     req.flash('success', 'Your profile information has been updated.');
     req.session.save(() => {
