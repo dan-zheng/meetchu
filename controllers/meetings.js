@@ -26,18 +26,15 @@ exports.getMeeting = (req, res) => {
   }).then((meeting) => {
     if (!meeting) {
       req.flash('error', 'No meeting with the specificied id exists.');
-      req.session.save(() => {
-        return res.redirect('/meetings');
-      });
-    } else {
-      meeting = meeting.dataValues;
-      meeting.Users = meeting.Users.map((user) => {
-        return user.dataValues;
-      });
-      return res.render('meetings/meeting', {
-        title: meeting.Title,
-        meeting
-      });
+      return res.redirect('/meetings');
     }
+    meeting = meeting.dataValues;
+    meeting.Users = meeting.Users.map((user) => {
+      return user.dataValues;
+    });
+    return res.render('meetings/meeting', {
+      title: meeting.Title,
+      meeting
+    });
   });
 };

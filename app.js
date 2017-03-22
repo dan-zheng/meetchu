@@ -5,7 +5,7 @@ const dotenv = require('dotenv');
 const express = require('express');
 const passport = require('passport');
 const session = require('express-session');
-const SequelizeStore = require('express-session-sequelize')(session.Store);
+const MySQLStore = require('express-mysql-session')(session);
 const path = require('path');
 const compression = require('compression');
 const bodyParser = require('body-parser');
@@ -39,8 +39,15 @@ const courseController = require('./controllers/courses');
  * Passport configuration.
  */
 const passportConfig = require('./config/passport');
-const sequelizeStore = new SequelizeStore({
-  db: models.sequelize
+const sessionStore = new MySQLStore({
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASS,
+  database: process.env.DB_NAME,
+  schema: {
+    tableName: 'Sessions'
+  }
 });
 
 /**
@@ -66,12 +73,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(validator());
 app.use(session({
   secret: process.env.SESSION_SECRET,
-  store: sequelizeStore,
-  cookie: {
-    maxAge: 1000 * 60 * 60 * 24 * 7
-  },
+  store: sessionStore,
   saveUninitialized: true,
-  resave: false,
+  resave: true,
   proxy: true
 }));
 app.use(passport.initialize());
@@ -82,9 +86,11 @@ app.use((req, res, next) => {
   next();
 });
 app.use((req, res, next) => {
-  // After successful login, redirect back to the intended page
+  // Force responses with code 304 to have code 200
+  req.headers['if-none-match'] = 'no-match-for-this';
+  // Save last visited valid page
   req.on('end', () => {
-    if (// !req.user &&
+    if (res.statusCode === 200 &&
         req.path !== '/login' &&
         req.path !== '/signup' &&
         !req.path.match(/^\/reset/) &&
@@ -138,6 +144,7 @@ app.get('/auth/google', authController.getAuthGoogle);
 app.get('/auth/google/callback', authController.getAuthGoogleCallback);
 app.get('/auth/facebook', authController.getAuthFacebook);
 app.get('/auth/facebook/callback', authController.getAuthFacebookCallback);
+
 /**
  * Create any missing database tables and start Express server.
  */
