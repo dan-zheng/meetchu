@@ -3,11 +3,22 @@ extends ../base
 block content
   .page-header
     h1 #{group.name}
-    
+
+  .container-full
+    .col-md-4
+      h4 Chat
+
+      ul.list-group#chat-box
+        
+      form.form-horizontal(action='')#chat-form
+        .col-sm-6
+            input(placeholder='Enter chat messsage')#chat-message
+            button.btn.btn-primary Send
+                  
   .container-full
     .col-md-4
       h4 Members
-      
+
       ul.list-group
         each user in group.Users
           .list-group-item
@@ -18,7 +29,7 @@ block content
     .col-md-8
       .container-full
         h4 Invite a user
-        
+
         form.form-horizontal(method='POST', action=`/chats/${group.id}/invite`)
           .form-group
             label.col-sm-2.control-label(for='email') Email
@@ -37,7 +48,7 @@ block content
 
       .container-full
         h4 Leave chat
-        
+
         form.form-horizontal(method='POST', action=`/chats/${group.id}/leave`)
           .form-group
             .col-sm-offset-2.col-sm-6

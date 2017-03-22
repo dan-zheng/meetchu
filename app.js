@@ -104,6 +104,19 @@ app.use((req, res, next) => {
 app.use(express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 }));
 
 /*
+ * Socket.io setup.
+ */
+const http = require('http').createServer(app);
+const io = require('socket.io')(http);
+
+http.listen(8080, "127.0.0.1");
+io.on('connection', (socket) => {
+  socket.on('chat message', (msg) => {
+    io.emit('chat message', msg);
+  });
+});
+
+/*
  * App routes.
  */
 app.get('/', homeController.index);
