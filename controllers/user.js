@@ -305,7 +305,10 @@ exports.getPublicProfile = (req, res) => {
       user
     });
   }).catch((err) => {
-
+    req.flash('info', 'User profile page does not exist.');
+    req.session.save(() => {
+      return res.redirect(req.session.returnTo);
+    });
   });
 };
 

@@ -82,20 +82,24 @@ app.use((req, res, next) => {
   next();
 });
 app.use((req, res, next) => {
-    // After successful login, redirect back to the intended page
-  if (// !req.user &&
-      req.path !== '/login' &&
-      req.path !== '/signup' &&
-      !req.path.match(/^\/reset/) &&
-      !req.path.match(/^\/auth/) &&
-      !req.path.match(/\./)) {
-    req.session.returnTo = req.path;
-    req.session.save(() => {
-      next();
-    });
-  } else {
-    next();
-  }
+  // After successful login, redirect back to the intended page
+  req.on('end', () => {
+    console.log(`res.statusCode: ${res.statusCode}`);
+    if (// !req.user &&
+        req.path !== '/login' &&
+        req.path !== '/signup' &&
+        !req.path.match(/^\/reset/) &&
+        !req.path.match(/^\/auth/) &&
+        !req.path.match(/\./)) {
+      req.session.returnTo = req.path;
+      req.session.save(() => {
+        console.log(`req.session.returnTo succ: ${req.session.returnTo}`);
+      });
+    } else {
+      console.log(`req.session.returnTo fail: ${req.session.returnTo}`);
+    }
+  });
+  next();
 });
 app.use(express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 }));
 
