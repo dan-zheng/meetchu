@@ -18,29 +18,29 @@ const removeTags = ((input) => {
 
 // Initialize autocomplete on search input (ID selector must match)
 searchInput.textcomplete([{
-    // Regular expression used to trigger the autocomplete dropdown
+  // Regular expression used to trigger the autocomplete dropdown
   match: /(^)(.*)$/,
-    // Function called at every new keystroke
+  // Function called at every new keystroke
   search: (query, callback) => {
     lastQuery = query;
     index.search(lastQuery, { hitsPerPage: numOfResultsDisplayed })
-        .then((content) => {
-          if (content.query === lastQuery) {
-            callback(content.hits);
-          }
-        })
-        .catch((err) => {
-          console.error(err);
-        });
+      .then((content) => {
+        if (content.query === lastQuery) {
+          callback(content.hits);
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+      });
   },
-    // Template used to display each result obtained by the Algolia API
+  // Template used to display each result obtained by the Algolia API
   template: (hit) => {
-      // Returns the highlighted version of the name attribute
+    // Returns the highlighted version of the name attribute
     return '<span>' + hit._highlightResult.email.value + ' </span><span class="hspace"></spam><span>' +
-        hit._highlightResult.firstName.value + ' ' + hit._highlightResult.lastName.value +
-        '</span>';
+      hit._highlightResult.firstName.value + ' ' + hit._highlightResult.lastName.value +
+      '</span>';
   },
-    // Template used to display the selected result in the textarea
+  // Template used to display the selected result in the textarea
   replace: (hit) => {
     return hit.email.trim();
   }
