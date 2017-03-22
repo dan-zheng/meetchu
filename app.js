@@ -9,6 +9,7 @@ const SequelizeStore = require('express-session-sequelize')(session.Store);
 const path = require('path');
 const compression = require('compression');
 const bodyParser = require('body-parser');
+const logger = require('morgan');
 const sass = require('node-sass-middleware');
 const flash = require('express-flash');
 const validator = require('express-validator');
@@ -56,6 +57,7 @@ app.use(sass({
   prefix: '/css',
   outputStyle: process.env.NODE_ENV === 'production' ? 'compressed' : 'nested'
 }));
+app.use(logger('dev'));
 if (process.env.NODE_ENV !== 'production') {
   app.locals.pretty = true;
 }
