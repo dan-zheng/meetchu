@@ -15,7 +15,7 @@
 # Compiled output
 public/css
 
-# OSx
+# macOS
 .DS_Store
 
 # LaTeX-related
