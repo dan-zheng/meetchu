@@ -18,6 +18,12 @@ module.exports = (sequelize, Sequelize) => {
       defaultValue: 'private-message',
       allowNull: false
     }
+  }, {
+    classMethods: {
+      associate: (models) => {
+        Group.belongsToMany(models.User, { through: 'UserGroup' });
+      }
+    }
   });
   return Group;
 };

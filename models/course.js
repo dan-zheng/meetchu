@@ -28,6 +28,12 @@ module.exports = (sequelize, Sequelize) => {
       allowNull: false
     }
   }, {
+    classMethods: {
+      associate: (models) => {
+        Course.belongsToMany(models.User, { through: 'CourseUser' });
+        Course.belongsToMany(models.Instructor, { through: 'CourseInstructor' });
+      }
+    },
     timestamps: false
   });
   return Course;

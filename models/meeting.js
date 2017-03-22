@@ -12,6 +12,12 @@ module.exports = (sequelize, Sequelize) => {
     description: {
       type: Sequelize.STRING
     }
+  }, {
+    classMethods: {
+      associate: (models) => {
+        Meeting.belongsToMany(models.User, { through: 'UserMeeting' });
+      }
+    }
   });
   return Meeting;
 };

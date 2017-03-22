@@ -56,6 +56,13 @@ module.exports = (sequelize, Sequelize) => {
       allowNull: false
     }
   }, {
+    classMethods: {
+      associate: (models) => {
+        User.belongsToMany(models.Group, { through: 'UserGroup' });
+        User.belongsToMany(models.Meeting, { through: 'UserMeeting' });
+        User.belongsToMany(models.Course, { through: 'CourseUser' });
+      }
+    },
     hooks: {
       beforeCreate: (model, options, done) => {
         if (model.password) {

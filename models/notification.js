@@ -12,6 +12,12 @@ module.exports = (sequelize, Sequelize) => {
     timestamps: true,
     createdAt: true,
     updatedAt: false
+  }, {
+    classMethods: {
+      associate: (models) => {
+        Notification.belongsTo(models.User, { through: 'UserNotification' });
+      }
+    }
   });
   return Notification;
 };

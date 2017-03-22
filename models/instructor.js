@@ -17,6 +17,12 @@ module.exports = (sequelize, Sequelize) => {
       allowNull: false,
       unique: true
     }
+  }, {
+    classMethods: {
+      associate: (models) => {
+        Instructor.belongsToMany(models.Course, { through: 'CourseInstructor' });
+      }
+    }
   });
   return Instructor;
 };
