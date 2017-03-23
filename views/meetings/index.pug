@@ -5,7 +5,7 @@ block content
     h1 Meetings
 
   .container-full
-    .col-sm-3
+    .col-md-3
       h3 Your Meetings
       if meetings && meetings.length > 0
         ul.list-group
@@ -17,27 +17,29 @@ block content
                   p.list-group-item-text #{meeting.description}
       else
         p You are not in any meetings.
-    .col-sm-9
+    .col-md-9
       h3 Create a meeting
       form.form-horizontal(method='POST', action='/meetings/create')
         .form-group
-          label.col-sm-2.control-label(for='name') Name
-          .col-sm-6
+          label.col-md-2.control-label(for='name') Name
+          .col-md-6
             input.form-control(type='name', name='name', id='name', placeholder='Name', required)
         .form-group
-          label.col-sm-2.control-label(for='description') Description
-          .col-sm-6
+          label.col-md-2.control-label(for='description') Description
+          .col-md-6
             input.form-control(type='description', name='description', id='description', placeholder='A short description')
         .form-group
-          .col-sm-offset-2.col-sm-6
+          label.col-md-2.control-label Dates
+          .col-md-6.container-full
+            .col-md-6
+              select.form-control(name='month', id='month')
+            .col-md-6
+              select.form-control(name='year', id='year')
+        .form-group
+          .col-md-offset-2.col-md-6
+            .calendar
+        .form-group
+          .col-md-offset-2.col-md-6
             button.btn.btn-primary(type='submit')
               i.fa.fa-plus
               | Create
-
-        .form-group
-          .col-sm-6
-            .col-sm-6
-              select.form-control(name='month', id='month')
-            .col-sm-6
-              select.form-control(name='year', id='year')
-        .calendar

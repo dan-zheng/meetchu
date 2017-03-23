@@ -1,20 +1,29 @@
 .calendar {
-  width: 600px;
-  height: 400px;
+  max-width: calc(57px * 7);
+  font-size: 16px;
+  margin: auto;
   border-collapse: collapse;
-  
+
+  @media (max-width: $screen-xs-max) {
+    max-width: calc(40px * 7);
+    font-size: 13px;
+  }
+
   .calendar-cell {
-    //display: block;
+    color: #fff;
+    background-color: $brand-primary;
+    height: 40px;
     width: calc(100% / 7);
-    // padding-left: 5px;
-    // padding-right: 5px;
-    // border: 1px solid black;
-    border: 2px solid white;
-    background-color: gray;
+    padding-left: 2px;
+    padding-right: 2px;
+    border: 1.5px solid white;
     text-align: center;
 
+    &.past {
+      background-color: lighten($brand-primary, 25%);
+    }
+
     &.empty {
-      border: none;
       background-color: transparent;
     }
   }
