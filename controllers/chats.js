@@ -52,9 +52,9 @@ exports.getChat = (req, res) => {
     const isAdmin = group.Users[0].id === req.user.id;
     return res.render('chats/chat', {
       title: group.name,
+      tag: 'Chat',
       group,
-      isAdmin,
-      tag: 'Chat'
+      isAdmin
     });
   });
 };

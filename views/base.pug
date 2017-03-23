@@ -46,13 +46,23 @@ html
     script(src='/js/lib/pace.min.js')
     script(src='/js/main.js')
     if title == 'Courses'
-      // Include AlgoliaSearch JS Client and autocomplete.js library
+      // Include AlgoliaSearch JS Client and autocomplete.js libraries
       script(src='https://cdn.jsdelivr.net/algoliasearch/3/algoliasearch.min.js')
       script(src='https://cdn.jsdelivr.net/autocomplete.js/0/autocomplete.jquery.min.js')
       script(src='/js/courses.js')
     else if tag == 'Chat'
-      // Include AlgoliaSearch JS Client and jQuery text-complete library
+      // Include AlgoliaSearch JS Client and jQuery text-complete libraries
       script(src='https://cdn.jsdelivr.net/algoliasearch/3/algoliasearch.min.js')
       script(src='https://cdnjs.cloudflare.com/ajax/libs/jquery.textcomplete/1.8.0/jquery.textcomplete.min.js')
       script(src='/js/lib/socket.io.min.js')
       script(src='/js/chat.js')
+    else if tag == 'Meeting'
+      // Include calendar and d3 libraries
+      script(src='/js/lib/calendar.min.js')
+      script(src='/js/lib/d3.min.js')
+      if title == 'Meetings'
+        script(src='/js/meetings.js')
+      else
+        script(src='/js/meeting.js')
+
+

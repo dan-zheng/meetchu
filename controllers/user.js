@@ -6,7 +6,6 @@ const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const algoliasearch = require('algoliasearch');
 const pug = require('pug');
-const resetTemplate = pug.compileFile('views/email/reset.pug');
 
 /**
  * Nodemailer transport configuration.
@@ -19,7 +18,7 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-/*
+/**
  * Algolia configuration.
  */
 // const client = algoliasearch(process.env.ALGOLIA_ID, process.env.ALGOLIA_ADMIN_KEY);
@@ -69,7 +68,7 @@ exports.postSignup = (req, res, next) => {
       req.flash('error', 'An account with that email already exists.');
       return res.redirect('/signup');
     }
-        // Add user to Algolia index
+    // Add user to Algolia index
     const userValues = {
       objectID: user.dataValues.id,
       firstName: user.dataValues.firstName,
@@ -81,7 +80,7 @@ exports.postSignup = (req, res, next) => {
         return next(err);
       }
     });
-        // Log in with Passport
+    // Log in with Passport
     req.logIn(user, (err) => {
       if (err) {
         return next(err);
@@ -166,6 +165,7 @@ exports.postForgot = (req, res, next) => {
     },
     (token, user, done) => {
       const resetURL = `http://${req.headers.host}/reset/${token}`;
+      const resetTemplate = pug.compileFile('views/email/reset.pug');
       const mailOpts = {
         to: user.email,
         from: process.env.SENDGRID_USERNAME,
@@ -178,7 +178,9 @@ exports.postForgot = (req, res, next) => {
       });
     }
   ], (err) => {
-    if (err) { return next(err); }
+    if (err) {
+      return next(err);
+    }
     return res.redirect('/forgot');
   });
 };
@@ -203,11 +205,12 @@ exports.getPasswordReset = (req, res) => {
     });
   });
 };
+
 /**
  * POST /reset
  * Reset password.
  */
-exports.postPasswordReset = (req, res, next) => {
+exports.postPasswordReset = (req, res) => {
   models.User.findOne({
     where: {
       resetPasswordToken: req.params.token,
@@ -231,17 +234,17 @@ exports.postPasswordReset = (req, res, next) => {
   });
 };
 
-/*
+/**
  * GET /account
  * Account page.
  */
 exports.getProfile = (req, res) => {
-  return res.render('account/profile', {
+  return res.render('account/account', {
     title: 'Update profile'
   });
 };
 
-/*
+/**
  * POST /account/profile
  * Update profile information.
  */
@@ -257,7 +260,7 @@ exports.postUpdateProfile = (req, res) => {
   });
 };
 
-/*
+/**
  * GET /profile/:id
  * Get user public profile.
  */
@@ -276,7 +279,7 @@ exports.getPublicProfile = (req, res) => {
     });
     user = user.dataValues;
     user.Courses = courses;
-    return res.render('account/public_profile', {
+    return res.render('account/profile', {
       title: 'Public Profile',
       user
     });
@@ -286,6 +289,10 @@ exports.getPublicProfile = (req, res) => {
   });
 };
 
+/**
+ * POST /profile/:id/chat
+ * Update password.
+ */
 exports.postPublicProfileCreateChat = (req, res) => {
   const errors = req.validationErrors();
 
@@ -296,7 +303,7 @@ exports.postPublicProfileCreateChat = (req, res) => {
   models.Group.create({
     name: 'Private Chat',
     description: req.body.description || '',
-      // groupType: req.body.groupType
+    // groupType: req.body.groupType
   }).then((group) => {
     group.addUser(req.user);
     req.flash('success', 'Your chat has been created.');
@@ -304,7 +311,7 @@ exports.postPublicProfileCreateChat = (req, res) => {
   });
 };
 
-/*
+/**
  * POST /account/password
  * Update password.
  */

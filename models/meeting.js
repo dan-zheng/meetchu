@@ -16,6 +16,7 @@ module.exports = (sequelize, Sequelize) => {
     classMethods: {
       associate: (models) => {
         Meeting.belongsToMany(models.User, { through: 'UserMeeting' });
+        Meeting.hasMany(models.DateTime);
       }
     }
   });

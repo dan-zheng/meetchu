@@ -1,0 +1,26 @@
+.calendar {
+  width: 600px;
+  height: 400px;
+  border-collapse: collapse;
+  
+  .calendar-cell {
+    //display: block;
+    width: calc(100% / 7);
+    // padding-left: 5px;
+    // padding-right: 5px;
+    // border: 1px solid black;
+    border: 2px solid white;
+    background-color: gray;
+    text-align: center;
+
+    &.empty {
+      border: none;
+      background-color: transparent;
+    }
+  }
+  
+  .calendar-header {
+    color: white;
+    background: black;
+  }
+}

@@ -6,7 +6,9 @@ const passport = require('passport');
  */
 exports.loginCallback = ((strategy, req, res, next) => {
   passport.authenticate(strategy, (err1, user, info) => {
-    if (err1) { return next(err1); }
+    if (err1) {
+      return next(err1);
+    }
     if (!user) {
       req.flash('error', info.message);
       req.session.save(() => {
@@ -14,7 +16,9 @@ exports.loginCallback = ((strategy, req, res, next) => {
       });
     } else {
       req.login(user, (err2) => {
-        if (err2) { return next(err2); }
+        if (err2) {
+          return next(err2);
+        }
         req.session.save(() => {
           return res.redirect('/');
         });

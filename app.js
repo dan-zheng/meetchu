@@ -90,12 +90,8 @@ app.use((req, res, next) => {
   req.headers['if-none-match'] = 'no-match-for-this';
   // Save last visited valid page
   req.on('end', () => {
-    if (res.statusCode === 200 &&
-        req.path !== '/login' &&
-        req.path !== '/signup' &&
-        !req.path.match(/^\/reset/) &&
-        !req.path.match(/^\/auth/) &&
-        !req.path.match(/\./)) {
+    if (res.statusCode === 200 && req.path !== '/login' && req.path !== '/signup' && !req.path.match(/^\/reset/)
+        && !req.path.match(/^\/auth/) && !req.path.match(/\./)) {
       req.session.returnTo = req.path;
       req.session.save();
     }
@@ -148,7 +144,8 @@ app.post('/courses/add', passportConfig.isAuthenticated, courseController.postAd
 app.post('/courses/remove/:id', passportConfig.isAuthenticated, courseController.postRemoveCourse);
 app.post('/courses/auth', passportConfig.isAuthenticated, courseController.postAuthCourses);
 app.get('/meetings', passportConfig.isAuthenticated, meetingController.getMeetings);
-app.get('/meeting/:id', passportConfig.isAuthenticated, meetingController.getMeeting);
+app.get('/meetings/:id', passportConfig.isAuthenticated, meetingController.getMeeting);
+app.post('/meetings/create', passportConfig.isAuthenticated, meetingController.postCreateMeeting);
 
 /**
  * OAuth authentication routes.

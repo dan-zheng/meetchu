@@ -1,6 +1,7 @@
 @import '_variables';
 @import 'lib/bootstrap/bootstrap/_variables.scss';
 @import '_search';
+@import '_calendar';
 
 @mixin styling($sidebar-width, $icon-padding) {
   #wrapper {

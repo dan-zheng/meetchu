@@ -1,0 +1,17 @@
+extends ../base
+
+block content
+  .page-header
+    h1 #{meeting.name}
+    h3 #{meeting.description}
+
+  .container-full
+    .col-sm-4
+      h4 Students
+      
+      ul.list-group
+        each user in meeting.Users
+          .list-group-item
+            .col-xs-9.course-box.flex-column
+              h4.list-group-item-heading #{user.firstName} #{user.lastName}
+              p.list-group-item-text #{user.email}
