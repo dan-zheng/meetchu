@@ -9,27 +9,55 @@
     font-size: 13px;
   }
 
-  .calendar-cell {
+  .cal-cell {
+    display: inline-block;
     color: #fff;
     background-color: $brand-primary;
     height: 40px;
-    width: calc(100% / 7);
-    padding-left: 2px;
-    padding-right: 2px;
-    border: 1.5px solid white;
+    line-height: 40px;
+    width: calc((100% / 7) - 3px);
+    margin: 1px;
+    border: 2px solid transparent;
     text-align: center;
+    cursor: pointer;
+    align-items: flex-start;
 
-    &.past {
+    &.cal-cell-past {
       background-color: lighten($brand-primary, 25%);
+
+      &:hover {
+        border-color: darken(lighten($brand-primary, 25%), 5%);
+      }
     }
 
-    &.empty {
+    &.cal-cell-empty {
       background-color: transparent;
+    }
+
+    //&.cell-selecting, &.cell-selected {
+    //&.ui-selecting, &.ui-selected {
+    &.selected {
+      background-color: $cal-green;
+      padding: 0;
+      border: 2px solid darken($cal-green, 5%);
+
+      &:hover {
+        border-color: darken($cal-green, 10%);
+      }
+    }
+
+    &:hover {
+      border-color: darken($brand-primary, 5%);
+    }
+
+    &:focus {
+      outline: none;
     }
   }
   
-  .calendar-header {
+  .cal-cell-header {
     color: white;
     background: black;
+    pointer-events: none;
   }
 }
