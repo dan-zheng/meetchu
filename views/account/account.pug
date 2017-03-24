@@ -33,6 +33,14 @@ block content
       .col-sm-6
         input(type='checkbox', name='privacyShowEmail', data-toggle='toggle', checked=user.privacyShowEmail)
     .form-group
+      label.col-sm-3.control-label(for='privacyShowMajor') Show Major
+      .col-sm-6
+        input(type='checkbox', name='privacyShowMajor', data-toggle='toggle', checked=user.privacyShowMajor)
+    .form-group
+      label.col-sm-3.control-label(for='privacyShowProfilePicture') Show Profile Picture
+      .col-sm-6
+        input(type='checkbox', name='privacyShowProfilePicture', data-toggle='toggle', checked=user.privacyShowProfilePicture)
+    .form-group
       .col-sm-offset-3.col-sm-6
         button.btn.btn-primary(type='submit')
           i.fa.fa-pencil
