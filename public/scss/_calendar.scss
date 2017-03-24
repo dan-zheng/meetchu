@@ -20,6 +20,7 @@
     border: 2px solid transparent;
     text-align: center;
     cursor: pointer;
+    user-select: none;
     align-items: flex-start;
 
     &.cal-cell-past {

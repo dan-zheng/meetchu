@@ -9,6 +9,35 @@ const calendar = d3.select('.calendar');
 
 let selected = [];
 let state;
+let mouseDown = false;
+
+$(document).mousedown((e) => {
+  mouseDown = true;
+}).mouseup((e) => {
+  mouseDown = false;
+});
+
+const isSameDate = (d1, d2) => {
+  return d1.toDateString() === d2.toDateString();
+}
+
+const getDate = (cell) => {
+  const month = monthInput.find(':selected').text();
+  const year = yearInput.find(":selected").text();
+  return new Date(year, Calendar.parseMonth(month), cell.text());
+}
+
+const toggleDate = (date) => {
+  for (let i = 0; i < selected.length; i++) {
+    if (isSameDate(selected[i], date)) {
+      selected.splice(selected.indexOf(date), 1);
+      console.log(selected);
+      return;
+    }
+  }
+  selected.push(date);
+  console.log(selected);
+}
 
 const updateCalendar = (date) => {
   const now = new Date();
@@ -52,73 +81,25 @@ const updateCalendar = (date) => {
   const selectAttr = 'selected';
 
   $('.cal-body .cal-cell').mousedown(function(e) {
-    state = $(this).hasClass(selectAttr);
+    const cell = $(this);
+    const date = getDate(cell);
+    state = cell.hasClass(selectAttr);
     console.log(state);
+    cell.toggleClass(selectAttr);
+    toggleDate(date);
   });
 
-  $('.cal-body').mousedown((e) => {
-    e.metaKey = true;
-  }).selectable({
-    selecting(event, ui) {
-      console.log('selecting, state = ' + state);
-      if (state) {
-        $(ui.selecting).removeClass(selectAttr);
-      } else {
-        $(ui.selecting).addClass(selectAttr);
-      }
-    },
-    /*
-    unselecting(event, ui) {
-      console.log('unselecting, state = ' + state);
-      if (state) {
-        $(ui.unselecting).removeClass('ui-selected');
-      } else {
-        $(ui.unselecting).addClass('ui-selected');
-      }
-    },
-    */
-    selected(event, ui) {
-      console.log('selected, state = ' + state);
-      const select = $(ui.selected).hasClass('ui-selecting');
-      if (select) {
-        $(ui.selected).removeClass(selectAttr);
-      } else {
-        $(ui.selected).addClass(selectAttr);
-      }
-    },
-    /*
-    unselected(event, ui) {
-      const select = $(ui.selected).hasClass('ui-selecting');
-      if (select) {
-        $(ui.unselected).removeClass('ui-selected');
-      } else {
-        $(ui.unselected).addClass('ui-selected');
+  $('.cal-body .cal-cell').mouseover(function(e) {
+    console.log('mouseover');
+    if (mouseDown) {
+      const cell = $(this);
+      const date = getDate(cell);
+      const select = cell.hasClass(selectAttr);
+      if (select === state) {
+        cell.toggleClass(selectAttr);
+        toggleDate(date);
       }
     }
-    */
-    /*
-     selecting(event, ui) {
-     selected: (event, ui) {
-     test = ui;
-     const cell = $(ui.selected).find('.cal-cell');
-     co
-     const year = yearInput.find(":selected").text();
-     const date = new Date(year, Calendar.parseMonth(month), cell.text());
-     console.log(cell);
-     console.log(date);
-     cell.attr('selected', (i, v) => {
-     v = !v;
-     if (v) {
-     selected.push(date);
-     } else {
-     selected.splice(selected.indexOf(date), 1);
-     }
-     console.log(selected);
-     return v;
-     });
-     }
-     }
-     */
   });
 };
 
@@ -153,23 +134,3 @@ yearInput.change(() => {
 });
 
 updateCalendar(now);
-
-
-/*
-$('.calendar-cell').mousedown(function() {
-  const cell = $(this);
-  const month = monthInput.find(':selected').text();
-  const year = yearInput.find(":selected").text();
-  const date = new Date(year, Calendar.parseMonth(month), cell.text());
-  cell.attr('selected', (i, v) => {
-    v = !v;
-    if (v) {
-      selected.push(date);
-    } else {
-      selected.splice(selected.indexOf(date), 1);
-    }
-    console.log(selected);
-    return v;
-  });
-});
-*/
