@@ -254,6 +254,8 @@ exports.postUpdateProfile = (req, res) => {
   req.user.email = req.body.email;
   req.user.major = req.body.major;
   req.user.privacyShowEmail = req.body.privacyShowEmail === 'on';
+  req.user.privacyShowMajor = req.body.privacyShowMajor === 'on';
+  req.user.privacyShowProfilePicture = req.body.privacyShowProfilePicture === 'on';
   req.user.save().then(() => {
     req.flash('success', 'Your profile information has been updated.');
     return res.redirect('/account');

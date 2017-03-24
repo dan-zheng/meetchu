@@ -106,10 +106,11 @@ app.use(express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 }))
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
 
-http.listen(8080, "127.0.0.1");
+http.listen(8080, '127.0.0.1');
 io.on('connection', (socket) => {
-  socket.on('chat message', (msg) => {
-    io.emit('chat message', msg);
+  socket.on('send message', (rec) => {
+    models.Message.create({ text: rec.text, groupId: rec.groupId, senderId: rec.senderId });
+    io.emit(`receive message ${rec.groupId}`, { text: rec.text, senderId: rec.senderId });
   });
 });
 

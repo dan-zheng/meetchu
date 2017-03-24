@@ -50,10 +50,24 @@ module.exports = (sequelize, Sequelize) => {
       type: Sequelize.DATE,
       allowNull: true
     },
+    profilePictureURL: {
+      type: Sequelize.STRING,
+      allowNull: true
+    },
     privacyShowEmail: {
       type: Sequelize.BOOLEAN,
       defaultValue: false,
       allowNull: false
+    },
+    privacyShowMajor: {
+      type: Sequelize.BOOLEAN,
+      defaultValue: true,
+      allowNull: false
+    },
+    privacyShowProfilePicture: {
+      type: Sequelize.BOOLEAN,
+      defaultValue: true,
+      allowNull: true
     }
   }, {
     classMethods: {
