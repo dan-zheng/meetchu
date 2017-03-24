@@ -1,68 +1,15 @@
 extends ../base
 
 block content
-  form.form-horizontal(method='POST', action='account/profile')
-    .page-header
-      h3 Update Profile
-
-    .form-group
-      label.col-sm-3.control-label(for='firstName') Name
-      .col-sm-3
-        input.form-control(type='firstName', name='firstName', id='firstName', placeholder='First', value=user.firstName, autofocus, required)
-      .col-sm-3
-        input.form-control(type='lastName', name='lastName', id='lastName', placeholder='Last', value=user.lastName, required)
-    .form-group
-      label.col-sm-3.control-label(for='email') Email
-      .col-sm-6
-        input.form-control(type='email', name='email', id='email', value=user.email, required)
-    .form-group
-       label.col-sm-3.control-label(for='major') Major
-       .col-sm-6
-        input.form-control(type='major', name='major', id='major', value=user.major)
+  .page-header
+    h3 #{user.firstName} #{user.lastName}
+  - const email = user.privacyShowEmail ? user.email : 'hidden'
+  h4 Email: #{email}
+  - const major = user.major || 'unset'
+  h4 Major: #{major}
+  form.form-horizontal(method='POST', action=`/profile/${user.id}/chat`)
     .form-group
       .col-sm-offset-3.col-sm-6
         button.btn.btn-primary(type='submit')
           i.fa.fa-pencil
-          | Update
-
-    .page-header
-      h3 Privacy Settings
-
-    .form-group
-      label.col-sm-3.control-label(for='privacyShowEmail') Show Email
-      .col-sm-6
-        input(type='checkbox', name='privacyShowEmail', data-toggle='toggle', checked=user.privacyShowEmail)
-    .form-group
-      .col-sm-offset-3.col-sm-6
-        button.btn.btn-primary(type='submit')
-          i.fa.fa-pencil
-          | Update
-
-  .page-header
-    h3 Change Password
-
-  form.form-horizontal(method='POST', action='account/password')
-    .form-group
-      label.col-sm-3.control-label(for='password') New Password
-      .col-sm-6
-        input.form-control(type='password', name='password', id='password', placeholder='Password', required)
-    .form-group
-      label.col-sm-3.control-label(for='confirmPassword') Confirm Password
-      .col-sm-6
-        input.form-control(type='password', name='confirmPassword', id='confirmPassword', placeholder='Confirm Password', required)
-    .form-group
-      .col-sm-offset-3.col-sm-6
-        button.btn.btn-primary(type='submit')
-          i.fa.fa-lock
-          | Change password
-
-  .page-header
-    h3 Delete Account
-
-  form.form-horizontal(method='POST', action='/account/delete')
-    .form-group
-      p.col-sm-offset-3.col-sm-4 You can delete your account, but keep in mind this action is irreversible.
-      .col-sm-offset-3.col-sm-4
-        button.btn.btn-danger(type='submit')
-          i.fa.fa-trash
-          | Delete my account
+          | Start a chat

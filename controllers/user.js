@@ -6,7 +6,6 @@ const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const algoliasearch = require('algoliasearch');
 const pug = require('pug');
-const resetTemplate = pug.compileFile('views/email/reset.pug');
 
 /**
  * Nodemailer transport configuration.
@@ -19,7 +18,7 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-/*
+/**
  * Algolia configuration.
  */
 // const client = algoliasearch(process.env.ALGOLIA_ID, process.env.ALGOLIA_ADMIN_KEY);
@@ -53,55 +52,45 @@ exports.postSignup = (req, res, next) => {
 
   if (errors) {
     req.flash('error', errors);
-    req.session.save(() => {
-      return res.redirect('/signup');
-    });
-  } else {
-    models.User.findOrCreate({
-      where: {
-        email: req.body.email
-      },
-      defaults: {
-        firstName: req.body.firstName,
-        lastName: req.body.lastName,
-        password: req.body.password
-      }
-    }).spread((user, wasCreated) => {
-      if (!wasCreated) {
-        req.flash('error', 'An account with that email already exists.');
-        req.session.save(() => {
-          return res.redirect('/signup');
-        });
-      } else {
-        // Add user to Algolia index
-        const userValues = {
-          objectID: user.dataValues.id,
-          firstName: user.dataValues.firstName,
-          lastName: user.dataValues.lastName,
-          email: user.dataValues.email
-        };
-        userIndex.addObjects([userValues], (err, content) => {
-          if (err) {
-            return next(err);
-          }
-        });
-        // Log in with Passport
-        req.logIn(user, (err) => {
-          if (err) {
-            return next(err);
-          }
-          req.session.save(() => {
-            return res.redirect(req.session.returnTo || '/');
-          });
-        });
-      }
-    }).catch((err) => {
-      req.flash('error', 'Database error: user was not created.');
-      req.session.save(() => {
-        return res.redirect('/signup');
-      });
-    });
+    return res.redirect('/signup');
   }
+  models.User.findOrCreate({
+    where: {
+      email: req.body.email
+    },
+    defaults: {
+      firstName: req.body.firstName,
+      lastName: req.body.lastName,
+      password: req.body.password
+    }
+  }).spread((user, wasCreated) => {
+    if (!wasCreated) {
+      req.flash('error', 'An account with that email already exists.');
+      return res.redirect('/signup');
+    }
+    // Add user to Algolia index
+    const userValues = {
+      objectID: user.dataValues.id,
+      firstName: user.dataValues.firstName,
+      lastName: user.dataValues.lastName,
+      email: user.dataValues.email
+    };
+    userIndex.addObjects([userValues], (err, content) => {
+      if (err) {
+        return next(err);
+      }
+    });
+    // Log in with Passport
+    req.logIn(user, (err) => {
+      if (err) {
+        return next(err);
+      }
+      return res.redirect(req.session.returnTo || '/');
+    });
+  }).catch((err) => {
+    req.flash('error', 'Database error: user was not created.');
+    return res.redirect('/signup');
+  });
 };
 
 /**
@@ -162,9 +151,7 @@ exports.postForgot = (req, res, next) => {
       models.User.findOne({ where: { email: req.body.email } }).then((user) => {
         if (!user) {
           req.flash('error', 'An account with that email address could not be found.');
-          req.session.save(() => {
-            return res.redirect('/forgot');
-          });
+          return res.redirect('/forgot');
         }
         // Recovery token will expire in one hour
         const expirationDate = new Date();
@@ -178,6 +165,7 @@ exports.postForgot = (req, res, next) => {
     },
     (token, user, done) => {
       const resetURL = `http://${req.headers.host}/reset/${token}`;
+      const resetTemplate = pug.compileFile('views/email/reset.pug');
       const mailOpts = {
         to: user.email,
         from: process.env.SENDGRID_USERNAME,
@@ -190,10 +178,10 @@ exports.postForgot = (req, res, next) => {
       });
     }
   ], (err) => {
-    if (err) { return next(err); }
-    req.session.save(() => {
-      return res.redirect('/forgot');
-    });
+    if (err) {
+      return next(err);
+    }
+    return res.redirect('/forgot');
   });
 };
 
@@ -210,21 +198,19 @@ exports.getPasswordReset = (req, res) => {
   }).then((user) => {
     if (!user) {
       req.flash('error', 'Password reset token is invalid or has expired.');
-      req.session.save(() => {
-        return res.redirect('/forgot');
-      });
-    } else {
-      return res.render('account/reset', {
-        title: 'Reset password'
-      });
+      return res.redirect('/forgot');
     }
+    return res.render('account/reset', {
+      title: 'Reset password'
+    });
   });
 };
+
 /**
  * POST /reset
  * Reset password.
  */
-exports.postPasswordReset = (req, res, next) => {
+exports.postPasswordReset = (req, res) => {
   models.User.findOne({
     where: {
       resetPasswordToken: req.params.token,
@@ -233,37 +219,32 @@ exports.postPasswordReset = (req, res, next) => {
   }).then((user) => {
     if (!user) {
       req.flash('error', 'Password reset token is invalid or has expired.');
-      req.session.save(() => {
-        return res.redirect('/');
-      });
-    } else {
-      user.resetPasswordToken = null;
-      user.resetPasswordExpires = null;
-      user.setPassword(req.body.password, () => {
-        user.save().then(() => {
-          req.flash('success', 'Your password has been updated.');
-          req.session.save(() => {
-            return res.redirect('/login');
-          });
-        });
-      });
+      return res.redirect('/');
     }
+    user.resetPasswordToken = null;
+    user.resetPasswordExpires = null;
+    user.setPassword(req.body.password, () => {
+      user.save().then(() => {
+        req.flash('success', 'Your password has been updated.');
+        return res.redirect('/login');
+      });
+    });
   }).catch((err) => {
     return res.redirect('/');
   });
 };
 
-/*
+/**
  * GET /account
  * Account page.
  */
 exports.getProfile = (req, res) => {
-  return res.render('account/profile', {
+  return res.render('account/account', {
     title: 'Update profile'
   });
 };
 
-/*
+/**
  * POST /account/profile
  * Update profile information.
  */
@@ -275,13 +256,11 @@ exports.postUpdateProfile = (req, res) => {
   req.user.privacyShowEmail = req.body.privacyShowEmail === 'on';
   req.user.save().then(() => {
     req.flash('success', 'Your profile information has been updated.');
-    req.session.save(() => {
-      return res.redirect('/account');
-    });
+    return res.redirect('/account');
   });
 };
 
-/*
+/**
  * GET /profile/:id
  * Get user public profile.
  */
@@ -300,42 +279,39 @@ exports.getPublicProfile = (req, res) => {
     });
     user = user.dataValues;
     user.Courses = courses;
-    return res.render('account/public_profile', {
+    return res.render('account/profile', {
       title: 'Public Profile',
       user
     });
   }).catch((err) => {
     req.flash('info', 'User profile page does not exist.');
-    req.session.save(() => {
-      return res.redirect(req.session.returnTo);
-    });
+    return res.redirect(req.session.returnTo);
   });
 };
 
+/**
+ * POST /profile/:id/chat
+ * Update password.
+ */
 exports.postPublicProfileCreateChat = (req, res) => {
   const errors = req.validationErrors();
 
   if (errors) {
     req.flash('errors', errors);
-    req.session.save(() => {
-      return res.redirect('/chats');
-    });
-  } else {
-    models.Group.create({
-      name: 'Private Chat',
-      description: req.body.description || '',
-      // groupType: req.body.groupType
-    }).then((group) => {
-      group.addUser(req.user);
-      req.flash('success', 'Your chat has been created.');
-      req.session.save(() => {
-        return res.redirect('/chats');
-      });
-    });
+    return res.redirect('/chats');
   }
+  models.Group.create({
+    name: 'Private Chat',
+    description: req.body.description || '',
+    // groupType: req.body.groupType
+  }).then((group) => {
+    group.addUser(req.user);
+    req.flash('success', 'Your chat has been created.');
+    return res.redirect('/chats');
+  });
 };
 
-/*
+/**
  * POST /account/password
  * Update password.
  */
@@ -347,18 +323,13 @@ exports.postUpdatePassword = (req, res) => {
 
   if (errors) {
     req.flash('error', errors);
-    req.session.save(() => {
-      return res.redirect('/account');
-    });
-  } else {
-    req.user.set('password', req.body.password);
-    req.user.save().then(() => {
-      req.flash('success', 'Your password has been updated.');
-      req.session.save(() => {
-        return res.redirect('/account');
-      });
-    });
+    return res.redirect('/account');
   }
+  req.user.set('password', req.body.password);
+  req.user.save().then(() => {
+    req.flash('success', 'Your password has been updated.');
+    return res.redirect('/account');
+  });
 };
 
 /**
@@ -373,8 +344,6 @@ exports.postDeleteAccount = (req, res, next) => {
   });
   req.user.destroy().then(() => {
     req.flash('info', 'Your account has been deleted.');
-    req.session.save(() => {
-      return res.redirect('/');
-    });
+    return res.redirect('/');
   });
 };

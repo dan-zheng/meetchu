@@ -41,19 +41,16 @@ exports.getCourse = (req, res) => {
   }).then((course) => {
     if (!course) {
       req.flash('error', 'No course with the specificied id exists.');
-      req.session.save(() => {
-        return res.redirect('/courses');
-      });
-    } else {
-      course = course.dataValues;
-      course.Users = course.Users.map((user) => {
-        return user.dataValues;
-      });
-      return res.render('courses/course', {
-        title: course.Title,
-        course
-      });
+      return res.redirect('/courses');
     }
+    course = course.dataValues;
+    course.Users = course.Users.map((user) => {
+      return user.dataValues;
+    });
+    return res.render('courses/course', {
+      title: course.Title,
+      course
+    });
   });
 };
 
@@ -67,9 +64,7 @@ exports.postAddCourse = (req, res) => {
 
   if (errors) {
     req.flash('error', errors);
-    req.session.save(() => {
-      return res.redirect('/courses');
-    });
+    return res.redirect('/courses');
   }
 
   const courseId = req.body.courseId;
@@ -80,9 +75,7 @@ exports.postAddCourse = (req, res) => {
   }).then((course) => {
     req.user.addCourse(course);
     req.flash('success', 'Your course has been added.');
-    req.session.save(() => {
-      return res.redirect('/courses');
-    });
+    return res.redirect('/courses');
   });
 };
 
@@ -95,16 +88,11 @@ exports.postRemoveCourse = (req, res) => {
   models.Course.findById(courseId).then((course) => {
     if (!course) {
       req.flash('error', 'Database error: course does not exist.');
-      req.session.save(() => {
-        return res.redirect('/courses');
-      });
-    } else {
-      req.user.removeCourse(course);
-      req.flash('success', 'Your course has been removed.');
-      req.session.save(() => {
-        return res.redirect('/courses');
-      });
+      return res.redirect('/courses');
     }
+    req.user.removeCourse(course);
+    req.flash('success', 'Your course has been removed.');
+    return res.redirect('/courses');
   });
 };
 
@@ -119,66 +107,56 @@ exports.postAuthCourses = (req, res, next) => {
 
   if (errors) {
     req.flash('error', errors);
-    req.session.save(() => {
-      return res.redirect('/chats');
-    });
-  } else {
-    const username = req.body.username.replace('@purdue.edu', '');
-    const password = req.body.password;
-    const encodedString = Buffer.from(`${username}:${password}`).toString('base64');
+    return res.redirect('/chats');
+  }
+  const username = req.body.username.replace('@purdue.edu', '');
+  const password = req.body.password;
+  const encodedString = Buffer.from(`${username}:${password}`).toString('base64');
 
-    request
-      .get('https://api-dev.purdue.io/Student/Schedule')
-      .auth(username, password)
-      .then((res2) => {
-        const term = 'spring 2017';
-        const courses = res2.body[term];
-        async.each(courses, ((courseID, callback2) => {
-          request
-            .get('https://api.purdue.io/odata/Sections')
-            .query({
-              $filter: `SectionId eq ${courseID}`,
-              $expand: 'Class($expand=Course)'
-            })
-            .then((res3) => {
-              const section = res3.body.value[0];
-              const _class = section.Class;
-              const course = _class.Course;
-              models.Course.findOne({
-                where: {
-                  id: course.CourseId
-                }
-              }).then((_course) => {
-                req.user.addCourse(_course);
-                callback2(null);
-              }).catch((err) => {
-                callback2(err);
-              });
-            })
-            .catch((err) => {
-              callback2(err);
-            });
-        }), ((err) => {
-          // If error
-          if (err) {
-            req.flash('error', 'A database error occured. Please try again.');
-            req.session.save(() => {
-              return res.redirect('/courses');
-            });
-          } else {
-            // If success
-            req.flash('success', 'Your Purdue courses have been added successfully.');
-            req.session.save(() => {
-              return res.redirect('/courses');
-            });
+  request
+  .get('https://api-dev.purdue.io/Student/Schedule')
+  .auth(username, password)
+  .then((res2) => {
+    const term = 'spring 2017';
+    const courses = res2.body[term];
+    async.each(courses, ((courseID, callback2) => {
+      request
+      .get('https://api.purdue.io/odata/Sections')
+      .query({
+        $filter: `SectionId eq ${courseID}`,
+        $expand: 'Class($expand=Course)'
+      })
+      .then((res3) => {
+        const section = res3.body.value[0];
+        const _class = section.Class;
+        const course = _class.Course;
+        models.Course.findOne({
+          where: {
+            id: course.CourseId
           }
-        }));
+        }).then((_course) => {
+          req.user.addCourse(_course);
+          callback2(null);
+        }).catch((err) => {
+          callback2(err);
+        });
       })
       .catch((err) => {
-        req.flash('error', 'Your Purdue credentials are invalid. Please try again.');
-        req.session.save(() => {
-          return res.redirect('/courses');
-        });
+        callback2(err);
       });
-  }
+    }), ((err) => {
+      // If error
+      if (err) {
+        req.flash('error', 'A database error occured. Please try again.');
+        return res.redirect('/courses');
+      }
+      // If success
+      req.flash('success', 'Your Purdue courses have been added successfully.');
+      return res.redirect('/courses');
+    }));
+  })
+  .catch((err) => {
+    req.flash('error', 'Your Purdue credentials are invalid. Please try again.');
+    return res.redirect('/courses');
+  });
 };

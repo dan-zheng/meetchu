@@ -70,25 +70,23 @@ const oauthLogin = (oauthId, profile, done) => {
     lastName: profile.name.familyName
   };
   opts.defaults[oauthId] = profile.id;
-  
-  models.User.findOrCreate(opts)
-    .spread((user, userWasCreated) => {
-      if (userWasCreated) {
-        return addUserToAlgolia(user, done);
-      }
-      if (user[oauthId]) {
-        return done(null, user);
-      }
-      user[oauthId] = profile.id;
-      user.save(() => {
-        return done(null, user);
-      });
-    })
-    .catch((err) => {
-      return done(null, false, {
-        message: `${profile.provider} account not found for email ${profile.emails[0].value}`
-      });
+
+  models.User.findOrCreate(opts).spread((user, userWasCreated) => {
+    if (userWasCreated) {
+      return addUserToAlgolia(user, done);
+    }
+    if (user[oauthId]) {
+      return done(null, user);
+    }
+    user[oauthId] = profile.id;
+    user.save(() => {
+      return done(null, user);
     });
+  }).catch((err) => {
+    return done(null, false, {
+      message: `${profile.provider} account not found for email ${profile.emails[0].value}`
+    });
+  });
 };
 
 /**
@@ -100,7 +98,9 @@ passport.use(new LocalStrategy({ usernameField: 'email' }, (email, password, don
       return done(null, false, { message: `Email ${email} not found.` });
     }
     user.verifyPassword(password, (err, isMatch) => {
-      if (err) { return done(err); }
+      if (err) {
+        return done(err);
+      }
       if (isMatch) {
         return done(null, user);
       }

@@ -45,35 +45,35 @@ const errorHandler = ((err) => {
 const dbQueue = async.queue((subject, callback1) => {
   const subjectAbbr = subject.Abbreviation;
   request
-    .get('https://api.purdue.io/odata/Courses')
-    .query({ $filter: `Subject/Abbreviation eq '${subjectAbbr}' and (Classes/any(c: c/Term/Name eq 'Spring 2017'))` })
-    .then((res2) => {
-      const courses = res2.body.value;
-      async.each(courses, ((course, callback2) => {
-        course.subject = subjectAbbr;
-        models.Course.create({
-          id: course.CourseId,
-          title: course.Title,
-          subject: course.subject,
-          number: course.Number,
-          description: course.Description,
-          creditHours: course.CreditHours
-        }).then(() => {
-          callback2();
-        }).catch((err) => {
-          errorHandler(err);
-          failCount += 1;
-          callback2(err);
-        });
-      }), ((err) => {
-        if (err) {
-          errorHandler(err);
-          callback1(err);
-        } else {
-          callback1();
-        }
-      }));
-    });
+  .get('https://api.purdue.io/odata/Courses')
+  .query({ $filter: `Subject/Abbreviation eq '${subjectAbbr}' and (Classes/any(c: c/Term/Name eq 'Spring 2017'))` })
+  .then((res2) => {
+    const courses = res2.body.value;
+    async.each(courses, ((course, callback2) => {
+      course.subject = subjectAbbr;
+      models.Course.create({
+        id: course.CourseId,
+        title: course.Title,
+        subject: course.subject,
+        number: course.Number,
+        description: course.Description,
+        creditHours: course.CreditHours
+      }).then(() => {
+        callback2();
+      }).catch((err) => {
+        errorHandler(err);
+        failCount += 1;
+        callback2(err);
+      });
+    }), ((err) => {
+      if (err) {
+        errorHandler(err);
+        callback1(err);
+      } else {
+        callback1();
+      }
+    }));
+  });
 }, 5);
 
 const updateDb = (() => {
@@ -81,17 +81,17 @@ const updateDb = (() => {
   console.log(chalk.cyan.bold('Updating the database.'));
   console.log(chalk.cyan('Collecting course subjects...'));
   request
-    .get('http://api.purdue.io/odata/Subjects')
-    .query({ $select: 'Name,Abbreviation' })
-    .then((res1) => {
-      const subjects = res1.body.value;
-      console.log(chalk.green(`Subjects collected. (${subjects.length} total)`));
-      console.log(chalk.cyan('Collecting courses...'));
-      for (let i = 0; i < subjects.length; i += 1) {
-        const subject = subjects[i];
-        dbQueue.push(subject);
-      }
-    });
+  .get('http://api.purdue.io/odata/Subjects')
+  .query({ $select: 'Name,Abbreviation' })
+  .then((res1) => {
+    const subjects = res1.body.value;
+    console.log(chalk.green(`Subjects collected. (${subjects.length} total)`));
+    console.log(chalk.cyan('Collecting courses...'));
+    for (let i = 0; i < subjects.length; i += 1) {
+      const subject = subjects[i];
+      dbQueue.push(subject);
+    }
+  });
 });
 
 const updateAlgolia = (() => {

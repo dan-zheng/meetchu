@@ -1,0 +1,35 @@
+.calendar {
+  max-width: calc(57px * 7);
+  font-size: 16px;
+  margin: auto;
+  border-collapse: collapse;
+
+  @media (max-width: $screen-xs-max) {
+    max-width: calc(40px * 7);
+    font-size: 13px;
+  }
+
+  .calendar-cell {
+    color: #fff;
+    background-color: $brand-primary;
+    height: 40px;
+    width: calc(100% / 7);
+    padding-left: 2px;
+    padding-right: 2px;
+    border: 1.5px solid white;
+    text-align: center;
+
+    &.past {
+      background-color: lighten($brand-primary, 25%);
+    }
+
+    &.empty {
+      background-color: transparent;
+    }
+  }
+  
+  .calendar-header {
+    color: white;
+    background: black;
+  }
+}

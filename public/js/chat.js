@@ -9,7 +9,7 @@ const inputContainer = $('#aa-input-container');
 
 // Helper variables
 const numOfResultsDisplayed = 5;
-var lastQuery = '';
+let lastQuery = '';
 
 // Helper function for removing HTML tags
 const removeTags = ((input) => {
@@ -18,33 +18,33 @@ const removeTags = ((input) => {
 
 // Initialize autocomplete on search input (ID selector must match)
 searchInput.textcomplete([{
-    // Regular expression used to trigger the autocomplete dropdown
-    match: /(^)(.*)$/,
-    // Function called at every new keystroke
-    search: (query, callback) => {
-      lastQuery = query;
-      index.search(lastQuery, { hitsPerPage: numOfResultsDisplayed })
-        .then((content) => {
-          if (content.query === lastQuery) {
-            callback(content.hits);
-          }
-        })
-        .catch((err) => {
-          console.error(err);
-        });
-    },
-    // Template used to display each result obtained by the Algolia API
-    template: (hit) => {
-      // Returns the highlighted version of the name attribute
-      return '<span>' + hit._highlightResult.email.value + ' </span><span class="hspace"></spam><span>' +
-        hit._highlightResult.firstName.value + ' ' + hit._highlightResult.lastName.value +
-        '</span>';
-    },
-    // Template used to display the selected result in the textarea
-    replace: (hit) => {
-      return hit.email.trim();
-    }
-  }], {
+  // Regular expression used to trigger the autocomplete dropdown
+  match: /(^)(.*)$/,
+  // Function called at every new keystroke
+  search: (query, callback) => {
+    lastQuery = query;
+    index.search(lastQuery, { hitsPerPage: numOfResultsDisplayed })
+      .then((content) => {
+        if (content.query === lastQuery) {
+          callback(content.hits);
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  },
+  // Template used to display each result obtained by the Algolia API
+  template: (hit) => {
+    // Returns the highlighted version of the name attribute
+    return '<span>' + hit._highlightResult.email.value + ' </span><span class="hspace"></spam><span>' +
+      hit._highlightResult.firstName.value + ' ' + hit._highlightResult.lastName.value +
+      '</span>';
+  },
+  // Template used to display the selected result in the textarea
+  replace: (hit) => {
+    return hit.email.trim();
+  }
+}], {
   // footer: '&lt;div style="text-align: center; display: block; font-size:12px; margin: 5px 0 0 0;"&gt;Powered by &lt;a href="http://www.algolia.com"&gt;&lt;img src="https://www.algolia.com/assets/algolia128x40.png" style="height: 14px;" /&gt;&lt;/a&gt;&lt;/div&gt;'
 });
 
@@ -65,4 +65,16 @@ searchInput.on('autocomplete:updated', () => {
 $('#icon-close').on('click', () => {
   searchInput.val('');
   inputContainer.removeClass('input-has-value');
+});
+
+// Socket.io
+const socket = io.connect('http://localhost:8080');
+
+$('#chat-form').submit(() => {
+  socket.emit('chat message', $('#chat-message').val());
+  $('#chat-message').val('');
+  return false;
+});
+socket.on('chat message', (msg) => {
+  $('#chat-box').append($('<li>').text(msg));
 });
