@@ -70,11 +70,17 @@ $('#icon-close').on('click', () => {
 // Socket.io
 const socket = io.connect('http://localhost:8080');
 
+const script = document.getElementById('chat');
+const groupId = script.getAttribute('data-group-id');
+
 $('#chat-form').submit(() => {
-  socket.emit('chat message', $('#chat-message').val());
-  $('#chat-message').val('');
+  const msg = $('#chat-message');
+  socket.emit('send message', { text: msg.val(), groupId });
+  msg.val('');
   return false;
 });
-socket.on('chat message', (msg) => {
-  $('#chat-box').append($('<li>').text(msg));
+
+socket.on(`receive message ${groupId}`, (msg) => {
+  const line = $('<li>').text(msg);
+  $('#chat-box').append(line);
 });
