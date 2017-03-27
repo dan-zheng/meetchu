@@ -7,6 +7,10 @@ module.exports = (sequelize, Sequelize) => {
     text: {
       type: Sequelize.STRING,
       allowNull: false
+    },
+    seen: {
+      type: Sequelize.BOOLEAN,
+      allowNull: false
     }
   }, {
     timestamps: true,
