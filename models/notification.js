@@ -1,11 +1,18 @@
 module.exports = (sequelize, Sequelize) => {
   const Notification = sequelize.define('Notification', {
     id: {
-      type: Sequelize.STRING,
+    //CHANGED FROM STRING. WHY? HAHAHAH
+      type: Sequelize.INTEGER,
+      autoIncrement: true,
       primaryKey: true
     },
+    
     text: {
       type: Sequelize.STRING,
+      allowNull: false
+    },
+    seen: {
+      type: Sequelize.BOOLEAN,
       allowNull: false
     }
   }, {
@@ -15,7 +22,7 @@ module.exports = (sequelize, Sequelize) => {
   }, {
     classMethods: {
       associate: (models) => {
-        Notification.belongsTo(models.User, { through: 'UserNotification' });
+        Notification.belongsTo(models.User);
       }
     }
   });

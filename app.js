@@ -134,6 +134,9 @@ app.post('/forgot', userController.postForgot);
 app.get('/reset/:token', userController.getPasswordReset);
 app.post('/reset/:token', userController.postPasswordReset);
 app.get('/chats', passportConfig.isAuthenticated, chatController.getChats);
+//temp
+app.get('/chats/proto', passportConfig.isAuthenticated, chatController.getProto); 
+//----
 app.get('/chats/:id', passportConfig.isAuthenticated, chatController.getChat);
 app.post('/chats/create', passportConfig.isAuthenticated, chatController.postCreateChatGroup);
 app.post('/chats/:id/invite', passportConfig.isAuthenticated, chatController.postInviteChatGroup);
