@@ -22,7 +22,7 @@ module.exports = (sequelize, Sequelize) => {
   }, {
     classMethods: {
       associate: (models) => {
-        Notification.belongsTo(models.User, { through: 'UserNotification' });
+        Notification.belongsTo(models.User);
       }
     }
   });

@@ -17,19 +17,8 @@ block content
                   p.list-group-item-text #{group.description}
       else
         p You are not in any chats.
-    .col-sm-3 
-      h3 Your Notifications
-      if notifications && notifications.length > 0 
-          ul.list-notification
-           each notification in notifications
-           .list-notification-item 
-             a.col-xs-12.course.flex-column(href=`/chats/${notification.id}`)
-               h4.list-notification-item-heading #{notification.text} 
-               if notification.description
-                   p.list-notification-item-text #{notification.description}
-      else
-        p YOU GOT NO NOTES BRAH 
-    .col-sm-6
+    
+    .col-sm-9
       h3 Create a chat
       form.form-horizontal(method='POST', action='/chats/create')
         .form-group
