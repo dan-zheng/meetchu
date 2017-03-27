@@ -1,9 +1,11 @@
 module.exports = (sequelize, Sequelize) => {
   const Notification = sequelize.define('Notification', {
     id: {
-      type: Sequelize.STRING,
+    //CHANGED FROM STRING. WHY? HAHAHAH
+      type: Sequelize.INTEGER,
       primaryKey: true
     },
+    
     text: {
       type: Sequelize.STRING,
       allowNull: false
