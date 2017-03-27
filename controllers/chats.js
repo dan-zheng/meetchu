@@ -1,34 +1,37 @@
 const models = require('../models');
+const MAX_MESSAGES = 10;
 
 /**
  * GET /chats
  * Chats page.
  */
 exports.getChats = (req, res) => {
-  models.Group.findAll({
-    include: [{
-      model: models.User,
-      where: {
-        id: req.user.dataValues.id
-      }
-    }]
-  }).then((groups) => {
-    if (groups) {
-      groups = groups.map((group) => {
-        return group.dataValues;
+  models.sequelize.query(`
+    SELECT chat.id, chat.name, chat.description, person.firstName, person.lastName, msg.message
+    FROM Groups AS chat
+    LEFT JOIN Messages AS msg
+    ON chat.id = msg.groupId
+    LEFT JOIN Users AS person
+    ON msg.senderId = person.id
+    GROUP BY chat.id
+    ORDER BY msg.timeSent ASC`, { type: models.sequelize.QueryTypes.SELECT })
+    .then((qres) => {
+      const groups = qres.map((group) => {
+        const grp = {};
+        grp.id = group.id;
+        grp.name = group.name;
+        grp.description = group.description;
+        if (group.message) {
+          grp.lastMessage = `${group.firstName} ${group.lastName[0]}: ${group.message}`
+        }
+        return grp;
       });
       return res.render('chats/index', {
         title: 'Chats',
         groups
       });
-    }
-    return res.render('chats/index', {
-      title: 'Chats'
     });
-  });
 };
-
-const MAX_MESSAGES = 10;
 
 /**
  * GET /chats/:id
