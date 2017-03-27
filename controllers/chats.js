@@ -56,7 +56,12 @@ exports.getChat = (req, res) => {
             group,
             isAdmin
         });
+  }).catch((err) => {
+    req.flash('info', 'Chat does not exist.');
+    req.session.save(() => {
+      return res.redirect(req.session.returnTo);
     });
+  });
 };
 
 /**
