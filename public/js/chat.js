@@ -74,23 +74,34 @@ const script = document.getElementById('chat');
 const groupId = script.getAttribute('data-group-id');
 const messageHistory = JSON.parse(script.getAttribute('data-message-history'));
 const sender = JSON.parse(script.getAttribute('data-sender'));
+const maxMessages = JSON.parse(script.getAttribute('data-max-messages'));
+var messageCount = 0;
 
-function addMessage(senderName, message) {
-  const line = $('<li>').text(`${senderName}: ${message}`);
+function addMessage(msg) {
+  while (messageCount >= maxMessages) {
+    $('#chat-box li').first().remove();
+    messageCount -= 1;
+  }
+  const line = $('<li>').text(`${msg.senderName}: ${msg.body}`);
   $('#chat-box').append(line);
+  messageCount += 1;
 }
 
 messageHistory.forEach((msg) => {
-  addMessage(msg.senderName, msg.message);
+  addMessage(msg);
 });
 
-$('#chat-form').submit(() => {
-  const msg = $('#chat-message');
-  socket.emit('send message', { text: msg.val(), groupId, sender });
-  msg.val('');
-  return false;
+$('#chat-form').submit((ev) => {
+  const inputField = $('#chat-message');
+  const message = { senderName: sender.name, body: inputField.val(), timeSent: new Date() };
+  if (message.body) {
+    const messagePayload = { groupId, senderId: sender.id, message };
+    socket.emit('send message', messagePayload);
+    inputField.val('');
+  }
+  ev.preventDefault();
 });
 
-socket.on(`receive message ${groupId}`, (rec) => {
-  addMessage(rec.senderName, rec.text);
+socket.on(`receive message ${groupId}`, (msg) => {
+  addMessage(msg);
 });

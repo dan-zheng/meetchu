@@ -55,8 +55,12 @@ html
       script(src='https://cdn.jsdelivr.net/algoliasearch/3/algoliasearch.min.js')
       script(src='https://cdnjs.cloudflare.com/ajax/libs/jquery.textcomplete/1.8.0/jquery.textcomplete.min.js')
       script(src='/js/lib/socket.io.min.js')
-      script(id='chat', data-group-id=groupId, data-message-history=messageHistory, data-sender=sender, src='/js/chat.js')
-      
+      script(id='chat',
+        data-group-id=groupId,
+        data-message-history=messageHistory, 
+        data-sender=sender,
+        data-max-messages=maxMessages,
+        src='/js/chat.js')
     else if tag == 'Meeting'
       // Include calendar and d3 libraries
       script(src='js/lib/jquery-ui.min.js')
