@@ -5,27 +5,27 @@ const models = require('../models');
  * Chats page.
  */
 exports.getChats = (req, res) => {
-  models.Group.findAll({
-    include: [{
-      model: models.User,
-      where: {
-        id: req.user.dataValues.id
-      }
-    }]
-  }).then((groups) => {
-    if (groups) {
-      groups = groups.map((group) => {
-        return group.dataValues;
-      });
-      return res.render('chats/index', {
-        title: 'Chats',
-        groups
-      });
-    }
-    return res.render('chats/index', {
-      title: 'Chats'
+    models.Group.findAll({
+        include: [{
+            model: models.User,
+            where: {
+                id: req.user.dataValues.id
+            }
+        }]
+    }).then((groups) => {
+        if (groups) {
+            groups = groups.map((group) => {
+                return group.dataValues;
+            });
+            return res.render('chats/index', {
+                title: 'Chats',
+                groups
+            });
+        }
+        return res.render('chats/index', {
+            title: 'Chats'
+        });
     });
-  });
 };
 
 /**
@@ -33,30 +33,30 @@ exports.getChats = (req, res) => {
  * Chat page.
  */
 exports.getChat = (req, res) => {
-  const groupId = req.params.id;
-  models.Group.findOne({
-    where: {
-      id: groupId
-    },
-    include: [{
-      model: models.User
-    }]
-  }).then((group) => {
-    group = group.dataValues;
-    group.Users = group.Users.map((user) => {
-      return user.dataValues;
+    const groupId = req.params.id;
+    models.Group.findOne({
+        where: {
+            id: groupId
+        },
+        include: [{
+            model: models.User
+        }]
+    }).then((group) => {
+        group = group.dataValues;
+        group.Users = group.Users.map((user) => {
+            return user.dataValues;
+        });
+        // NOTE: A user is given admin status based on
+        // whether or not they are first in group.Users.
+        // This may not work as intended.
+        const isAdmin = group.Users[0].id === req.user.id;
+        return res.render('chats/chat', {
+            title: group.name,
+            tag: 'Chat',
+            group,
+            isAdmin
+        });
     });
-    // NOTE: A user is given admin status based on
-    // whether or not they are first in group.Users.
-    // This may not work as intended.
-    const isAdmin = group.Users[0].id === req.user.id;
-    return res.render('chats/chat', {
-      title: group.name,
-      tag: 'Chat',
-      group,
-      isAdmin
-    });
-  });
 };
 
 /**
@@ -64,22 +64,22 @@ exports.getChat = (req, res) => {
  * Create a chat group.
  */
 exports.postCreateChatGroup = (req, res) => {
-  req.assert('name', 'Chat name is empty.').notEmpty();
-  const errors = req.validationErrors();
+    req.assert('name', 'Chat name is empty.').notEmpty();
+    const errors = req.validationErrors();
 
-  if (errors) {
-    req.flash('errors', errors);
-    return res.redirect('/chats');
-  }
-  models.Group.create({
-    name: req.body.name,
-    description: req.body.description || '',
-    // groupType: req.body.groupType
-  }).then((group) => {
-    group.addUser(req.user);
-    req.flash('success', 'Your chat has been created.');
-    return res.redirect('/chats');
-  });
+    if (errors) {
+        req.flash('errors', errors);
+        return res.redirect('/chats');
+    }
+    models.Group.create({
+        name: req.body.name,
+        description: req.body.description || '',
+        // groupType: req.body.groupType
+    }).then((group) => {
+        group.addUser(req.user);
+        req.flash('success', 'Your chat has been created.');
+        return res.redirect('/chats');
+    });
 };
 
 /**
@@ -87,48 +87,48 @@ exports.postCreateChatGroup = (req, res) => {
  * Invite a user to a chat group.
  */
 exports.postInviteChatGroup = (req, res) => {
-  const groupId = req.params.id;
-  const userEmail = req.body.email;
+    const groupId = req.params.id;
+    const userEmail = req.body.email;
 
-  req.assert('email', 'Invitee field is not an email.').isEmail();
-  const errors = req.validationErrors();
+    req.assert('email', 'Invitee field is not an email.').isEmail();
+    const errors = req.validationErrors();
 
-  if (errors) {
-    req.flash('errors', errors);
-    return res.redirect(`/chats/${groupId}`);
-  }
-  models.Group.findOne({
-    where: {
-      id: groupId
-    },
-    include: [{
-      model: models.User
-    }]
-  }).then((group) => {
-    if (!group) {
-      req.flash('error', 'The chat does not exist.');
-      return res.redirect('/chats');
+    if (errors) {
+        req.flash('errors', errors);
+        return res.redirect(`/chats/${groupId}`);
     }
-    models.User.findOne({
-      where: {
-        email: userEmail
-      }
-    }).then((user) => {
-      if (!user) {
-        req.flash('error', 'No user with that email exists.');
-        return res.redirect(`/chats/${groupId}`);
-      }
-      group.hasUser(user).then((exists) => {
-        if (exists) {
-          req.flash('error', 'The user you tried to invite is already in the chat.');
-          return res.redirect(`/chats/${groupId}`);
+    models.Group.findOne({
+        where: {
+            id: groupId
+        },
+        include: [{
+            model: models.User
+        }]
+    }).then((group) => {
+        if (!group) {
+            req.flash('error', 'The chat does not exist.');
+            return res.redirect('/chats');
         }
-        group.addUser(user);
-        req.flash('success', `${user.firstName} has been invited.`);
-        return res.redirect(`/chats/${groupId}`);
-      });
+        models.User.findOne({
+            where: {
+                email: userEmail
+            }
+        }).then((user) => {
+            if (!user) {
+                req.flash('error', 'No user with that email exists.');
+                return res.redirect(`/chats/${groupId}`);
+            }
+            group.hasUser(user).then((exists) => {
+                if (exists) {
+                    req.flash('error', 'The user you tried to invite is already in the chat.');
+                    return res.redirect(`/chats/${groupId}`);
+                }
+                group.addUser(user);
+                req.flash('success', `${user.firstName} has been invited.`);
+                return res.redirect(`/chats/${groupId}`);
+            });
+        });
     });
-  });
 };
 
 /**
@@ -136,33 +136,33 @@ exports.postInviteChatGroup = (req, res) => {
  * Leave a chat group.
  */
 exports.postLeaveChatGroup = (req, res) => {
-  const groupId = req.params.id;
-  models.Group.findOne({
-    where: {
-      id: groupId
-    },
-    include: [{
-      model: models.User
-    }]
-  }).then((group) => {
-    if (!group) {
-      req.flash('error', 'The chat does not exist.');
-      return res.redirect('/chats');
-    }
-    group.hasUser(req.user).then((exists) => {
-      if (!exists) {
-        req.flash('error', 'You are not in the chat.');
-        return res.redirect('/chats');
-      }
-      group.removeUser(req.user);
-      if (group.Users.length <= 0) {
-        req.flash('info', 'Your chat has been deleted.');
-        return res.redirect('/chats');
-      }
-      req.flash('info', 'You have left the chat.');
-      return res.redirect('/chats');
+    const groupId = req.params.id;
+    models.Group.findOne({
+        where: {
+            id: groupId
+        },
+        include: [{
+            model: models.User
+        }]
+    }).then((group) => {
+        if (!group) {
+            req.flash('error', 'The chat does not exist.');
+            return res.redirect('/chats');
+        }
+        group.hasUser(req.user).then((exists) => {
+            if (!exists) {
+                req.flash('error', 'You are not in the chat.');
+                return res.redirect('/chats');
+            }
+            group.removeUser(req.user);
+            if (group.Users.length <= 0) {
+                req.flash('info', 'Your chat has been deleted.');
+                return res.redirect('/chats');
+            }
+            req.flash('info', 'You have left the chat.');
+            return res.redirect('/chats');
+        });
     });
-  });
 };
 
 /**
@@ -170,15 +170,39 @@ exports.postLeaveChatGroup = (req, res) => {
  * delete a chat group.
  */
 exports.postDeleteChatGroup = (req, res) => {
-  const groupId = req.params.id;
-  models.Group.findById(groupId).then((group) => {
-    if (!group) {
-      req.flash('error', 'The chat does not exist.');
-      return res.redirect('/chats');
-    }
-    group.destroy().then(() => {
-      req.flash('info', 'Your group has been deleted.');
-      return res.redirect('/chats');
+    const groupId = req.params.id;
+    models.Group.findById(groupId).then((group) => {
+        if (!group) {
+            req.flash('error', 'The chat does not exist.');
+            return res.redirect('/chats');
+        }
+        group.destroy().then(() => {
+            req.flash('info', 'Your group has been deleted.');
+            return res.redirect('/chats');
+        });
     });
-  });
+};
+
+exports.getProto = (req, res) => {
+    models.Group.findAll({
+        include: [{
+            model: models.User,
+            where: {
+                id: req.user.dataValues.id
+            }
+        }]
+    }).then((groups) => {
+        if (groups) {
+            groups = groups.map((group) => {
+                return group.dataValues;
+            });
+            return res.render('chats/proto', {
+                title: 'Chats',
+                groups
+            });
+        }
+        return res.render('chats/proto', {
+            title: 'Chats'
+        });
+    });
 };
