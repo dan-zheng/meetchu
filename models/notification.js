@@ -1,7 +1,8 @@
 module.exports = (sequelize, Sequelize) => {
   const Notification = sequelize.define('Notification', {
     id: {
-      type: Sequelize.STRING,
+      type: Sequelize.INTEGER,
+      autoIncrement: true,
       primaryKey: true
     },
     text: {
