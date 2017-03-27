@@ -72,17 +72,25 @@ const socket = io.connect('http://localhost:8080');
 
 const script = document.getElementById('chat');
 const groupId = script.getAttribute('data-group-id');
+const messageHistory = JSON.parse(script.getAttribute('data-message-history'));
 const sender = JSON.parse(script.getAttribute('data-sender'));
-const senderName = `${sender.firstName} ${sender.lastName.charAt(0)}`;
+
+function addMessage(senderName, message) {
+  const line = $('<li>').text(`${senderName}: ${message}`);
+  $('#chat-box').append(line);
+}
+
+messageHistory.forEach((msg) => {
+  addMessage(msg.senderName, msg.message);
+});
 
 $('#chat-form').submit(() => {
   const msg = $('#chat-message');
-  socket.emit('send message', { text: msg.val(), groupId, senderId: sender.id, senderName });
+  socket.emit('send message', { text: msg.val(), groupId, sender });
   msg.val('');
   return false;
 });
 
 socket.on(`receive message ${groupId}`, (rec) => {
-  const line = $('<li>').text(`${rec.senderName}: ${rec.text}`);
-  $('#chat-box').append(line);
+  addMessage(rec.senderName, rec.text);
 });

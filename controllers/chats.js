@@ -34,34 +34,45 @@ exports.getChats = (req, res) => {
  */
 exports.getChat = (req, res) => {
   const groupId = req.params.id;
-  models.Group.findOne({
-    where: {
-      id: groupId
-    },
-    include: [{
-      model: models.User
-    }]
-  }).then((group) => {
-    group = group.dataValues;
-    group.Users = group.Users.map((user) => {
-      return user.dataValues;
+  models.sequelize.query(`
+    SELECT chat.name, person.firstName, person.lastName, message
+    	FROM Groups AS chat
+    	JOIN Messages AS msg
+    	ON chat.id = msg.groupId
+    	JOIN Users AS person
+    	ON msg.senderId = person.id
+    	WHERE chat.id = ? AND msg.groupId = chat.id
+    	ORDER BY msg.timeSent DESC
+      LIMIT 10
+    `, { replacements: [groupId], type: models.sequelize.QueryTypes.SELECT })
+    .then((qres) => {
+      const senderName = (first, last) => {
+        return `${first} ${last.charAt(0)}`;
+      };
+      const sender = { id: req.user.id, name: senderName(req.user.firstName, req.user.lastName) };
+      const chatName = qres.name;
+      const messageHistory = qres.map((q) => {
+        return {
+          senderName: senderName(q.firstName, q.lastName),
+          message: q.message
+        }
+      }).reverse();
+      // NOTE: TODO
+      const isAdmin = true;
+      return res.render('chats/chat', {
+        title: chatName,
+        tag: 'Chat',
+        sender,
+        groupId,
+        messageHistory,
+        isAdmin
+      });
+    }).catch((err) => {
+      req.flash('info', 'Chat does not exist.');
+      req.session.save(() => {
+        return res.redirect(req.session.returnTo);
+      });
     });
-    // NOTE: A user is given admin status based on
-    // whether or not they are first in group.Users.
-    // This may not work as intended.
-    const isAdmin = group.Users[0].id === req.user.id;
-    return res.render('chats/chat', {
-      title: group.name,
-      tag: 'Chat',
-      group,
-      isAdmin
-    });
-  }).catch((err) => {
-    req.flash('info', 'Chat does not exist.');
-    req.session.save(() => {
-      return res.redirect(req.session.returnTo);
-    });
-  });
 };
 
 /**

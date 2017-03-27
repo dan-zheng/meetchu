@@ -109,8 +109,8 @@ const io = require('socket.io')(http);
 http.listen(8080, '127.0.0.1');
 io.on('connection', (socket) => {
   socket.on('send message', (rec) => {
-    models.Message.create({ text: rec.text, groupId: rec.groupId, senderId: rec.senderId });
-    io.emit(`receive message ${rec.groupId}`, { text: rec.text, senderName: rec.senderName });
+    models.Message.create({ message: rec.text, groupId: rec.groupId, senderId: rec.sender.id });
+    io.emit(`receive message ${rec.groupId}`, { text: rec.text, senderName: rec.sender.name });
   });
 });
 

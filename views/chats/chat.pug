@@ -2,7 +2,7 @@ extends ../base
 
 block content
   .page-header
-    h1 #{group.name}
+    h1 #{title}
 
   .container-full
     .col-md-4
@@ -20,7 +20,7 @@ block content
       h4 Members
 
       ul.list-group
-        each user in group.Users
+        //each user in group.Users
           .list-group-item
             .col-sm-9.course-box.flex-column
               h4.list-group-item-heading #{user.firstName} #{user.lastName}
@@ -30,7 +30,7 @@ block content
       .container-full
         h4 Invite a user
 
-        form.form-horizontal(method='POST', action=`/chats/${group.id}/invite`)
+        form.form-horizontal(method='POST', action=`/chats/${groupId}/invite`)
           .form-group
             label.col-sm-2.control-label(for='email') Email
             .col-sm-6
@@ -49,7 +49,7 @@ block content
       .container-full
         h4 Leave chat
 
-        form.form-horizontal(method='POST', action=`/chats/${group.id}/leave`)
+        form.form-horizontal(method='POST', action=`/chats/${groupId}/leave`)
           .form-group
             .col-sm-offset-2.col-sm-6
               button.btn.btn-danger(type='submit')
@@ -60,7 +60,7 @@ block content
         .container-full
           h4 Delete chat
 
-          form.form-horizontal(method='POST', action=`/chats/${group.id}/delete`)
+          form.form-horizontal(method='POST', action=`/chats/${groupId}/delete`)
             .form-group
               p.col-sm-offset-2.col-sm-5 You can delete a chat group, but keep in mind this action is irreversible.
               .col-sm-offset-2.col-sm-5
