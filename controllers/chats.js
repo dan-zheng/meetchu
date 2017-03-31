@@ -8,13 +8,17 @@ const MAX_MESSAGES = 10;
 exports.getChats = (req, res) => {
   models.sequelize.query(`
     SELECT chat.id, chat.name, chat.description, person.firstName, person.lastName, msg.message
-    FROM Groups AS chat
-    LEFT JOIN Messages AS msg
+    FROM Groups chat
+    LEFT JOIN Messages msg
+    	INNER JOIN
+    	(SELECT id, groupId, MAX(id) maxId
+    		FROM Messages
+    		GROUP BY groupId
+    	) sub_msg ON msg.groupId = sub_msg.groupId AND msg.Id = sub_msg.maxId
     ON chat.id = msg.groupId
-    LEFT JOIN Users AS person
+    LEFT JOIN Users person
     ON msg.senderId = person.id
-    GROUP BY chat.id
-    ORDER BY msg.timeSent ASC`, { type: models.sequelize.QueryTypes.SELECT })
+    `, { type: models.sequelize.QueryTypes.SELECT })
     .then((qres) => {
       const groups = qres.map((group) => {
         const grp = {};
