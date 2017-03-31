@@ -75,7 +75,7 @@ module.exports = (sequelize, Sequelize) => {
         User.belongsToMany(models.Group, { through: 'UserGroup' });
         User.belongsToMany(models.Meeting, { through: 'UserMeeting' });
         User.belongsToMany(models.Course, { through: 'CourseUser' });
-        User.hasMany(models.Notification);
+        User.hasMany(models.Notification, { as: 'notifications', foreignKey: 'userId' });
       }
     },
     getterMethods: {

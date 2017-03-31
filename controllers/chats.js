@@ -150,6 +150,11 @@ exports.postInviteChatGroup = (req, res) => {
           req.flash('error', 'The user you tried to invite is already in the chat.');
           return res.redirect(`/chats/${groupId}`);
         }
+        models.Notification.create({
+          message: `You have been invited to the chat ${group.name}.`
+        }).then((notification) => {
+          user.addNotification(notification);
+        });
         group.addUser(user);
         req.flash('success', `${user.firstName} has been invited.`);
         return res.redirect(`/chats/${groupId}`);
