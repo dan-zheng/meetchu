@@ -14,6 +14,18 @@ block content
         i.fa.fa-sign-out
         | Log out
     hr
+    .col-sm-3 
+      h3 Your Notifications
+      if notifications && notifications.length > 0 
+        ul.list-notification
+          each notification in notifications
+            .list-notification-item 
+              a.col-xs-12.course.flex-column(href=`/chats/${notification.id}`)
+                h4.list-notification-item-heading #{notification.text} 
+                if notification.description
+                  p.list-notification-item-text #{notification.description}
+      else
+        p You have no notifications.
   else
     .text-center
       h1#title Group study made easy.
@@ -21,17 +33,3 @@ block content
       .row.text-center
         img(src='meetchu.svg', style='max-width: 80%;')
       a.btn.btn-lg.btn-primary(href='/login', role='button') Get started
-     
-  .col-sm-3 
-    h3 Your Notifications
-    if notifications && notifications.length > 0 
-      ul.list-notification
-        each notification in notifications
-          .list-notification-item 
-            a.col-xs-12.course.flex-column(href=`/chats/${notification.id}`)
-              h4.list-notification-item-heading #{notification.text} 
-              if notification.description
-                p.list-notification-item-text #{notification.description}
-    else
-      p YOU GOT NO NOTES BRAH 
-

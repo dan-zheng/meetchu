@@ -1,3 +1,5 @@
+/* eslint-env browser jquery */
+
 const now = new Date();
 const currentMonth = now.getMonth();
 const currentYear = now.getUTCFullYear();
