@@ -1,6 +1,5 @@
 // Search configuration
-// const client = algoliasearch('4977PJKR36', '01af7222321161de5a290b840b90b456');
-const client = algoliasearch('8NC5DAIBAS', '17a1d9aa3e455702917e6237891af591');
+const client = algoliasearch('4977PJKR36', '01af7222321161de5a290b840b90b456');
 const index = client.initIndex('users');
 
 // DOM Binding
