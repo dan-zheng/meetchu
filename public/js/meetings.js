@@ -7,7 +7,7 @@ const monthInput = $('select#month');
 const yearInput = $('select#year');
 const calendar = d3.select('.calendar');
 
-let selected = [];
+const selected = [];
 let state;
 let mouseDown = false;
 
@@ -21,7 +21,7 @@ const getDate = (cell) => {
   const month = monthInput.find(':selected').text();
   const year = yearInput.find(":selected").text();
   return new Date(year, Calendar.parseMonth(month), cell.text());
-}
+};
 
 const toggleDate = (date) => {
   if (selected.indexOf(date) === -1) {
@@ -29,7 +29,7 @@ const toggleDate = (date) => {
   } else {
     selected.splice(selected.indexOf(date), 1);
   }
-}
+};
 
 const updateCalendar = (date) => {
   const now = new Date();
@@ -59,7 +59,7 @@ const updateCalendar = (date) => {
   calendar.append('div')
           .attr('class', 'cal-body')
           .selectAll('div')
-          .data(days, (d) => d)
+          .data(days, (d) => { return d; })
           .enter()
           .append('div')
           .attr('type', 'div')
@@ -72,7 +72,7 @@ const updateCalendar = (date) => {
 
   const selectAttr = 'selected';
 
-  $('.cal-body .cal-cell').mousedown(function(e) {
+  $('.cal-body .cal-cell').mousedown(function (e) {
     const cell = $(this);
     const date = getDate(cell);
     state = cell.hasClass(selectAttr);
@@ -81,7 +81,7 @@ const updateCalendar = (date) => {
     toggleDate(date);
   });
 
-  $('.cal-body .cal-cell').mouseover(function(e) {
+  $('.cal-body .cal-cell').mouseover(function (e) {
     console.log('mouseover');
     if (mouseDown) {
       const cell = $(this);

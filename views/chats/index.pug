@@ -15,8 +15,12 @@ block content
                 h4.list-group-item-heading #{group.name}
                 if group.description
                   p.list-group-item-text #{group.description}
+                if group.lastMessage
+                  p.list-group-item-text #{group.lastMessage}
+                  
       else
         p You are not in any chats.
+    
     .col-sm-9
       h3 Create a chat
       form.form-horizontal(method='POST', action='/chats/create')

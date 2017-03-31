@@ -111,8 +111,12 @@ const io = require('socket.io')(http);
 http.listen(8080, '127.0.0.1');
 io.on('connection', (socket) => {
   socket.on('send message', (rec) => {
-    models.Message.create({ text: rec.text, groupId: rec.groupId, senderId: rec.senderId });
-    io.emit(`receive message ${rec.groupId}`, { text: rec.text, senderName: rec.senderName });
+    models.Message.create({
+      senderId: rec.senderId,
+      groupId: rec.groupId,
+      message: rec.message.body
+    });
+    io.emit(`receive message ${rec.groupId}`, rec.message);
   });
 });
 
@@ -136,6 +140,9 @@ app.post('/forgot', userController.postForgot);
 app.get('/reset/:token', userController.getPasswordReset);
 app.post('/reset/:token', userController.postPasswordReset);
 app.get('/chats', passportConfig.isAuthenticated, chatController.getChats);
+// temp
+app.get('/chats/proto', passportConfig.isAuthenticated, chatController.getProto);
+//----
 app.get('/chats/:id', passportConfig.isAuthenticated, chatController.getChat);
 app.post('/chats/create', passportConfig.isAuthenticated, chatController.postCreateChatGroup);
 app.post('/chats/:id/invite', passportConfig.isAuthenticated, chatController.postInviteChatGroup);

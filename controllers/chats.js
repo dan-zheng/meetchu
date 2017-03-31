@@ -1,31 +1,36 @@
 const models = require('../models');
+const MAX_MESSAGES = 10;
 
 /**
  * GET /chats
  * Chats page.
  */
 exports.getChats = (req, res) => {
-  models.Group.findAll({
-    include: [{
-      model: models.User,
-      where: {
-        id: req.user.dataValues.id
-      }
-    }]
-  }).then((groups) => {
-    if (groups) {
-      groups = groups.map((group) => {
-        return group.dataValues;
+  models.sequelize.query(`
+    SELECT chat.id, chat.name, chat.description, person.firstName, person.lastName, msg.message
+    FROM Groups AS chat
+    LEFT JOIN Messages AS msg
+    ON chat.id = msg.groupId
+    LEFT JOIN Users AS person
+    ON msg.senderId = person.id
+    GROUP BY chat.id
+    ORDER BY msg.timeSent ASC`, { type: models.sequelize.QueryTypes.SELECT })
+    .then((qres) => {
+      const groups = qres.map((group) => {
+        const grp = {};
+        grp.id = group.id;
+        grp.name = group.name;
+        grp.description = group.description;
+        if (group.message) {
+          grp.lastMessage = `${group.firstName} ${group.lastName[0]}: ${group.message}`
+        }
+        return grp;
       });
       return res.render('chats/index', {
         title: 'Chats',
         groups
       });
-    }
-    return res.render('chats/index', {
-      title: 'Chats'
     });
-  });
 };
 
 /**
@@ -34,34 +39,47 @@ exports.getChats = (req, res) => {
  */
 exports.getChat = (req, res) => {
   const groupId = req.params.id;
-  models.Group.findOne({
-    where: {
-      id: groupId
-    },
-    include: [{
-      model: models.User
-    }]
-  }).then((group) => {
-    group = group.dataValues;
-    group.Users = group.Users.map((user) => {
-      return user.dataValues;
-    });
-    // NOTE: A user is given admin status based on
-    // whether or not they are first in group.Users.
-    // This may not work as intended.
-    const isAdmin = group.Users[0].id === req.user.id;
-    return res.render('chats/chat', {
-      title: group.name,
-      tag: 'Chat',
-      group,
-      isAdmin
-    });
-  }).catch((err) => {
-    req.flash('info', 'Chat does not exist.');
-    req.session.save(() => {
+  models.sequelize.query(`
+    SELECT *
+    FROM (SELECT chat.name, person.firstName, person.lastName, msg.message, msg.timeSent
+    	FROM Groups AS chat
+    	JOIN Messages AS msg
+    	ON chat.id = msg.groupId
+    	JOIN Users AS person
+    	ON msg.senderId = person.id
+    	WHERE chat.id = ?
+    	ORDER BY msg.timeSent DESC
+    	LIMIT ?) messages
+    ORDER BY messages.timeSent ASC
+    `, { replacements: [groupId, MAX_MESSAGES], type: models.sequelize.QueryTypes.SELECT })
+    .then((qres) => {
+      const senderName = (first, last) => {
+        return `${first} ${last.charAt(0)}`;
+      };
+      const sender = { id: req.user.id, name: senderName(req.user.firstName, req.user.lastName) };
+      const chatName = qres.name;
+      const messageHistory = qres.map((q) => {
+        return {
+          senderName: senderName(q.firstName, q.lastName),
+          body: q.message,
+          timeSent: q.timeSent
+        };
+      });
+      // TODO
+      const isAdmin = true;
+      return res.render('chats/chat', {
+        title: chatName,
+        tag: 'Chat',
+        sender,
+        groupId,
+        messageHistory,
+        isAdmin,
+        maxMessages: MAX_MESSAGES
+      });
+    }).catch((err) => {
+      req.flash('info', 'Chat does not exist.');
       return res.redirect(req.session.returnTo);
     });
-  });
 };
 
 /**
@@ -79,7 +97,7 @@ exports.postCreateChatGroup = (req, res) => {
   models.Group.create({
     name: req.body.name,
     description: req.body.description || '',
-    // groupType: req.body.groupType
+        // groupType: req.body.groupType
   }).then((group) => {
     group.addUser(req.user);
     req.flash('success', 'Your chat has been created.');
@@ -184,6 +202,30 @@ exports.postDeleteChatGroup = (req, res) => {
     group.destroy().then(() => {
       req.flash('info', 'Your group has been deleted.');
       return res.redirect('/chats');
+    });
+  });
+};
+
+exports.getProto = (req, res) => {
+  models.Group.findAll({
+    include: [{
+      model: models.User,
+      where: {
+        id: req.user.dataValues.id
+      }
+    }]
+  }).then((groups) => {
+    if (groups) {
+      groups = groups.map((group) => {
+        return group.dataValues;
+      });
+      return res.render('chats/proto', {
+        title: 'Chats',
+        groups
+      });
+    }
+    return res.render('chats/proto', {
+      title: 'Chats'
     });
   });
 };
