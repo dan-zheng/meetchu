@@ -18,7 +18,9 @@ const nodemailer = require('nodemailer');
 /**
  * Load environment variables from .env file.
  */
-dotenv.load({ path: '.env' });
+if (process.env.NODE_ENV !== 'production') {
+  dotenv.load({ path: '.env' });
+}
 
 /**
  * Models.

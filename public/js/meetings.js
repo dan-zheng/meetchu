@@ -17,10 +17,6 @@ $(document).mousedown((e) => {
   mouseDown = false;
 });
 
-const isSameDate = (d1, d2) => {
-  return d1.toDateString() === d2.toDateString();
-}
-
 const getDate = (cell) => {
   const month = monthInput.find(':selected').text();
   const year = yearInput.find(":selected").text();
@@ -28,15 +24,11 @@ const getDate = (cell) => {
 }
 
 const toggleDate = (date) => {
-  for (let i = 0; i < selected.length; i++) {
-    if (isSameDate(selected[i], date)) {
-      selected.splice(selected.indexOf(date), 1);
-      console.log(selected);
-      return;
-    }
+  if (selected.indexOf(date) === -1) {
+    selected.push(date);
+  } else {
+    selected.splice(selected.indexOf(date), 1);
   }
-  selected.push(date);
-  console.log(selected);
 }
 
 const updateCalendar = (date) => {
@@ -134,3 +126,43 @@ yearInput.change(() => {
 });
 
 updateCalendar(now);
+
+const vueApp = new Vue({
+  el: '#app',
+  data: {
+    message: 'Hello',
+    checked: false,
+    result: '',
+    datetime: new Date()
+  },
+  components: {
+    UiButton: KeenUI.UiButton,
+    UiDatePacker: KeenUI.UiDatePacker
+  },
+  methods: {
+    getRequest() {
+      this.$http.get('/').then((res) => {
+        console.log(res.body);
+      });
+    }
+  }
+});
+
+/*
+$('.calendar-cell').mousedown(function() {
+  const cell = $(this);
+  const month = monthInput.find(':selected').text();
+  const year = yearInput.find(":selected").text();
+  const date = new Date(year, Calendar.parseMonth(month), cell.text());
+  cell.attr('selected', (i, v) => {
+    v = !v;
+    if (v) {
+      selected.push(date);
+    } else {
+      selected.splice(selected.indexOf(date), 1);
+    }
+    console.log(selected);
+    return v;
+  });
+});
+*/
