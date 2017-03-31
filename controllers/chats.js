@@ -11,10 +11,10 @@ exports.getChats = (req, res) => {
     FROM Groups chat
     LEFT JOIN Messages msg
     	INNER JOIN
-    	(SELECT id, groupId, MAX(id) maxId
+    	(SELECT id, groupId, MAX(timeSent) mostRecent
     		FROM Messages
     		GROUP BY groupId
-    	) sub_msg ON msg.groupId = sub_msg.groupId AND msg.Id = sub_msg.maxId
+    	) sub_msg ON msg.groupId = sub_msg.groupId AND msg.timeSent = sub_msg.mostRecent
     ON chat.id = msg.groupId
     LEFT JOIN Users person
     ON msg.senderId = person.id
