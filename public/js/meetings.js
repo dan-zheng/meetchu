@@ -10,7 +10,12 @@ const yearInput = $('select#year');
 const calendar = d3.select('.calendar');
 
 const selected = [];
+const selectAttr = 'selected';
 let state;
+let startRow;
+let startCol;
+let endRow;
+let endCol;
 let mouseDown = false;
 
 $(document).mousedown((e) => {
@@ -20,17 +25,17 @@ $(document).mousedown((e) => {
 });
 
 const getDate = (cell) => {
-  const month = monthInput.find(':selected').text();
-  const year = yearInput.find(":selected").text();
-  return new Date(year, Calendar.parseMonth(month), cell.text());
+  return new Date(cell.attr('data-date'));
 };
 
 const toggleDate = (date) => {
-  if (selected.indexOf(date) === -1) {
-    selected.push(date);
-  } else {
-    selected.splice(selected.indexOf(date), 1);
+  for (let i = 0; i < selected.length; i++) {
+    if (selected[i].getTime() === date.getTime()) {
+      selected.splice(i, 1);
+      return;
+    }
   }
+  selected.push(date);
 };
 
 const updateCalendar = (date) => {
@@ -65,33 +70,70 @@ const updateCalendar = (date) => {
           .enter()
           .append('div')
           .attr('type', 'div')
+          .attr('data-date', (d) => {
+            return d;
+          })
+          .attr('data-row', (d, i) => {
+            return Math.floor(i / 7);
+          })
+          .attr('data-col', (d, i) => {
+            return i % 7;
+          })
           .attr('class', (d) => {
-            return d > now ? 'cal-cell' : 'cal-cell cal-cell-past';
+            let cellClass = d > now ? 'cal-cell' : 'cal-cell cal-cell-past';
+            for (let i = 0; i < selected.length; i++) {
+              if (selected[i].getTime() === d.getTime()) {
+                cellClass += ` ${selectAttr}`;
+                break;
+              }
+            }
+            return cellClass;
           })
           .text((d) => {
             return d.getUTCDate();
           });
 
-  const selectAttr = 'selected';
+  const isBetween = (x, a, b, inclusive) => {
+    inclusive = inclusive || true;
+    const min = Math.min(a, b);
+    const max = Math.max(a, b);
+    return inclusive ? x >= min && x <= max : x > min && x < max;
+  };
 
   $('.cal-body .cal-cell').mousedown(function (e) {
     const cell = $(this);
     const date = getDate(cell);
     state = cell.hasClass(selectAttr);
-    console.log(state);
+    startRow = cell.attr('data-row');
+    startCol = cell.attr('data-col');
+    endRow = cell.attr('data-row');
+    endCol = cell.attr('data-col');
     cell.toggleClass(selectAttr);
     toggleDate(date);
   });
 
   $('.cal-body .cal-cell').mouseover(function (e) {
-    console.log('mouseover');
     if (mouseDown) {
       const cell = $(this);
       const date = getDate(cell);
       const select = cell.hasClass(selectAttr);
+      endRow = cell.attr('data-row');
+      endCol = cell.attr('data-col');
       if (select === state) {
-        cell.toggleClass(selectAttr);
-        toggleDate(date);
+        $('.calendar .cal-body .cal-cell').filter(function(c) {
+          const cell = $(this);
+          const cellRow = cell.attr('data-row');
+          const cellCol = cell.attr('data-col');
+          const select = cell.hasClass(selectAttr);
+          return select === state &&
+              isBetween(cellRow, startRow, endRow) &&
+              isBetween(cellCol, startCol, endCol);
+        }).each((i, c) => {
+          const cell = $(c);
+          const date = getDate(cell);
+          cell.toggleClass(selectAttr);
+          toggleDate(date);
+        });
       }
     }
   });
@@ -129,6 +171,10 @@ yearInput.change(() => {
 
 updateCalendar(now);
 
+const calendarCell = {
+  template: '<div></div>'
+};
+
 const vueApp = new Vue({
   el: '#app',
   data: {
@@ -149,22 +195,3 @@ const vueApp = new Vue({
     }
   }
 });
-
-/*
-$('.calendar-cell').mousedown(function() {
-  const cell = $(this);
-  const month = monthInput.find(':selected').text();
-  const year = yearInput.find(":selected").text();
-  const date = new Date(year, Calendar.parseMonth(month), cell.text());
-  cell.attr('selected', (i, v) => {
-    v = !v;
-    if (v) {
-      selected.push(date);
-    } else {
-      selected.splice(selected.indexOf(date), 1);
-    }
-    console.log(selected);
-    return v;
-  });
-});
-*/
