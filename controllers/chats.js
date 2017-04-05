@@ -139,21 +139,21 @@ exports.postCreateChatGroup = (req, res) => {
  * Invite a user to a chat group.
  */
 exports.postInviteChatGroup = (req, res) => {
-  const groupId = req.params.id;
+  const id = req.params.id;
 
   req.assert('email', 'Invitee field is not an email.').isEmail();
 
   const errors = req.validationErrors();
   if (errors) {
     req.flash('error', errors);
-    return res.redirect(`/chats/${groupId}`);
+    return res.redirect(`/chats/${id}`);
   }
 
   const userEmail = req.body.email;
 
   models.Group.findOne({
     where: {
-      id: groupId
+      id
     },
     include: [{
       model: models.User
@@ -170,12 +170,12 @@ exports.postInviteChatGroup = (req, res) => {
     }).then((user) => {
       if (!user) {
         req.flash('error', 'No user with that email exists.');
-        return res.redirect(`/chats/${groupId}`);
+        return res.redirect(`/chats/${id}`);
       }
       group.hasUser(user).then((exists) => {
         if (exists) {
           req.flash('error', 'The user you tried to invite is already in the chat.');
-          return res.redirect(`/chats/${groupId}`);
+          return res.redirect(`/chats/${id}`);
         }
         models.Notification.create({
           message: `You have been invited to the chat ${group.name}.`
@@ -184,7 +184,7 @@ exports.postInviteChatGroup = (req, res) => {
         });
         group.addUser(user);
         req.flash('success', `${user.firstName} has been invited.`);
-        return res.redirect(`/chats/${groupId}`);
+        return res.redirect(`/chats/${id}`);
       });
     });
   });
@@ -195,10 +195,10 @@ exports.postInviteChatGroup = (req, res) => {
  * Leave a chat group.
  */
 exports.postLeaveChatGroup = (req, res) => {
-  const groupId = req.params.id;
+  const id = req.params.id;
   models.Group.findOne({
     where: {
-      id: groupId
+      id
     },
     include: [{
       model: models.User

@@ -167,6 +167,8 @@ app.post('/courses/auth', passportConfig.isAuthenticated, courseController.postA
 app.get('/meetings', passportConfig.isAuthenticated, meetingController.getMeetings);
 app.get('/meetings/:id', passportConfig.isAuthenticated, meetingController.getMeeting);
 app.post('/meetings/create', passportConfig.isAuthenticated, meetingController.postCreateMeeting);
+app.post('/meetings/:id/invite', passportConfig.isAuthenticated, meetingController.postInviteMeeting);
+app.post('/meetings/:id/delete', passportConfig.isAuthenticated, meetingController.postDeleteMeeting);
 
 /**
  * OAuth authentication routes.

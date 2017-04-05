@@ -1,4 +1,6 @@
+const _ = require('lodash');
 const async = require('async');
+const moment = require('moment');
 
 const models = require('../models');
 
@@ -47,10 +49,11 @@ exports.getMeeting = (req, res) => {
         model: models.User
       },
       {
-        model: models.DateTime
+        model: models.DateTime,
+        attributes: ['dateTime']
       }
     ],
-    order: [[models.DateTime, 'dateTime', 'ASC']]
+    order: [[models.DateTime, 'dateTime', 'ASC']],
   }).then((meeting) => {
     if (!meeting) {
       req.flash('error', 'No meeting with the specified id exists.');
@@ -62,6 +65,9 @@ exports.getMeeting = (req, res) => {
     });
     meeting.DateTimes = meeting.DateTimes.map((datetime) => {
       return datetime.dataValues;
+    });
+    meeting.DateTimes = _.groupBy(meeting.DateTimes, (datetime) => {
+      return moment(datetime.dateTime).startOf('day').format();
     });
     console.log(meeting);
     return res.render('meetings/meeting', {
@@ -112,6 +118,62 @@ exports.postCreateMeeting = (req, res) => {
       }
       req.flash('success', 'Your meeting has been created.');
       return res.redirect('/meetings');
+    });
+  });
+};
+
+/**
+ * POST /meetings/:id/invite
+ * Invite a user to a meeting.
+ */
+exports.postInviteMeeting = (req, res) => {
+  const id = req.params.id;
+
+  req.assert('email', 'Invitee field is not an email.').isEmail();
+
+  const errors = req.validationErrors();
+  if (errors) {
+    req.flash('error', errors);
+    return res.redirect(`/meetings/${id}`);
+  }
+
+  const userEmail = req.body.email;
+
+  models.Meeting.findOne({
+    where: {
+      id
+    },
+    include: [{
+      model: models.User
+    }]
+  }).then((meeting) => {
+    if (!meeting) {
+      req.flash('error', 'The chat does not exist.');
+      return res.redirect('/meetings');
+    }
+    models.User.findOne({
+      where: {
+        email: userEmail
+      }
+    }).then((user) => {
+      if (!user) {
+        req.flash('error', 'No user with that email exists.');
+        return res.redirect(`/meetings/${id}`);
+      }
+      meeting.hasUser(user).then((exists) => {
+        if (exists) {
+          req.flash('error', 'The user you tried to invite is already in the meeting.');
+          return res.redirect(`/meetings/${id}`);
+        }
+        models.Notification.create({
+          message: `You have been invited to the meeting ${meeting.name}.`
+        }).then((notification) => {
+          user.addNotification(notification);
+        });
+        meeting.addUser(user);
+        req.flash('success', `${user.firstName} has been invited.`);
+        return res.redirect(`/meetings/${id}`);
+      });
     });
   });
 };
