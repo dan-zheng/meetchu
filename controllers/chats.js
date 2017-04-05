@@ -1,41 +1,67 @@
 const models = require('../models');
-const MAX_MESSAGES = 10;
+
+const maxMessages = 10;
+
+const getChatsQuery = `
+  SELECT chat.id, chat.name, chat.description, person.firstName, person.lastName, msg.message
+  FROM Groups chat
+  LEFT JOIN Messages msg
+    INNER JOIN
+    (SELECT id, groupId, MAX(timeSent) mostRecent
+      FROM Messages
+      GROUP BY groupId
+    ) sub_msg ON msg.groupId = sub_msg.groupId AND msg.timeSent = sub_msg.mostRecent
+  ON chat.id = msg.groupId
+  LEFT JOIN Users person
+  ON msg.senderId = person.id
+`;
+
+const getChatQuery = `
+  SELECT *
+  FROM (SELECT chat.name, person.firstName, person.lastName, msg.message, msg.timeSent
+    FROM Groups AS chat
+    JOIN Messages AS msg
+    ON chat.id = msg.groupId
+    JOIN Users AS person
+    ON msg.senderId = person.id
+    WHERE chat.id = ?
+    ORDER BY msg.timeSent DESC
+    LIMIT ?) messages
+  ORDER BY messages.timeSent ASC
+`;
+
+const getChatMembers = `
+  SELECT person.firstName, person.lastName, person.email
+    FROM Users AS person
+    JOIN UserGroup
+    ON UserGroup.UserId = person.id
+    WHERE UserGroup.GroupId = ?
+    ORDER BY UserGroup.createdAt, person.firstName DESC
+`;
 
 /**
  * GET /chats
  * Chats page.
  */
 exports.getChats = (req, res) => {
-  models.sequelize.query(`
-    SELECT chat.id, chat.name, chat.description, person.firstName, person.lastName, msg.message
-    FROM Groups chat
-    LEFT JOIN Messages msg
-    	INNER JOIN
-    	(SELECT id, groupId, MAX(id) maxId
-    		FROM Messages
-    		GROUP BY groupId
-    	) sub_msg ON msg.groupId = sub_msg.groupId AND msg.Id = sub_msg.maxId
-    ON chat.id = msg.groupId
-    LEFT JOIN Users person
-    ON msg.senderId = person.id
-    `, { type: models.sequelize.QueryTypes.SELECT })
-    .then((qres) => {
-      console.log(qres);
-      const groups = qres.map((group) => {
-        const grp = {};
-        grp.id = group.id;
-        grp.name = group.name;
-        grp.description = group.description;
-        if (group.message) {
-          grp.lastMessage = `${group.firstName} ${group.lastName[0]}: ${group.message}`
-        }
-        return grp;
-      });
-      return res.render('chats/index', {
-        title: 'Chats',
-        groups
-      });
+  models.sequelize.query(getChatsQuery, {
+    type: models.sequelize.QueryTypes.SELECT
+  }).then((qres) => {
+    const groups = qres.map((group) => {
+      const grp = {};
+      grp.id = group.id;
+      grp.name = group.name;
+      grp.description = group.description;
+      if (group.message) {
+        grp.lastMessage = `${group.firstName} ${group.lastName[0]}: ${group.message}`
+      }
+      return grp;
     });
+    return res.render('chats/index', {
+      title: 'Chats',
+      groups
+    });
+  });
 };
 
 /**
@@ -44,34 +70,29 @@ exports.getChats = (req, res) => {
  */
 exports.getChat = (req, res) => {
   const groupId = req.params.id;
-  models.sequelize.query(`
-    SELECT *
-    FROM (SELECT chat.name, person.firstName, person.lastName, msg.message, msg.timeSent
-    	FROM Groups AS chat
-    	JOIN Messages AS msg
-    	ON chat.id = msg.groupId
-    	JOIN Users AS person
-    	ON msg.senderId = person.id
-    	WHERE chat.id = ?
-    	ORDER BY msg.timeSent DESC
-    	LIMIT ?) messages
-    ORDER BY messages.timeSent ASC
-    `, { replacements: [groupId, MAX_MESSAGES], type: models.sequelize.QueryTypes.SELECT })
-    .then((qres) => {
-      const senderName = (first, last) => {
-        return `${first} ${last.charAt(0)}`;
+  models.sequelize.query(getChatQuery, {
+    replacements: [groupId, maxMessages],
+    type: models.sequelize.QueryTypes.SELECT
+  }).then((chat) => {
+    const senderName = (first, last) => {
+      return `${first} ${last.charAt(0)}`;
+    };
+    const sender = { id: req.user.id, name: senderName(req.user.firstName, req.user.lastName) };
+    const chatName = chat.name;
+    const messageHistory = chat.map((q) => {
+      return {
+        senderName: senderName(q.firstName, q.lastName),
+        body: q.message,
+        timeSent: q.timeSent
       };
-      const sender = { id: req.user.id, name: senderName(req.user.firstName, req.user.lastName) };
-      const chatName = qres.name;
-      const messageHistory = qres.map((q) => {
-        return {
-          senderName: senderName(q.firstName, q.lastName),
-          body: q.message,
-          timeSent: q.timeSent
-        };
+    });
+    models.sequelize.query(getChatMembers, {
+      replacements: [groupId],
+      type: models.sequelize.QueryTypes.SELECT
+    }).then((members) => {
+      const isAdmin = members.slice(0, 1).some((e, i, arr) => {
+        return e.email === req.user.email;
       });
-      // TODO
-      const isAdmin = true;
       return res.render('chats/chat', {
         title: chatName,
         tag: 'Chat',
@@ -79,12 +100,14 @@ exports.getChat = (req, res) => {
         groupId,
         messageHistory,
         isAdmin,
-        maxMessages: MAX_MESSAGES
+        members,
+        maxMessages
       });
-    }).catch((err) => {
-      req.flash('info', 'Chat does not exist.');
-      return res.redirect(req.session.returnTo);
     });
+  }).catch((err) => {
+    req.flash('info', 'Chat does not exist.');
+    return res.redirect(req.session.returnTo);
+  });
 };
 
 /**
@@ -153,6 +176,11 @@ exports.postInviteChatGroup = (req, res) => {
           req.flash('error', 'The user you tried to invite is already in the chat.');
           return res.redirect(`/chats/${groupId}`);
         }
+        models.Notification.create({
+          message: `You have been invited to the chat ${group.name}.`
+        }).then((notification) => {
+          user.addNotification(notification);
+        });
         group.addUser(user);
         req.flash('success', `${user.firstName} has been invited.`);
         return res.redirect(`/chats/${groupId}`);

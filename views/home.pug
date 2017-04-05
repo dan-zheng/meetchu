@@ -20,10 +20,8 @@ block content
         ul.list-notification
           each notification in notifications
             .list-notification-item 
-              a.col-xs-12.course.flex-column(href=`/chats/${notification.id}`)
-                h4.list-notification-item-heading #{notification.text} 
-                if notification.description
-                  p.list-notification-item-text #{notification.description}
+              // a.col-xs-12.course.flex-column(href=`/chats/${notification.id}`)
+              h4.list-notification-item-heading #{notification.message} 
       else
         p You have no notifications.
   else
