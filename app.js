@@ -151,6 +151,7 @@ app.get('/meetings', passportConfig.isAuthenticated, meetingController.getMeetin
 app.get('/meetings/:id', passportConfig.isAuthenticated, meetingController.getMeeting);
 app.post('/meetings/create', passportConfig.isAuthenticated, meetingController.postCreateMeeting);
 
+
 /**
  * OAuth authentication routes.
  */
