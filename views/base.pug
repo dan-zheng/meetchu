@@ -11,6 +11,8 @@ html
       link(rel='stylesheet', type='text/css', href='/css/home.css')
     if user
       link(rel='stylesheet', type='text/css', href='/css/sidebar.css')
+      link(href='https://fonts.googleapis.com/css?family=Roboto', rel='stylesheet')
+      link(href='https://fonts.googleapis.com/icon?family=Material+Icons', rel='stylesheet')
     else
       link(rel='stylesheet', type='text/css', href='/css/navbar-footer.css')
 
@@ -44,6 +46,12 @@ html
     script(src='/js/lib/bootstrap.min.js')
     script(src='/js/lib/bootstrap-toggle.min.js')
     script(src='/js/lib/pace.min.js')
+    // Vue.js
+    // script(src='/js/lib/vue.js')
+    script(src='https://unpkg.com/vue/dist/vue.js')
+    script(src='https://unpkg.com/vue-router/dist/vue-router.js')
+    script(src='https://unpkg.com/vue-resource@1.2.1/dist/vue-resource.js')
+    script(src='/js/lib/keen-ui.min.js')
     script(src='/js/main.js')
     if title == 'Courses'
       // Include AlgoliaSearch JS Client and autocomplete.js libraries
@@ -55,8 +63,12 @@ html
       script(src='https://cdn.jsdelivr.net/algoliasearch/3/algoliasearch.min.js')
       script(src='https://cdnjs.cloudflare.com/ajax/libs/jquery.textcomplete/1.8.0/jquery.textcomplete.min.js')
       script(src='/js/lib/socket.io.min.js')
-      script(id='chat', data-group-id=group.id, data-sender=user, src='/js/chat.js')
-      
+      script(id='chat',
+        data-group-id=groupId,
+        data-message-history=messageHistory, 
+        data-sender=sender,
+        data-max-messages=maxMessages,
+        src='/js/chat.js')
     else if tag == 'Meeting'
       // Include calendar and d3 libraries
       script(src='js/lib/jquery-ui.min.js')

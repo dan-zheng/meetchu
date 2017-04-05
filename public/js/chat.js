@@ -1,6 +1,5 @@
 // Search configuration
-// const client = algoliasearch('4977PJKR36', '01af7222321161de5a290b840b90b456');
-const client = algoliasearch('8NC5DAIBAS', '17a1d9aa3e455702917e6237891af591');
+const client = algoliasearch('4977PJKR36', '01af7222321161de5a290b840b90b456');
 const index = client.initIndex('users');
 
 // DOM Binding
@@ -72,17 +71,36 @@ const socket = io.connect('http://localhost:8080');
 
 const script = document.getElementById('chat');
 const groupId = script.getAttribute('data-group-id');
+const messageHistory = JSON.parse(script.getAttribute('data-message-history'));
 const sender = JSON.parse(script.getAttribute('data-sender'));
-const senderName = `${sender.firstName} ${sender.lastName.charAt(0)}`;
+const maxMessages = JSON.parse(script.getAttribute('data-max-messages'));
+var messageCount = 0;
 
-$('#chat-form').submit(() => {
-  const msg = $('#chat-message');
-  socket.emit('send message', { text: msg.val(), groupId, senderId: sender.id, senderName });
-  msg.val('');
-  return false;
+function addMessage(msg) {
+  while (messageCount >= maxMessages) {
+    $('#chat-box li').first().remove();
+    messageCount -= 1;
+  }
+  const line = $('<li>').text(`${msg.senderName}: ${msg.body}`);
+  $('#chat-box').append(line);
+  messageCount += 1;
+}
+
+messageHistory.forEach((msg) => {
+  addMessage(msg);
 });
 
-socket.on(`receive message ${groupId}`, (rec) => {
-  const line = $('<li>').text(`${rec.senderName}: ${rec.text}`);
-  $('#chat-box').append(line);
+$('#chat-form').submit((ev) => {
+  const inputField = $('#chat-message');
+  const message = { senderName: sender.name, body: inputField.val(), timeSent: new Date() };
+  if (message.body) {
+    const messagePayload = { groupId, senderId: sender.id, message };
+    socket.emit('send message', messagePayload);
+    inputField.val('');
+  }
+  ev.preventDefault();
+});
+
+socket.on(`receive message ${groupId}`, (msg) => {
+  addMessage(msg);
 });

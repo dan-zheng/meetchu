@@ -1,3 +1,5 @@
+/* eslint-env browser jquery */
+
 const now = new Date();
 const currentMonth = now.getMonth();
 const currentYear = now.getUTCFullYear();
@@ -7,7 +9,7 @@ const monthInput = $('select#month');
 const yearInput = $('select#year');
 const calendar = d3.select('.calendar');
 
-let selected = [];
+const selected = [];
 let state;
 let mouseDown = false;
 
@@ -17,27 +19,19 @@ $(document).mousedown((e) => {
   mouseDown = false;
 });
 
-const isSameDate = (d1, d2) => {
-  return d1.toDateString() === d2.toDateString();
-}
-
 const getDate = (cell) => {
   const month = monthInput.find(':selected').text();
   const year = yearInput.find(":selected").text();
   return new Date(year, Calendar.parseMonth(month), cell.text());
-}
+};
 
 const toggleDate = (date) => {
-  for (let i = 0; i < selected.length; i++) {
-    if (isSameDate(selected[i], date)) {
-      selected.splice(selected.indexOf(date), 1);
-      console.log(selected);
-      return;
-    }
+  if (selected.indexOf(date) === -1) {
+    selected.push(date);
+  } else {
+    selected.splice(selected.indexOf(date), 1);
   }
-  selected.push(date);
-  console.log(selected);
-}
+};
 
 const updateCalendar = (date) => {
   const now = new Date();
@@ -67,7 +61,7 @@ const updateCalendar = (date) => {
   calendar.append('div')
           .attr('class', 'cal-body')
           .selectAll('div')
-          .data(days, (d) => d)
+          .data(days, (d) => { return d; })
           .enter()
           .append('div')
           .attr('type', 'div')
@@ -80,7 +74,7 @@ const updateCalendar = (date) => {
 
   const selectAttr = 'selected';
 
-  $('.cal-body .cal-cell').mousedown(function(e) {
+  $('.cal-body .cal-cell').mousedown(function (e) {
     const cell = $(this);
     const date = getDate(cell);
     state = cell.hasClass(selectAttr);
@@ -89,7 +83,7 @@ const updateCalendar = (date) => {
     toggleDate(date);
   });
 
-  $('.cal-body .cal-cell').mouseover(function(e) {
+  $('.cal-body .cal-cell').mouseover(function (e) {
     console.log('mouseover');
     if (mouseDown) {
       const cell = $(this);
@@ -134,3 +128,43 @@ yearInput.change(() => {
 });
 
 updateCalendar(now);
+
+const vueApp = new Vue({
+  el: '#app',
+  data: {
+    message: 'Hello',
+    checked: false,
+    result: '',
+    datetime: new Date()
+  },
+  components: {
+    UiButton: KeenUI.UiButton,
+    UiDatePacker: KeenUI.UiDatePacker
+  },
+  methods: {
+    getRequest() {
+      this.$http.get('/').then((res) => {
+        console.log(res.body);
+      });
+    }
+  }
+});
+
+/*
+$('.calendar-cell').mousedown(function() {
+  const cell = $(this);
+  const month = monthInput.find(':selected').text();
+  const year = yearInput.find(":selected").text();
+  const date = new Date(year, Calendar.parseMonth(month), cell.text());
+  cell.attr('selected', (i, v) => {
+    v = !v;
+    if (v) {
+      selected.push(date);
+    } else {
+      selected.splice(selected.indexOf(date), 1);
+    }
+    console.log(selected);
+    return v;
+  });
+});
+*/

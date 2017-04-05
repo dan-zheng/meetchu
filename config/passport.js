@@ -12,13 +12,14 @@ const models = require('../models');
 /**
  * Load environment variables from .env file
  */
-dotenv.load({ path: '.env' });
+if (process.env.NODE_ENV !== 'production') {
+  dotenv.load({ path: '.env' });
+}
 
 /*
  * Algolia configuration.
  */
-// const client = algoliasearch(process.env.ALGOLIA_ID, process.env.ALGOLIA_ADMIN_KEY);
-const client = algoliasearch(process.env.ALGOLIA_ID_OLD, process.env.ALGOLIA_ADMIN_KEY_OLD);
+const client = algoliasearch(process.env.ALGOLIA_ID, process.env.ALGOLIA_ADMIN_KEY);
 const userIndex = client.initIndex('users');
 
 passport.serializeUser((user, done) => {
@@ -26,7 +27,7 @@ passport.serializeUser((user, done) => {
 });
 
 passport.deserializeUser((id, done) => {
-  models.User.find({ where: { id } }).then((user) => {
+  models.User.findById(id).then((user) => {
     return done(null, user);
   }).catch((err) => {
     return done(err, null);

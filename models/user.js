@@ -75,27 +75,7 @@ module.exports = (sequelize, Sequelize) => {
         User.belongsToMany(models.Group, { through: 'UserGroup' });
         User.belongsToMany(models.Meeting, { through: 'UserMeeting' });
         User.belongsToMany(models.Course, { through: 'CourseUser' });
-        User.hasMany(models.Notification);
-      }
-    },
-    hooks: {
-      beforeCreate: (model, options, done) => {
-        if (model.password) {
-          bcrypt.genSalt(10, (err1, salt) => {
-            if (err1) {
-              return done(err1);
-            }
-            bcrypt.hash(model.password, salt, null, (err2, hash) => {
-              if (err2) {
-                return done(err2);
-              }
-              model.password = hash;
-              return done(null, options);
-            });
-          });
-        } else {
-          return done(null, options);
-        }
+        User.hasMany(models.Notification, { as: 'notifications', foreignKey: 'userId' });
       }
     },
     getterMethods: {

@@ -43,3 +43,17 @@ block content
             button.btn.btn-primary(type='submit')
               i.fa.fa-plus
               | Create
+    #app
+      p {{message}}
+      input(v-model='message')
+      hr
+      input#checkbox(type='checkbox', v-model='checked')
+      label(for='checkbox') {{ checked }}
+      button(@click='getRequest')
+
+      //ui-datepicker(icon='events', placeholder='Select a date', v-model='datetime', picker-type='modal')
+      ui-datepicker(icon='events', placeholder='Select a date', v-model='datetime')
+        | Start Date
+
+      ui-button(color='primary', icon='add')
+        | ADD POST

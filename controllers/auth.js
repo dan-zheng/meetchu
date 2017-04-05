@@ -10,7 +10,7 @@ exports.loginCallback = ((strategy, req, res, next) => {
       return next(err1);
     }
     if (!user) {
-      req.flash('error', info.message);
+      req.flash('error', info.msg);
       req.session.save(() => {
         return res.redirect('/login');
       });
