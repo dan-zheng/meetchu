@@ -20,7 +20,7 @@ block content
       h4 Members
 
       ul.list-group
-        //each user in group.Users
+        each user in members
           .list-group-item
             .col-sm-9.course-box.flex-column
               h4.list-group-item-heading #{user.firstName} #{user.lastName}
