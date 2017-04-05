@@ -29,7 +29,7 @@ const getDate = (cell) => {
 };
 
 const toggleDate = (date) => {
-  for (let i = 0; i < selected.length; i++) {
+  for (let i = 0; i < selected.length; i += 1) {
     if (selected[i].getTime() === date.getTime()) {
       selected.splice(i, 1);
       return;
@@ -80,8 +80,13 @@ const updateCalendar = (date) => {
             return i % 7;
           })
           .attr('class', (d) => {
-            let cellClass = d > now ? 'cal-cell' : 'cal-cell cal-cell-past';
-            for (let i = 0; i < selected.length; i++) {
+            let cellClass = 'cal-cell';
+            if (d.toDateString() === now.toDateString()) {
+              cellClass += ' cal-cell-today';
+            } else if (d < now) {
+              cellClass += ' cal-cell-past';
+            }
+            for (let i = 0; i < selected.length; i += 1) {
               if (selected[i].getTime() === d.getTime()) {
                 cellClass += ` ${selectAttr}`;
                 break;
@@ -120,7 +125,7 @@ const updateCalendar = (date) => {
       endRow = cell.attr('data-row');
       endCol = cell.attr('data-col');
       if (select === state) {
-        $('.calendar .cal-body .cal-cell').filter(function(c) {
+        $('.calendar .cal-body .cal-cell').filter(function (c) {
           const cell = $(this);
           const cellRow = cell.attr('data-row');
           const cellCol = cell.attr('data-col');
@@ -171,27 +176,13 @@ yearInput.change(() => {
 
 updateCalendar(now);
 
-const calendarCell = {
-  template: '<div></div>'
-};
-
-const vueApp = new Vue({
-  el: '#app',
-  data: {
-    message: 'Hello',
-    checked: false,
-    result: '',
-    datetime: new Date()
-  },
-  components: {
-    UiButton: KeenUI.UiButton,
-    UiDatePacker: KeenUI.UiDatePacker
-  },
-  methods: {
-    getRequest() {
-      this.$http.get('/').then((res) => {
-        console.log(res.body);
-      });
-    }
+$('form#form-dates').submit(function() {
+  // event.preventDefault();
+  for (let i = 0; i < selected.length; i += 1) {
+    $('<input>').attr('type', 'hidden')
+                .attr('name', 'dates[]')
+                .attr('value', selected[i])
+                .appendTo(this);
   }
+  // $(this).unbind('submit').submit();
 });

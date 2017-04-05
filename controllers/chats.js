@@ -20,6 +20,7 @@ exports.getChats = (req, res) => {
     ON msg.senderId = person.id
     `, { type: models.sequelize.QueryTypes.SELECT })
     .then((qres) => {
+      console.log(qres);
       const groups = qres.map((group) => {
         const grp = {};
         grp.id = group.id;
@@ -92,10 +93,10 @@ exports.getChat = (req, res) => {
  */
 exports.postCreateChatGroup = (req, res) => {
   req.assert('name', 'Chat name is empty.').notEmpty();
-  const errors = req.validationErrors();
 
+  const errors = req.validationErrors();
   if (errors) {
-    req.flash('errors', errors);
+    req.flash('error', errors);
     return res.redirect('/chats');
   }
   models.Group.create({
@@ -115,15 +116,17 @@ exports.postCreateChatGroup = (req, res) => {
  */
 exports.postInviteChatGroup = (req, res) => {
   const groupId = req.params.id;
-  const userEmail = req.body.email;
 
   req.assert('email', 'Invitee field is not an email.').isEmail();
-  const errors = req.validationErrors();
 
+  const errors = req.validationErrors();
   if (errors) {
-    req.flash('errors', errors);
+    req.flash('error', errors);
     return res.redirect(`/chats/${groupId}`);
   }
+
+  const userEmail = req.body.email;
+
   models.Group.findOne({
     where: {
       id: groupId

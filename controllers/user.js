@@ -48,11 +48,11 @@ exports.postSignup = (req, res, next) => {
   req.sanitize('email').normalizeEmail({ remove_dots: false });
 
   const errors = req.validationErrors();
-
   if (errors) {
     req.flash('error', errors);
     return res.redirect('/signup');
   }
+
   models.User.findOrCreate({
     where: {
       email: req.body.email
@@ -296,11 +296,11 @@ exports.getPublicProfile = (req, res) => {
  */
 exports.postPublicProfileCreateChat = (req, res) => {
   const errors = req.validationErrors();
-
   if (errors) {
-    req.flash('errors', errors);
+    req.flash('error', errors);
     return res.redirect('/chats');
   }
+
   models.Group.create({
     name: 'Private Chat',
     description: req.body.description || '',
@@ -321,11 +321,11 @@ exports.postUpdatePassword = (req, res) => {
   req.assert('confirmPassword', 'Passwords do not match.').equals(req.body.password);
 
   const errors = req.validationErrors();
-
   if (errors) {
     req.flash('error', errors);
     return res.redirect('/account');
   }
+
   req.user.set('password', req.body.password);
   req.user.save().then(() => {
     req.flash('success', 'Your password has been updated.');

@@ -7,11 +7,17 @@ block content
 
   .container-full
     .col-sm-4
-      h4 Students
-      
+      h4 Participants
       ul.list-group
         each user in meeting.Users
           .list-group-item
             .col-xs-9.course-box.flex-column
               h4.list-group-item-heading #{user.firstName} #{user.lastName}
               p.list-group-item-text #{user.email}
+    .col-sm-8
+      h4 Times
+      ul.list-group
+        each datetime in meeting.DateTimes
+          .list-group-item
+            .col-xs-9.course-box.flex-column
+              h4.list-group-item-heading #{datetime.dateTime.toLocaleString()}

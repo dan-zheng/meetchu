@@ -72,7 +72,18 @@ if (process.env.NODE_ENV !== 'production') {
 }
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(validator());
+app.use(validator({
+  customValidators: {
+    isArray(value) {
+      console.log('value: ' + value);
+      console.log('isArray: ' + Array.isArray(value));
+      return Array.isArray(value);
+    },
+    notEmptyArray(value) {
+      return Array.isArray(value) && value.length > 0;
+    }
+  }
+}));
 app.use(session({
   secret: process.env.SESSION_SECRET,
   store: sessionStore,
