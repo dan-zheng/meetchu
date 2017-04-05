@@ -53,7 +53,7 @@ exports.getChats = (req, res) => {
       grp.name = group.name;
       grp.description = group.description;
       if (group.message) {
-        grp.lastMessage = `${group.firstName} ${group.lastName[0]}: ${group.message}`
+        grp.lastMessage = `${group.firstName} ${group.lastName[0]}: ${group.message}`;
       }
       return grp;
     });
@@ -122,10 +122,11 @@ exports.postCreateChatGroup = (req, res) => {
     req.flash('error', errors);
     return res.redirect('/chats');
   }
+  // NOTE: description is empty string instead of NULL, possibly undesirable
   models.Group.create({
     name: req.body.name,
-    description: req.body.description || '',
-        // groupType: req.body.groupType
+    description: req.body.description
+    // groupType: req.body.groupType
   }).then((group) => {
     group.addUser(req.user);
     req.flash('success', 'Your chat has been created.');
@@ -225,11 +226,11 @@ exports.postLeaveChatGroup = (req, res) => {
 
 /**
  * POST /chats/:id/delete
- * delete a chat group.
+ * Delete a chat group.
  */
 exports.postDeleteChatGroup = (req, res) => {
-  const groupId = req.params.id;
-  models.Group.findById(groupId).then((group) => {
+  const id = req.params.id;
+  models.Group.findById(id).then((group) => {
     if (!group) {
       req.flash('error', 'The chat does not exist.');
       return res.redirect('/chats');

@@ -10,7 +10,8 @@ module.exports = (sequelize, Sequelize) => {
       allowNull: false
     },
     description: {
-      type: Sequelize.STRING
+      type: Sequelize.STRING,
+      allowNull: true
     },
     groupType: {
       type: Sequelize.ENUM,

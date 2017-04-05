@@ -116,6 +116,24 @@ exports.postCreateMeeting = (req, res) => {
   });
 };
 
+/**
+ * POST /meetings/:id/delete
+ * Delete a meeting.
+ */
+exports.postDeleteMeeting = (req, res) => {
+  const id = req.params.id;
+  models.Meeting.findById(id).then((meeting) => {
+    if (!meeting) {
+      req.flash('error', 'The meeting does not exist.');
+      return res.redirect('/meetings');
+    }
+    meeting.destroy().then(() => {
+      req.flash('info', 'Your meeting has been deleted.');
+      return res.redirect('/meetings');
+    });
+  });
+};
+
 const getDateTimes = (dates, times) => {
   const datetimes = [];
   const morning = times.indexOf('morning') !== -1;
