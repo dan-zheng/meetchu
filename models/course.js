@@ -31,7 +31,6 @@ module.exports = (sequelize, Sequelize) => {
     classMethods: {
       associate: (models) => {
         Course.belongsToMany(models.User, { through: 'CourseUser' });
-        Course.belongsToMany(models.Instructor, { through: 'CourseInstructor' });
       }
     },
     timestamps: false
