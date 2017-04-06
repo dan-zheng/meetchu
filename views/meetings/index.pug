@@ -15,15 +15,23 @@ block content
                 h4.list-group-item-heading #{meeting.name}
                 if meeting.description
                   p.list-group-item-text #{meeting.description}
+                if meeting.location
+                  p.list-group-item-text Location: #{meeting.location}
+                if meeting.finalTime
+                  p.list-group-item-text Time: #{new Date(meeting.finalTime.dateTime).toLocaleString()}
       else
         p You are not in any meetings.
     .col-md-9
       h3 Create a meeting
-      form.form-horizontal(method='POST', action='/meetings/create')
+      form.form-horizontal#form-dates(method='POST', action='/meetings/create')
         .form-group
           label.col-md-2.control-label(for='name') Name
           .col-md-6
             input.form-control(type='name', name='name', id='name', placeholder='Name', required)
+        .form-group
+          label.col-md-2.control-label(for='location') Location
+          .col-md-6
+            input.form-control(type='location', name='location', id='location', placeholder='Location')
         .form-group
           label.col-md-2.control-label(for='description') Description
           .col-md-6
@@ -39,21 +47,20 @@ block content
           .col-md-offset-2.col-md-6
             .calendar
         .form-group
+          label.col-md-2.control-label Times
+          .col-md-7(style='padding-top:6px')
+            p You can select more specific times later.
+            label.checkbox-inline
+              input.form-check-input(type='checkbox', name='times[]', value='morning')
+              |  Morning
+            label.checkbox-inline
+              input.form-check-input(type='checkbox', name='times[]', value='afternoon')
+              |  Afternoon
+            label.checkbox-inline
+              input.form-check-input(type='checkbox', name='times[]', value='evening')
+              |  Evening
+        .form-group
           .col-md-offset-2.col-md-6
             button.btn.btn-primary(type='submit')
               i.fa.fa-plus
               | Create
-    #app
-      p {{message}}
-      input(v-model='message')
-      hr
-      input#checkbox(type='checkbox', v-model='checked')
-      label(for='checkbox') {{ checked }}
-      button(@click='getRequest')
-
-      //ui-datepicker(icon='events', placeholder='Select a date', v-model='datetime', picker-type='modal')
-      ui-datepicker(icon='events', placeholder='Select a date', v-model='datetime')
-        | Start Date
-
-      ui-button(color='primary', icon='add')
-        | ADD POST

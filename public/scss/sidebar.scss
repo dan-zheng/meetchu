@@ -3,6 +3,7 @@
 @import 'lib/bootstrap/bootstrap/_variables';
 @import '_search';
 @import '_calendar';
+@import '_datetime';
 
 @mixin styling($sidebar-width, $icon-padding) {
   #wrapper {

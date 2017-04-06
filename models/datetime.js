@@ -14,6 +14,7 @@ module.exports = (sequelize, Sequelize) => {
       associate: (models) => {
         // DateTime.belongsTo(models.Meeting, { as: 'meeting' });
         DateTime.belongsTo(models.Meeting);
+        DateTime.belongsToMany(models.User, { through: 'UserDateTime', timestamps: false });
       }
     },
     timestamps: false

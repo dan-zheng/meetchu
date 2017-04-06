@@ -73,7 +73,29 @@ if (process.env.NODE_ENV !== 'production') {
 }
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(validator());
+app.use(validator({
+  customValidators: {
+    isArray(value) {
+      console.log('value: ' + value);
+      console.log('isArray: ' + Array.isArray(value));
+      return Array.isArray(value);
+    },
+    notEmptyArray(value) {
+      return Array.isArray(value) && value.length > 0;
+    },
+    notEmptyObjArray(obj) {
+      if (obj === null || typeof obj !== 'object') {
+        return false;
+      }
+      Object.keys(obj).map((key) => {
+        if (!Array.isArray(obj[key]) || obj[key] === 0) {
+          return false;
+        }
+      });
+      return true;
+    }
+  }
+}));
 app.use(session({
   secret: process.env.SESSION_SECRET,
   store: sessionStore,
@@ -157,6 +179,12 @@ app.post('/courses/auth', passportConfig.isAuthenticated, courseController.postA
 app.get('/meetings', passportConfig.isAuthenticated, meetingController.getMeetings);
 app.get('/meetings/:id', passportConfig.isAuthenticated, meetingController.getMeeting);
 app.post('/meetings/create', passportConfig.isAuthenticated, meetingController.postCreateMeeting);
+app.post('/meetings/:id/invite', passportConfig.isAuthenticated, meetingController.postInviteMeeting);
+app.post('/meetings/:id/update', passportConfig.isAuthenticated, meetingController.postUpdateMeeting);
+app.post('/meetings/:id/rsvp', passportConfig.isAuthenticated, meetingController.postRsvpMeeting);
+app.post('/meetings/:id/finalize', passportConfig.isAuthenticated, meetingController.postFinalizeMeeting);
+app.post('/meetings/:id/unfinalize', passportConfig.isAuthenticated, meetingController.postUnfinalizeMeeting);
+app.post('/meetings/:id/delete', passportConfig.isAuthenticated, meetingController.postDeleteMeeting);
 
 app.post('/notifications/create', passportConfig.isAuthenticated, notificationController.createNotification); 
 

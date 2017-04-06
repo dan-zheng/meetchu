@@ -10,7 +10,8 @@ module.exports = (sequelize, Sequelize) => {
       allowNull: false
     },
     description: {
-      type: Sequelize.STRING
+      type: Sequelize.STRING,
+      allowNull: true
     },
     groupType: {
       type: Sequelize.ENUM,
@@ -21,7 +22,7 @@ module.exports = (sequelize, Sequelize) => {
   }, {
     classMethods: {
       associate: (models) => {
-        Group.belongsToMany(models.User, { through: 'UserGroup' });
+        Group.belongsToMany(models.User, { through: 'UserGroup', timestamps: true, updatedAt: false });
       }
     }
   });

@@ -1,17 +1,216 @@
 extends ../base
 
 block content
+  - const finalTime = !!meeting.finalTime ? new Date(meeting.finalTime.dateTime) : false;
+  - const dts = [];
   .page-header
     h1 #{meeting.name}
     h3 #{meeting.description}
+    if meeting.location
+      h3 Location: #{meeting.location}
+    if finalTime
+      h3 Final time: #{finalTime.toLocaleString()}
 
   .container-full
-    .col-sm-4
-      h4 Students
-      
+    .col-sm-5
+      h4 Participants
       ul.list-group
         each user in meeting.Users
           .list-group-item
             .col-xs-9.course-box.flex-column
               h4.list-group-item-heading #{user.firstName} #{user.lastName}
               p.list-group-item-text #{user.email}
+
+      h4 Invite a user
+      form.form-horizontal(method='POST', action=`/meetings/${meeting.id}/invite`)
+        .form-group
+          label.col-sm-2.control-label Email
+          .col-sm-10
+            #aa-input-container.aa-input-container.col-sm-8
+              input#aa-search-input.aa-input-search(type='search', name='email', placeholder='Search for users...', autocomplete='off', autofocus, required)
+              svg#icon-search.aa-input-icon(viewbox='654 -372 1664 1664')
+                path(d='M1806,332c0-123.3-43.8-228.8-131.5-316.5C1586.8-72.2,1481.3-116,1358-116s-228.8,43.8-316.5,13 C953.8,103.2,910,208.7,910,332s43.8,228.8,131.5,316.5C1129.2,736.2,1234.7,780,1358,780s228.8-43.8,316.5-131.5 C1762.2,560.8,1806,455.3,1806,332z M2318,1164c0,34.7-12.7,64.7-38,90s-55.3,38-90,38c-36,0-66-12.7-90-38l-343-342  c-119.3,82.7-252.3,124-399,124c-95.3,0-186.5-18.5-273.5-55.5s-162-87-225-150s-113-138-150-225S654,427.3,654,332  s18.5-186.5,55.5-273.5s87-162,150-225s138-113,225-150S1262.7-372,1358-372s186.5,18.5,273.5,55.5s162,87,225,150s113,138,150,225  S2062,236.7,2062,332c0,146.7-41.3,279.7-124,399l343,343C2305.7,1098.7,2318,1128.7,2318,1164z')
+              svg#icon-close.aa-input-close(viewbox='0 0 26 25')
+                polygon(points='26.2,23 15.4,12.5 26.2,2 23.9,-0.4 13,10.2 2.1,-0.4 -0.2,2 10.6,12.5 -0.2,23 2.1,25.4 13,14.8 23.9,25.4')
+        .form-group
+          .col-sm-offset-2.col-sm-6
+            button.btn.btn-primary(type='submit')
+              i.fa.fa-user-plus
+              | Invite
+
+      h4 Leave meeting
+      form.form-horizontal(method='POST', action=`/meetings/${meeting.id}/leave`)
+        .form-group
+          .col-sm-offset-2.col-sm-6
+            button.btn.btn-danger(type='submit')
+              i.fa.fa-minus-square
+              | Leave
+
+      if isAdmin
+        h4 Delete meeting
+        form.form-horizontal(method='POST', action=`/meetings/${meeting.id}/delete`)
+          .form-group
+            p.col-sm-offset-2.col-sm-5 You can delete a meeting, but keep in mind this action is irreversible.
+            .col-sm-offset-2.col-sm-5
+              button.btn.btn-danger(type='submit')
+                i.fa.fa-trash
+                | Delete meeting
+
+    .col-md-6
+      if isAdmin
+        h4 Meeting Information
+        form.form-horizontal(method='POST', action=`/meetings/${meeting.id}/update`)
+          .form-group
+            label.col-sm-2.control-label(for='name') Name
+            .col-sm-6
+              input.form-control(type='name', name='name', id='name', placeholder='Name', value=meeting.name, required)
+          .form-group
+            label.col-sm-2.control-label(for='location') Location
+            .col-sm-6
+              input.form-control(type='location', name='location', id='location', placeholder='Location', value=meeting.location)
+          .form-group
+            label.col-sm-2.control-label(for='description') Description
+            .col-sm-6
+              input.form-control(type='description', name='description', id='description', placeholder='A short description', value=meeting.description)
+          .form-group
+            .col-sm-offset-2.col-sm-6
+              button.btn.btn-primary(type='submit')
+                i.fa.fa-pencil
+                | Update
+      
+      if !finalTime
+        h4 Times
+        table#table-rsvp.datetime
+          thead
+            tr
+              th
+                .dt-cell.dt-cell-empty
+              each date in dates
+                th
+                  .dt-cell.dt-cell-date #{date}
+          tbody
+            - let rowIndex = 0;
+            each _dates, time in times
+              tr
+                td
+                  .dt-cell.dt-cell-time #{time}
+                - let tempIndex = 0;
+                - let colIndex = 0;
+                each date in dates
+                  if _dates[tempIndex] === date
+                    - tempIndex += 1;
+                    td
+                      - const datetime = meeting.DateTimes[time][colIndex];
+                      - const numOfRSVP = datetime.Users.length;
+                      - const users = datetime.Users.filter((u) => { return u.id !== user.id; });
+                      - const contains = users.length < datetime.Users.length;
+                      - const usernames = datetime.Users.map((u) => { return `${u.firstName} ${u.lastName}`; }).join(', ');
+                      - const color = numOfRSVP / meeting.Users.length;
+                      - if (contains) { dts.push(datetime.dateTime); }
+                      .dt-cell.dt-cell-grid(data-toggle=(color > 0 ? 'tooltip' : false), title=(color > 0 ? usernames : false), data-users=users, data-datetime=datetime.dateTime, data-color=color, data-row=rowIndex, data-col=colIndex, data-orig-select=contains, class=`${contains ? 'selected' : false}`) #{numOfRSVP}
+                  else
+                    td
+                      .dt-cell.dt-cell-empty(data-row=rowIndex, data-col=colIndex) x
+                  - colIndex += 1;
+              - rowIndex += 1;
+        br
+        form.form-horizontal#form-rsvp(method='POST', action=`/meetings/${meeting.id}/rsvp`)
+          .form-group
+            button.btn.btn-primary(type='submit')
+              i.fa.fa-calendar-plus-o
+              | RSVP
+            if isAdmin
+              button.btn.btn-primary(type='button', data-toggle='modal', data-target='#modalFinalize')
+                i.fa.fa-calendar-check-o
+                | Finalize
+      else
+        h4 Times
+        p The meeting time is #{finalTime.toLocaleString()}.
+        table#table-finalized.datetime
+          thead
+            tr
+              th
+                .dt-cell.dt-cell-empty
+              each date in dates
+                th
+                  .dt-cell.dt-cell-date #{date}
+          tbody
+            - let rowIndex2 = 0;
+            each _dates, time in times
+              tr
+                td
+                  .dt-cell.dt-cell-time #{time}
+                - let tempIndex2 = 0;
+                - let colIndex2 = 0;
+                each date in dates
+                  if _dates[tempIndex2] === date
+                    - tempIndex2 += 1;
+                    td
+                      - const datetime = meeting.DateTimes[time][colIndex2];
+                      - const isFinal = new Date(datetime.dateTime).getTime() === finalTime.getTime();
+                      - const numOfRSVP = datetime.Users.length;
+                      - const usernames = datetime.Users.map((u) => { return `${u.firstName} ${u.lastName}`; }).join(', ');
+                      - const color = numOfRSVP / meeting.Users.length;
+                      .dt-cell.dt-cell-grid(data-toggle=(color > 0 ? 'tooltip' : false), title=(color > 0 ? usernames : false), data-datetime=datetime.dateTime, data-color=color, class=`${isFinal ? 'finalized' : false}`) #{numOfRSVP}
+                  else
+                    td
+                      .dt-cell.dt-cell-empty(data-row=rowIndex2, data-col=colIndex2) x
+                  - colIndex2 += 1;
+              - rowIndex2 += 1;
+        br
+        form.form-horizontal#form-rsvp(method='POST', action=`/meetings/${meeting.id}/unfinalize`)
+          .form-group
+            if isAdmin
+              button.btn.btn-primary(type='submit')
+                i.fa.fa-calendar-minus-o
+                | Unfinalize
+            
+  #modalFinalize.modal.fade(tabindex='-1', role='dialog', aria-labelledby='modalFinalizeLabel', data-trigger='click focus', data-backdrop='false', style='display: none; z-index: 1060; background-color: rgba(0, 0, 0, 0.5)')
+    .modal-dialog(role='document')
+      .modal-content
+        .modal-header
+          button.close(type='button', data-dismiss='modal', aria-label='Close')
+            span(aria-hidden='true') ×
+          h4#myModalLabel.modal-title Finalize meeting time
+        .modal-body
+          table#table-finalize.datetime
+            thead
+              tr
+                th
+                  .dt-cell.dt-cell-empty
+                each date in dates
+                  th
+                    .dt-cell.dt-cell-date #{date}
+            tbody
+              - let rowIndex3 = 0;
+              each _dates, time in times
+                tr
+                  td
+                    .dt-cell.dt-cell-time #{time}
+                  - let tempIndex3 = 0;
+                  - let colIndex3 = 0;
+                  each date in dates
+                    if _dates[tempIndex3] === date
+                      - tempIndex3 += 1;
+                      td
+                        - const datetime = meeting.DateTimes[time][colIndex3];
+                        - const numOfRSVP = datetime.Users.length;
+                        - const usernames = datetime.Users.map((u) => { return `${u.firstName} ${u.lastName}`; }).join(', ');
+                        - const color = numOfRSVP / meeting.Users.length;
+                        .dt-cell.dt-cell-grid(data-toggle=(color > 0 ? 'tooltip' : false), title=(color > 0 ? usernames : false), data-datetime=datetime.dateTime, data-color=color) #{numOfRSVP}
+                    else
+                      td
+                        .dt-cell.dt-cell-empty(data-row=rowIndex3, data-col=colIndex3) x
+                    - colIndex3 += 1;
+                - rowIndex3 += 1;
+        .modal-footer
+          form.form-horizontal#form-finalize(method='POST', action=`/meetings/${meeting.id}/finalize`)
+            button.btn.btn-primary(type='submit')
+              i.fa.fa-calendar-check-o
+              | Finalize
+
+  script.
+    const numUsers = #{meeting.Users.length};
+    const username = '#{user.firstName} #{user.lastName}';
+    const _datetimes = '#{JSON.stringify(dts)}';
+  br

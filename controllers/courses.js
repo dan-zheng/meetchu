@@ -60,8 +60,8 @@ exports.getCourse = (req, res) => {
  */
 exports.postAddCourse = (req, res) => {
   req.assert('courseId', 'Course field is empty.').notEmpty();
-  const errors = req.validationErrors();
 
+  const errors = req.validationErrors();
   if (errors) {
     req.flash('error', errors);
     return res.redirect('/courses');
@@ -103,12 +103,13 @@ exports.postRemoveCourse = (req, res) => {
 exports.postAuthCourses = (req, res, next) => {
   req.assert('username', 'Purdue username is empty.').notEmpty();
   req.assert('password', 'Purdue password is empty.').notEmpty();
-  const errors = req.validationErrors();
 
+  const errors = req.validationErrors();
   if (errors) {
     req.flash('error', errors);
     return res.redirect('/chats');
   }
+
   const username = req.body.username.replace('@purdue.edu', '');
   const password = req.body.password;
   const encodedString = Buffer.from(`${username}:${password}`).toString('base64');

@@ -1,0 +1,173 @@
+table.datetime {
+  max-width: 100%;
+  display: block;
+  overflow-x: auto;
+  // border-collapse: separate;
+
+  thead, tbody {
+    tr {
+      td, th {
+        .dt-cell {
+          height: 30px;
+          line-height: 30px;
+          margin: 1px;
+          border: 2px solid transparent;
+          cursor: pointer;
+
+          &.dt-cell-time {
+            min-width: 78px;
+            text-align: center;
+            font-weight: bold;
+            color: white;
+            background-color: black;
+            user-select: none;
+            pointer-events: none;
+          }
+
+          &.dt-cell-date {
+            min-width: 84px;
+            text-align: center;
+            font-weight: bold;
+            color: white;
+            background-color: black;
+            user-select: none;
+            pointer-events: none;
+          }
+
+          &.dt-cell-grid {
+            min-width: 84px;
+            background-color: #eeeeee;
+            // border: 2px solid darken(#eeeeee, 10%);
+            text-align: center;
+            user-select: none;
+
+            &:hover {
+              border-color: darken(#eeeeee, 10%);
+              // border-color: lighten($cal-green, 10%);
+            }
+
+            &.selected {
+              // background-color: $cal-green !important;
+              padding: 0;
+              // border: 3.5px solid darken($cal-green, 5%);
+              border: 3.5px dashed $cal-green;
+
+              &:hover {
+                border-color: darken($cal-green, 5%);
+              }
+            }
+
+            &.final {
+              padding: 0;
+              color: #fff;
+              background-color: lighten($brand-primary, 15%) !important;
+              border: 3px dashed lighten($brand-primary, 5%) !important;
+
+              &:hover {
+                border-color: darken($brand-primary, 5%);
+              }
+            }
+
+            &.finalized {
+              padding: 0;
+              color: #fff;
+              background-color: darken($brand-primary, 5%) !important;
+              border: 2px solid darken($brand-primary, 20%) !important;
+            }
+          }
+
+          &.dt-cell-empty {
+            background-color: transparent;
+            pointer-events: none;
+          }
+        }
+      }
+    }
+  }
+}
+
+/*
+.datetime {
+  //max-width: calc(57px * 7);
+  width: calc(350px);
+  font-size: 16px;
+  margin: auto;
+  border-collapse: collapse;
+
+  @media (max-width: $screen-xs-max) {
+    max-width: calc(40px * 7);
+    font-size: 13px;
+  }
+
+  .dt-cell {
+    display: inline-block;
+    color: #fff;
+    background-color: $brand-primary;
+    height: 40px;
+    line-height: 40px;
+    //width: calc((100% / 7) - 3px);
+    width: 60px;
+    margin: 1px;
+    border: 2px solid transparent;
+    text-align: center;
+    cursor: pointer;
+    user-select: none;
+    align-items: flex-start;
+
+    &.dt-cell-today {
+      background-color: lighten(#027fc7, 25%);
+
+      &:hover {
+        border-color: lighten(#027fc7, 20%);
+      }
+    }
+
+    &.dt-cell-past {
+      background-color: lighten($brand-primary, 25%);
+
+      &:hover {
+        border-color: lighten($brand-primary, 20%);
+      }
+    }
+
+    &.dt-cell-empty {
+      background-color: transparent;
+    }
+
+    //&.cell-selecting, &.cell-selected {
+    //&.ui-selecting, &.ui-selected {
+    &.selected {
+      background-color: $cal-green;
+      padding: 0;
+      border: 2px solid darken($cal-green, 5%);
+
+      &:hover {
+        border-color: darken($cal-green, 10%);
+      }
+    }
+
+    &:hover {
+      border-color: darken($brand-primary, 5%);
+    }
+
+    &:focus {
+      outline: none;
+    }
+  }
+
+  .dt-cell-time {
+    font-weight: bold;
+    color: white;
+    background: black;
+    pointer-events: none;
+  }
+
+  .dt-cell-date {
+    width: 60px;
+    font-weight: bold;
+    color: white;
+    background: black;
+    pointer-events: none;
+  }
+}
+*/

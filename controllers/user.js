@@ -48,11 +48,11 @@ exports.postSignup = (req, res, next) => {
   req.sanitize('email').normalizeEmail({ remove_dots: false });
 
   const errors = req.validationErrors();
-
   if (errors) {
     req.flash('error', errors);
     return res.redirect('/signup');
   }
+
   models.User.findOrCreate({
     where: {
       email: req.body.email
@@ -248,10 +248,21 @@ exports.getProfile = (req, res) => {
  * Update profile information.
  */
 exports.postUpdateProfile = (req, res) => {
-  req.user.firstName = req.body.firstName || '';
-  req.user.lastName = req.body.lastName || '';
-  req.user.email = req.body.email;
-  req.user.major = req.body.major;
+  req.assert('firstName', 'First name is empty.').notEmpty();
+  req.assert('lastName', 'Last name is empty.').notEmpty();
+  req.assert('email', 'Email is not valid.').isEmail();
+  req.sanitize('email').normalizeEmail({ remove_dots: false });
+
+  const errors = req.validationErrors();
+  if (errors) {
+    req.flash('error', errors);
+    return res.redirect(`/meetings/${id}`);
+  }
+
+  req.user.firstName = req.body.firstName || req.user.firstName;
+  req.user.lastName = req.body.lastName || req.user.firstName;
+  req.user.email = req.body.email || req.user.email;
+  req.user.major = req.body.major || req.user.email;
   req.user.privacyShowEmail = req.body.privacyShowEmail === 'on';
   req.user.privacyShowMajor = req.body.privacyShowMajor === 'on';
   req.user.privacyShowProfilePicture = req.body.privacyShowProfilePicture === 'on';
@@ -296,11 +307,11 @@ exports.getPublicProfile = (req, res) => {
  */
 exports.postPublicProfileCreateChat = (req, res) => {
   const errors = req.validationErrors();
-
   if (errors) {
-    req.flash('errors', errors);
+    req.flash('error', errors);
     return res.redirect('/chats');
   }
+
   models.Group.create({
     name: 'Private Chat',
     description: req.body.description || '',
@@ -321,11 +332,11 @@ exports.postUpdatePassword = (req, res) => {
   req.assert('confirmPassword', 'Passwords do not match.').equals(req.body.password);
 
   const errors = req.validationErrors();
-
   if (errors) {
     req.flash('error', errors);
     return res.redirect('/account');
   }
+
   req.user.set('password', req.body.password);
   req.user.save().then(() => {
     req.flash('success', 'Your password has been updated.');

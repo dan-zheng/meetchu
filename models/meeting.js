@@ -9,14 +9,20 @@ module.exports = (sequelize, Sequelize) => {
       type: Sequelize.STRING,
       allowNull: false
     },
+    location: {
+      type: Sequelize.STRING,
+      allowNull: true
+    },
     description: {
-      type: Sequelize.STRING
+      type: Sequelize.STRING,
+      allowNull: true
     }
   }, {
     classMethods: {
       associate: (models) => {
-        Meeting.belongsToMany(models.User, { through: 'UserMeeting' });
+        Meeting.belongsToMany(models.User, { through: 'UserMeeting', timestamps: true, updatedAt: false });
         Meeting.hasMany(models.DateTime);
+        Meeting.belongsTo(models.DateTime, { as: 'finalTime', foreignKey: 'finalTimeId', constraints: false });
       }
     }
   });

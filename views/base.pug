@@ -71,10 +71,13 @@ html
         src='/js/chat.js')
     else if tag == 'Meeting'
       // Include calendar and d3 libraries
-      script(src='js/lib/jquery-ui.min.js')
       script(src='/js/lib/calendar.min.js')
       script(src='/js/lib/d3.min.js')
       if title == 'Meetings'
         script(src='/js/meetings.js')
       else
+        // Include AlgoliaSearch JS Client and autocomplete.js libraries
+        script(src='https://cdn.jsdelivr.net/algoliasearch/3/algoliasearch.min.js')
+        script(src='https://cdnjs.cloudflare.com/ajax/libs/jquery.textcomplete/1.8.0/jquery.textcomplete.min.js')
+        script(src='/js/lib/jquery-xcolor.min.js')
         script(src='/js/meeting.js')

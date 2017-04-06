@@ -23,11 +23,19 @@
     user-select: none;
     align-items: flex-start;
 
+    &.cal-cell-today {
+      background-color: lighten(#027fc7, 25%);
+
+      &:hover {
+        border-color: lighten(#027fc7, 20%);
+      }
+    }
+
     &.cal-cell-past {
       background-color: lighten($brand-primary, 25%);
 
       &:hover {
-        border-color: darken(lighten($brand-primary, 25%), 5%);
+        border-color: lighten($brand-primary, 20%);
       }
     }
 
