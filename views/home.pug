@@ -45,20 +45,3 @@ block content
     else
       p YOU GOT NO NOTES BRAH 
     
-  .col-sm-9
-    h3 Create a notification
-      form.form-horizontal(method='POST', action='/notifications/create')
-        .form-group
-          label.col-sm-2.control-label(for='name') Name
-          .col-sm-6
-            input.form-control(type='name', name='name', id='name', placeholder='Name', required)
-        .form-group
-          label.col-sm-2.control-label(for='description') Description
-          .col-sm-6
-            input.form-control(type='description', name='description', id='description', placeholder='A short description')
-        .form-group
-          .col-sm-offset-2.col-sm-6
-            button.btn.btn-primary(type='submit')
-              i.fa.fa-plus
-              | Create
-
