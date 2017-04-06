@@ -15,7 +15,8 @@ exports.getMeetings = (req, res) => {
       where: {
         id: req.user.dataValues.id
       }
-    }]
+    }],
+    order: [['updatedAt', 'DESC']]
   }).then((meetings) => {
     if (meetings) {
       meetings = meetings.map((meeting) => {
@@ -50,10 +51,15 @@ exports.getMeeting = (req, res) => {
       },
       {
         model: models.DateTime,
-        attributes: ['dateTime']
+        attributes: ['dateTime'],
+        include: [
+          {
+            model: models.User
+          }
+        ]
       }
     ],
-    order: [[models.DateTime, 'dateTime', 'ASC']],
+    order: [[models.DateTime, 'dateTime', 'ASC']]
   }).then((meeting) => {
     if (!meeting) {
       req.flash('error', 'No meeting with the specified id exists.');
@@ -66,14 +72,48 @@ exports.getMeeting = (req, res) => {
     meeting.DateTimes = meeting.DateTimes.map((datetime) => {
       return datetime.dataValues;
     });
-    meeting.DateTimes = _.groupBy(meeting.DateTimes, (datetime) => {
-      return moment(datetime.dateTime).startOf('day').format();
+
+    let datetimes = meeting.DateTimes.map((datetime) => {
+      return datetime.dateTime;
     });
-    console.log(meeting);
+
+    let dates = datetimes.map((datetime) => {
+      return moment(datetime.toUTCString()).format('M/D');
+    });
+    dates = dates.filter((datetime, index) => {
+      return dates.indexOf(datetime) === index;
+    });
+
+    let times = _.groupBy(datetimes, (datetime) => {
+      return moment(datetime).format('h:mm A');
+    });
+    times = _.mapValues(times, (val, key) => {
+      const temp = val.map((datetime) => {
+        return moment(datetime.toUTCString()).format('M/D');
+      });
+      return temp;
+    });
+
+    meeting.DateTimes = _.groupBy(meeting.DateTimes, (datetime) => {
+      // return moment(datetime).startOf('day').format();
+      return moment(datetime.dateTime).format('h:mm A');
+    });
+    datetimes = _.groupBy(datetimes, (datetime) => {
+      // return moment(datetime).startOf('day').format();
+      return moment(datetime).format('h:mm A');
+    });
+
+    // console.log(meeting.DateTimes);
+    console.log(datetimes);
+    console.log(times);
+    console.log(dates);
     return res.render('meetings/meeting', {
       title: meeting.name,
       tag: 'Meeting',
-      meeting
+      meeting,
+      datetimes,
+      dates,
+      times
     });
   });
 };
@@ -99,7 +139,8 @@ exports.postCreateMeeting = (req, res) => {
 
   models.Meeting.create({
     name: req.body.name,
-    description: req.body.description || ''
+    location: req.body.location,
+    description: req.body.description
   }).then((meeting) => {
     meeting.addUser(req.user);
     async.eachOfLimit(datetimes, 1, (datetime, index, callback) => {
@@ -118,6 +159,94 @@ exports.postCreateMeeting = (req, res) => {
       }
       req.flash('success', 'Your meeting has been created.');
       return res.redirect('/meetings');
+    });
+  });
+};
+
+/**
+ * POST /meetings/:id/rsvp
+ * RSVP to a meeting.
+ */
+exports.postRsvpMeeting = (req, res) => {
+  const id = req.params.id;
+
+  // req.assert('datetimes', 'No RSVP times were selected.').notEmptyObjArray();
+
+  const errors = req.validationErrors();
+  if (errors) {
+    req.flash('error', errors);
+    return res.redirect(`/meetings/${id}`);
+  }
+
+  let _selected = req.body.selected || [];
+  let _deselected = req.body.deselected || [];
+
+  if (_selected.length === 0 && _deselected.length === 0) {
+    req.flash('error', 'No RSVP preferences were changed.');
+    return res.redirect(`/meetings/${id}`);
+  }
+
+  _selected = _selected.map((datetime) => {
+    return new Date(datetime);
+  });
+  _deselected = _deselected.map((datetime) => {
+    return new Date(datetime);
+  });
+  _selected.sort((a, b) => {
+    return new Date(a) - new Date(b);
+  });
+  _deselected.sort((a, b) => {
+    return new Date(a) - new Date(b);
+  });
+  console.log('_selected');
+  console.log(_selected);
+  console.log('_deselected');
+  console.log(_deselected);
+
+  models.DateTime.findAll({
+    where: {
+      MeetingId: id
+    },
+    order: [['dateTime', 'ASC']]
+  }).then((datetimes) => {
+    /*
+    for (let i = 0, j = 0, k = 0;
+        i < datetimes.length && (j < _selected.length || k < _deselected.length);
+        i += 1) {
+      const dt1 = datetimes[i].dataValues.dateTime.getTime();
+      const dt2 = j < _selected.length ? _selected[j].getTime() : null;
+      const dt3 = k < _deselected.length ? _deselected[k].getTime() : null;
+      if (j < _selected.length && dt1 === dt2) {
+        datetimes[i].addUser(req.user);
+        j += 1;
+      } else if (k < _deselected.length && dt1 === dt3) {
+        datetimes[i].removeUser(req.user);
+        k += 1;
+      }
+    }
+    */
+    let j = 0;
+    let k = 0;
+    async.eachOfLimit(datetimes, 1, (dt, index, callback) => {
+      const dt1 = dt.dataValues.dateTime.getTime();
+      const dt2 = j < _selected.length ? _selected[j].getTime() : null;
+      const dt3 = k < _deselected.length ? _deselected[k].getTime() : null;
+      if (j < _selected.length && dt1 === dt2) {
+        dt.addUser(req.user).then(() => {
+          j += 1;
+          callback();
+        });
+      } else if (k < _deselected.length && dt1 === dt3) {
+        dt.removeUser(req.user).then(() => {
+          k += 1;
+          callback();
+        });
+      } else {
+        callback();
+      }
+    }, (err) => {
+      req.flash('success', 'You have updated your RSVP preferences for the meeting.');
+      return res.redirect(`/meetings/${id}`);
     });
   });
 };

@@ -1,5 +1,76 @@
+table.datetime {
+  max-width: 100%;
+  display: block;
+  overflow-x: auto;
+  // border-collapse: separate;
+
+  thead, tbody {
+    tr {
+      td, th {
+        .dt-cell {
+          height: 30px;
+          line-height: 30px;
+          margin: 1px;
+          border: 2px solid transparent;
+          cursor: pointer;
+
+          &.dt-cell-time {
+            min-width: 78px;
+            text-align: center;
+            font-weight: bold;
+            color: white;
+            background-color: black;
+            user-select: none;
+            pointer-events: none;
+          }
+
+          &.dt-cell-date {
+            min-width: 60px;
+            text-align: center;
+            font-weight: bold;
+            color: white;
+            background-color: black;
+            user-select: none;
+            pointer-events: none;
+          }
+
+          &.dt-cell-grid {
+            min-width: 60px;
+            background-color: #eeeeee;
+            border-color: 2px darken(#eeeeee, 10%);
+            text-align: center;
+            user-select: none;
+
+            &:hover {
+              border-color: darken(#eeeeee, 10%);
+            }
+          }
+
+          &.selected {
+            // background-color: $cal-green !important;
+            padding: 0;
+            // border: 3.5px solid darken($cal-green, 5%);
+            border: 3.5px dashed $cal-green;
+
+            &:hover {
+              border-color: darken($cal-green, 5%);
+            }
+          }
+
+          &.dt-cell-empty {
+            background-color: transparent;
+            pointer-events: none;
+          }
+        }
+      }
+    }
+  }
+}
+
+/*
 .datetime {
   //max-width: calc(57px * 7);
+  width: calc(350px);
   font-size: 16px;
   margin: auto;
   border-collapse: collapse;
@@ -16,7 +87,7 @@
     height: 40px;
     line-height: 40px;
     //width: calc((100% / 7) - 3px);
-    min-width: 60px;
+    width: 60px;
     margin: 1px;
     border: 2px solid transparent;
     text-align: center;
@@ -65,9 +136,19 @@
     }
   }
 
-  .dt-cell-header {
+  .dt-cell-time {
+    font-weight: bold;
+    color: white;
+    background: black;
+    pointer-events: none;
+  }
+
+  .dt-cell-date {
+    width: 60px;
+    font-weight: bold;
     color: white;
     background: black;
     pointer-events: none;
   }
 }
+*/

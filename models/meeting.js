@@ -9,8 +9,13 @@ module.exports = (sequelize, Sequelize) => {
       type: Sequelize.STRING,
       allowNull: false
     },
+    location: {
+      type: Sequelize.STRING,
+      allowNull: true
+    },
     description: {
-      type: Sequelize.STRING
+      type: Sequelize.STRING,
+      allowNull: true
     }
   }, {
     classMethods: {

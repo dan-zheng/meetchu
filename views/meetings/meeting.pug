@@ -15,7 +15,7 @@ block content
               h4.list-group-item-heading #{user.firstName} #{user.lastName}
               p.list-group-item-text #{user.email}
 
-    .col-md-8
+    .col-sm-8
       .container-full
         h4 Invite a user
 
@@ -36,24 +36,51 @@ block content
                 | Invite
 
   .container-full
-    .col-sm-4
+    .col-sm-8
       h4 Times
-      .datetime
-        - const dates = meeting.DateTimes.keys();
-        .dt-header
-          each date in dates
-            .dt-cell.dt-cell-header #{date.getMonth() + 1}/#{date.getDate()}
-        .dt-body
-          each date in meeting.DateTimes
-            each time in date
-              .dt-cell.dt-cell-header #{time.dateTime.toLocaleString()}
-              each date in dates
-                .dt-cell x
 
-      //-
-        ul.list-group
-          each date in meeting.DateTimes
-            each time in date
-              .list-group-item
-                .col-xs-9.course-box.flex-column
-                  h4.list-group-item-heading #{time.dateTime.toLocaleString()}
+      table.datetime
+        thead
+          tr
+            th
+              .dt-cell.dt-cell-empty
+            each date in dates
+              th
+                .dt-cell.dt-cell-date #{date}
+        tbody
+          - const datetimes = [];
+          - let rowIndex = 0;
+          each _dates, time in times
+            tr
+              td
+                .dt-cell.dt-cell-time #{time}
+              - let tempIndex = 0;
+              - let colIndex = 0;
+              each date in dates
+                if _dates[tempIndex] === date
+                  - tempIndex += 1;
+                  td
+                    - const datetime = meeting.DateTimes[time][colIndex];
+                    - const numOfRSVP = datetime.Users.length;
+                    - const users = datetime.Users.filter((u) => { return u.id !== user.id; });
+                    - const contains = users.length < datetime.Users.length;
+                    - const usernames = datetime.Users.map((u) => { return `${u.firstName} ${u.lastName}`; }).join(', ');
+                    - const color = numOfRSVP / meeting.Users.length;
+                    - if (contains) { datetimes.push(datetime.dateTime); }
+                    .dt-cell.dt-cell-grid(data-toggle=(color > 0 ? 'tooltip' : false), title=(color > 0 ? usernames : false), data-users=users, data-datetime=datetime.dateTime, data-color=color, data-row=rowIndex, data-col=colIndex, data-orig-select=contains, class=`${contains ? 'selected' : false}`) #{numOfRSVP}
+                else
+                  td
+                    .dt-cell.dt-cell-empty(data-row=rowIndex, data-col=colIndex) x
+                - colIndex += 1;
+            - rowIndex += 1;
+      br
+      form.form-horizontal#form-rsvp(method='POST', action=`/meetings/${meeting.id}/rsvp`)
+        .form-group
+          button.btn.btn-primary(type='submit')
+            i.fa.fa-calendar-plus-o
+            | RSVP
+  script.
+    const numUsers = #{meeting.Users.length};
+    const username = '#{user.firstName} #{user.lastName}';
+    const datetimes = '#{JSON.stringify(datetimes)}';
+  br

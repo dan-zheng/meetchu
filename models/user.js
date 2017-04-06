@@ -76,6 +76,7 @@ module.exports = (sequelize, Sequelize) => {
         User.belongsToMany(models.Meeting, { through: 'UserMeeting' });
         User.belongsToMany(models.Course, { through: 'CourseUser' });
         User.hasMany(models.Notification, { as: 'notifications', foreignKey: 'userId' });
+        User.belongsToMany(models.DateTime, { through: 'UserDateTime', timestamps: false });
       }
     },
     getterMethods: {

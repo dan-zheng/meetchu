@@ -13,6 +13,8 @@ block content
             .list-group-item
               a.col-xs-12.course-box.flex-column(href=`/meetings/${meeting.id}`)
                 h4.list-group-item-heading #{meeting.name}
+                if meeting.location
+                  p.list-group-item-text Location: #{meeting.location}
                 if meeting.description
                   p.list-group-item-text #{meeting.description}
       else
@@ -24,6 +26,10 @@ block content
           label.col-md-2.control-label(for='name') Name
           .col-md-6
             input.form-control(type='name', name='name', id='name', placeholder='Name', required)
+        .form-group
+          label.col-md-2.control-label(for='location') Location
+          .col-md-6
+            input.form-control(type='location', name='location', id='location', placeholder='Location', required)
         .form-group
           label.col-md-2.control-label(for='description') Description
           .col-md-6

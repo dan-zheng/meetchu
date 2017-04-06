@@ -81,6 +81,17 @@ app.use(validator({
     },
     notEmptyArray(value) {
       return Array.isArray(value) && value.length > 0;
+    },
+    notEmptyObjArray(obj) {
+      if (obj === null || typeof obj !== 'object') {
+        return false;
+      }
+      Object.keys(obj).map((key) => {
+        if (!Array.isArray(obj[key]) || obj[key] === 0) {
+          return false;
+        }
+      });
+      return true;
     }
   }
 }));
@@ -168,6 +179,7 @@ app.get('/meetings', passportConfig.isAuthenticated, meetingController.getMeetin
 app.get('/meetings/:id', passportConfig.isAuthenticated, meetingController.getMeeting);
 app.post('/meetings/create', passportConfig.isAuthenticated, meetingController.postCreateMeeting);
 app.post('/meetings/:id/invite', passportConfig.isAuthenticated, meetingController.postInviteMeeting);
+app.post('/meetings/:id/rsvp', passportConfig.isAuthenticated, meetingController.postRsvpMeeting);
 app.post('/meetings/:id/delete', passportConfig.isAuthenticated, meetingController.postDeleteMeeting);
 
 /**
