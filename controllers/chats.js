@@ -15,7 +15,7 @@ const getChatsQuery = `
   LEFT JOIN Users person
   ON msg.senderId = person.id
   GROUP BY chat.id
-  ORDER BY msg.timeSent, chat.name DESC
+  ORDER BY msg.timeSent DESC, chat.name DESC
 `;
 
 const getChatQuery = `
