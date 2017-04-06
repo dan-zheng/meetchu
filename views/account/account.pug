@@ -1,7 +1,7 @@
 extends ../base
 
 block content
-  form.form-horizontal(method='POST', action='account/profile')
+  form.form-horizontal(method='POST', action='/account/profile')
     .page-header
       h3 Update Profile
 
@@ -49,7 +49,7 @@ block content
   .page-header
     h3 Change Password
 
-  form.form-horizontal(method='POST', action='account/password')
+  form.form-horizontal(method='POST', action='/account/password')
     .form-group
       label.col-sm-3.control-label(for='password') New Password
       .col-sm-6

@@ -19,20 +19,23 @@ const sequelize = new Sequelize(process.env.DB_URL, {
 });
 const db = {};
 
-fs.readdirSync(__dirname)
+const dirs = [__dirname, path.join(__dirname, 'joins')];
+for (let i = 0; i < dirs.length; i++) {
+  fs.readdirSync(dirs[i])
   .filter((file) => {
-    return (file.indexOf('.') !== 0) && (file !== 'index.js');
+    return (file.indexOf('.') !== 0) && (file !== 'index.js') && (file !== 'joins');
   })
   .forEach((file) => {
-    const model = sequelize.import(path.join(__dirname, file));
+    const model = sequelize.import(path.join(dirs[i], file));
     db[model.name] = model;
   });
 
-Object.keys(db).forEach((modelName) => {
-  if ('associate' in db[modelName]) {
-    db[modelName].associate(db);
-  }
-});
+  Object.keys(db).forEach((modelName) => {
+    if ('associate' in db[modelName]) {
+      db[modelName].associate(db);
+    }
+  });
+}
 
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;

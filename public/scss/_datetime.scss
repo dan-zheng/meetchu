@@ -25,7 +25,7 @@ table.datetime {
           }
 
           &.dt-cell-date {
-            min-width: 60px;
+            min-width: 84px;
             text-align: center;
             font-weight: bold;
             color: white;
@@ -35,25 +35,44 @@ table.datetime {
           }
 
           &.dt-cell-grid {
-            min-width: 60px;
+            min-width: 84px;
             background-color: #eeeeee;
-            border-color: 2px darken(#eeeeee, 10%);
+            // border: 2px solid darken(#eeeeee, 10%);
             text-align: center;
             user-select: none;
 
             &:hover {
               border-color: darken(#eeeeee, 10%);
+              // border-color: lighten($cal-green, 10%);
             }
-          }
 
-          &.selected {
-            // background-color: $cal-green !important;
-            padding: 0;
-            // border: 3.5px solid darken($cal-green, 5%);
-            border: 3.5px dashed $cal-green;
+            &.selected {
+              // background-color: $cal-green !important;
+              padding: 0;
+              // border: 3.5px solid darken($cal-green, 5%);
+              border: 3.5px dashed $cal-green;
 
-            &:hover {
-              border-color: darken($cal-green, 5%);
+              &:hover {
+                border-color: darken($cal-green, 5%);
+              }
+            }
+
+            &.final {
+              padding: 0;
+              color: #fff;
+              background-color: lighten($brand-primary, 15%) !important;
+              border: 3px dashed lighten($brand-primary, 5%) !important;
+
+              &:hover {
+                border-color: darken($brand-primary, 5%);
+              }
+            }
+
+            &.finalized {
+              padding: 0;
+              color: #fff;
+              background-color: darken($brand-primary, 5%) !important;
+              border: 2px solid darken($brand-primary, 20%) !important;
             }
           }
 

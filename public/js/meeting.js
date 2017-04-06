@@ -68,7 +68,11 @@ $('#icon-close').on('click', () => {
   inputContainer.removeClass('input-has-value');
 });
 
-let origSelected = JSON.parse(datetimes.replace(/&quot;/g, '"'));
+/*
+ * Meeting RSVP.
+ */
+
+let origSelected = JSON.parse(_datetimes.replace(/&quot;/g, '"'));
 origSelected = origSelected.map((dt) => {
   return new Date(dt);
 });
@@ -96,6 +100,7 @@ const getDate = (cell) => {
 const updateColor = (cell) => {
   const color = $.xcolor.gradientlevel('#eee', '#5feea9', cell.attr('data-color'), 1);
   cell.css('background-color', color);
+  // cell.css('border-color', color);
 }
 
 const toggleDate = (cell, showTooltip) => {
@@ -156,7 +161,7 @@ const toggleDate = (cell, showTooltip) => {
   }
 };
 
-$('.datetime tbody .dt-cell-grid').each(function () {
+$('#table-rsvp tbody .dt-cell-grid').each(function () {
   // Set background color
   const cell = $(this);
   updateColor(cell);
@@ -175,7 +180,7 @@ const isBetween = (x, a, b, inclusive) => {
   return inclusive ? x >= min && x <= max : x > min && x < max;
 };
 
-$('.datetime tbody .dt-cell-grid').mousedown(function (e) {
+$('#table-rsvp tbody .dt-cell-grid').mousedown(function (e) {
   const cell = $(this);
   const showTooltip = true;
   state = cell.hasClass(selectAttr);
@@ -187,7 +192,7 @@ $('.datetime tbody .dt-cell-grid').mousedown(function (e) {
   toggleDate(cell, showTooltip);
 });
 
-$('.datetime tbody .dt-cell-grid').mouseover(function (e) {
+$('#table-rsvp tbody .dt-cell-grid').mouseover(function (e) {
   if (mouseDown) {
     const cell = $(this);
     const showTooltip = false;
@@ -195,7 +200,7 @@ $('.datetime tbody .dt-cell-grid').mouseover(function (e) {
     endRow = cell.attr('data-row');
     endCol = cell.attr('data-col');
     if (select === state) {
-      $('.datetime tbody .dt-cell-grid').filter(function (c) {
+      $('#table-rsvp tbody .dt-cell-grid').filter(function (c) {
         const cell = $(this);
         const cellRow = cell.attr('data-row');
         const cellCol = cell.attr('data-col');
@@ -234,4 +239,57 @@ $('form#form-rsvp').submit(function() {
                 .appendTo(this);
   }
   // $(this).unbind('submit').submit();
+});
+
+/*
+ * Finalize meeting time.
+ */
+
+let finalCell;
+const finalClass = 'final';
+
+const finalizeSelect = (cell) => {
+  if (finalCell) {
+    finalCell.removeClass(finalClass);
+    if (cell.is(finalCell)) {
+      finalCell = null;
+      return;
+    }
+  }
+  finalCell = cell;
+  cell.addClass(finalClass);
+};
+
+$('#table-finalize tbody .dt-cell-grid').each(function () {
+  // Set background color
+  const cell = $(this);
+  updateColor(cell);
+  // Enable tooltip
+  cell.tooltip();
+});
+
+$('#table-finalize tbody .dt-cell-grid').mousedown(function (e) {
+  const cell = $(this);
+  finalizeSelect(cell);
+});
+
+$('form#form-finalize').submit(function() {
+  // event.preventDefault();
+  const dt = new Date(finalCell.attr('data-datetime'));
+  $('<input>').attr('type', 'hidden')
+              .attr('name', 'finalTime')
+              .attr('value', dt)
+              .appendTo(this);
+  // $(this).unbind('submit').submit();
+});
+
+/*
+ * Finalized meeting time.
+ */
+$('#table-finalized tbody .dt-cell-grid').each(function () {
+  // Set background color
+  const cell = $(this);
+  updateColor(cell);
+  // Enable tooltip
+  cell.tooltip();
 });

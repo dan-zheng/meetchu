@@ -22,6 +22,7 @@ module.exports = (sequelize, Sequelize) => {
       associate: (models) => {
         Meeting.belongsToMany(models.User, { through: 'UserMeeting', timestamps: true, updatedAt: false });
         Meeting.hasMany(models.DateTime);
+        Meeting.belongsTo(models.DateTime, { as: 'finalTime', foreignKey: 'finalTimeId', constraints: false });
       }
     }
   });
