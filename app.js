@@ -182,6 +182,7 @@ app.post('/meetings/:id/invite', passportConfig.isAuthenticated, meetingControll
 app.post('/meetings/:id/update', passportConfig.isAuthenticated, meetingController.postUpdateMeeting);
 app.post('/meetings/:id/rsvp', passportConfig.isAuthenticated, meetingController.postRsvpMeeting);
 app.post('/meetings/:id/finalize', passportConfig.isAuthenticated, meetingController.postFinalizeMeeting);
+app.post('/meetings/:id/unfinalize', passportConfig.isAuthenticated, meetingController.postUnfinalizeMeeting);
 app.post('/meetings/:id/delete', passportConfig.isAuthenticated, meetingController.postDeleteMeeting);
 
 /**

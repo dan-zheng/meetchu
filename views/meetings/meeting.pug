@@ -121,7 +121,7 @@ block content
               | RSVP
             if isAdmin
               button.btn.btn-primary(type='button', data-toggle='modal', data-target='#modalFinalize')
-                i.fa.fa-calendar-plus-o
+                i.fa.fa-calendar-check-o
                 | Finalize
       else
         h4 Times
@@ -157,6 +157,13 @@ block content
                       .dt-cell.dt-cell-empty(data-row=rowIndex2, data-col=colIndex2) x
                   - colIndex2 += 1;
               - rowIndex2 += 1;
+        br
+        form.form-horizontal#form-rsvp(method='POST', action=`/meetings/${meeting.id}/unfinalize`)
+          .form-group
+            if isAdmin
+              button.btn.btn-primary(type='submit')
+                i.fa.fa-calendar-minus-o
+                | Unfinalize
             
   #modalFinalize.modal.fade(tabindex='-1', role='dialog', aria-labelledby='modalFinalizeLabel', data-trigger='click focus', data-backdrop='false', style='display: none; z-index: 1060; background-color: rgba(0, 0, 0, 0.5)')
     .modal-dialog(role='document')
@@ -199,7 +206,7 @@ block content
         .modal-footer
           form.form-horizontal#form-finalize(method='POST', action=`/meetings/${meeting.id}/finalize`)
             button.btn.btn-primary(type='submit')
-              i.fa.fa-check
+              i.fa.fa-calendar-check-o
               | Finalize
 
   script.

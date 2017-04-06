@@ -320,6 +320,21 @@ exports.postFinalizeMeeting = (req, res) => {
 };
 
 /**
+ * POST /meetings/:id/unfinalize
+ * Unfinalize meeting time.
+ */
+exports.postUnfinalizeMeeting = (req, res) => {
+  const id = req.params.id;
+  models.Meeting.findById(id).then((meeting) => {
+    meeting.finalTimeId = null;
+    meeting.save().then(() => {
+      req.flash('success', 'Your meeting time has been unfinalized.');
+      return res.redirect(`/meetings/${id}`);
+    });
+  });
+};
+
+/**
  * POST /meetings/:id/invite
  * Invite a user to a meeting.
  */
