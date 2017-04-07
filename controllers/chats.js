@@ -42,7 +42,7 @@ const getChatMembers = `
 `;
 
 const socketAddress = process.env.NODE_ENV === 'production' ?
-  process.env.process.env.SOCKET_ADDRESS :
+  process.env.SOCKET_ADDRESS :
   'http://localhost:8080';
 
 /**

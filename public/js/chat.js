@@ -66,14 +66,16 @@ $('#icon-close').on('click', () => {
   inputContainer.removeClass('input-has-value');
 });
 
-// Socket.io
-const socket = io.connect(document.getAttribute('data-socket-address'));
-
 const script = document.getElementById('chat');
 const groupId = script.getAttribute('data-group-id');
+const socketAddress = script.getAttribute('data-socket-address');
 const messageHistory = JSON.parse(script.getAttribute('data-message-history'));
 const sender = JSON.parse(script.getAttribute('data-sender'));
 const maxMessages = JSON.parse(script.getAttribute('data-max-messages'));
+
+// Socket.io
+const socket = io.connect(socketAddress);
+
 var messageCount = 0;
 
 function addMessage(msg) {
