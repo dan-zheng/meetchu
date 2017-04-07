@@ -306,6 +306,8 @@ exports.getPublicProfile = (req, res) => {
  * Update password.
  */
 exports.postPublicProfileCreateChat = (req, res) => {
+  const id = req.params.id;
+
   const errors = req.validationErrors();
   if (errors) {
     req.flash('error', errors);
@@ -318,8 +320,20 @@ exports.postPublicProfileCreateChat = (req, res) => {
     // groupType: req.body.groupType
   }).then((group) => {
     group.addUser(req.user);
-    req.flash('success', 'Your chat has been created.');
-    return res.redirect('/chats');
+    models.User.findOne({
+      where: {
+        id
+      }
+    }).then((user) => {
+      group.addUser(user);
+      models.Notification.create({
+        message: `You have been invited to chat with ${user.firstName}.`
+      }).then((notification) => {
+        user.addNotification(notification);
+        req.flash('success', `Your chat with ${user.firstName} has been created.`);
+        return res.redirect(`/chats/${group.id}`);
+      });
+    });
   });
 };
 
