@@ -129,9 +129,18 @@ const toggleDate = (cell, showTooltip) => {
       // Handle selection/deselection
       selected.splice(i, 1);
       if (isOrigSelect) {
+        /*
         if (deselected.map(Number).indexOf(+date) === -1) {
+          console.log(date);
           deselected.push(date);
         }
+        */
+        for (let j = 0; j < deselected.length; j += 1) {
+          if (deselected[j].getTime() === date.getTime()) {
+            return;
+          }
+        }
+        deselected.push(date);
       }
       return;
     }
