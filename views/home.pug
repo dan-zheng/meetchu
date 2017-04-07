@@ -30,18 +30,4 @@ block content
       p#subtitle Meetchu simplifies messaging and scheduling so you can spend less time looking at the calendar and more time getting your work done.
       .row.text-center
         img(src='meetchu.svg', style='max-width: 80%;')
-      a.btn.btn-lg.btn-primary(href='/login', role='button') Get started
-     
-  .col-sm-3 
-    h3 Your Notifications
-    if notifications && notifications.length > 0 
-      ul.list-notification
-        each notification in notifications
-          .list-notification-item 
-            a.col-xs-12.course.flex-column(href=`/chats/${notification.id}`)
-              h4.list-notification-item-heading #{notification.text} 
-              if notification.description
-                p.list-notification-item-text #{notification.description}
-    else
-      p YOU GOT NO NOTES BRAH 
-    
+      a.btn.btn-lg.btn-primary(href='/login', role='button') Get started    

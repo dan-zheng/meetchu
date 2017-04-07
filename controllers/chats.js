@@ -191,48 +191,6 @@ exports.postInviteChatGroup = (req, res) => {
   });
 };
 
-/*
- * invite from pub profile
- *
- */
-
-exports.createAndInvite = (req, res) => {
-    /*create new chat group*/ 
-    //req.user is one viewing 
-    //req.param.id is user in db who owns profile
-    const errors = req.validationErrors();
-    if (errors) {
-        req.flash('error', errors);
-        return res.redirect('/chats');
-    }
-    models.Group.create({
-        name: "Private chat",
-        description: "Temp"
-        }).then((group) => {
-            //add person viewing profile. 
-            group.addUser(req.user);
-            //find other use based on id
-            models.User.findOne({
-                where: {
-                    id: req.param.id
-                }
-             }).then((user) => {
-                    models.Notification.create({
-                        message: "You have been invited to the chat ${group.name}."
-                    }).then((notification) => {
-                        user.addNotification(notification);
-                    });
-                group.addUser(user);
-                req.flash('success', `${user.firstName} has been invited.`);
-            });
-            //where to redir rn lol 
-            return res.redirect('/');
-        });
-
-
-
-};
-
 /**
  * POST /chats/:id/leave
  * Leave a chat group.

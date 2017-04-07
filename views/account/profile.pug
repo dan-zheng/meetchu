@@ -4,12 +4,23 @@ block content
   .page-header
     h3 #{user.firstName} #{user.lastName}
   - const email = user.privacyShowEmail ? user.email : 'hidden'
-  h4 Email: #{email}
-  - const major = user.major || 'unset'
-  h4 Major: #{major}
+  - const major = user.privacyShowMajor ? user.major : 'unset'
+  if user.email
+    if user.privacyShowEmail
+      h4 Email: #{user.email}
+    else
+      h4 Email:
+        i Hidden.
+  if user.major
+    if user.privacyShowMajor
+      h4 Major: #{user.major}
+    else
+      h4 Major:
+        i Hidden.
+  if user.profilePictureURL
+    img(src=`${user.profilePictureURL}`)
   form.form-horizontal(method='POST', action=`/profile/${user.id}/chat`)
     .form-group
-      .col-sm-offset-3.col-sm-6
-        button.btn.btn-primary(type='submit')
-          i.fa.fa-pencil
-          | Start a chat
+      button.btn.btn-primary(type='submit')
+        i.fa.fa-comments-o
+        | Start a chat

@@ -36,7 +36,7 @@ const authController = require('./controllers/auth');
 const chatController = require('./controllers/chats');
 const meetingController = require('./controllers/meetings');
 const courseController = require('./controllers/courses');
-const notificationController = require('./controllers/notification'); 
+const notificationController = require('./controllers/notification');
 
 /**
  * Passport configuration.
@@ -170,9 +170,7 @@ app.get('/chats/:id', passportConfig.isAuthenticated, chatController.getChat);
 app.post('/chats/create', passportConfig.isAuthenticated, chatController.postCreateChatGroup);
 app.post('/chats/:id/invite', passportConfig.isAuthenticated, chatController.postInviteChatGroup);
 app.post('/chats/:id/leave', passportConfig.isAuthenticated, chatController.postLeaveChatGroup);
-//-- temp 
-app.post('/chats/:id/createAndInvite', passportConfig.isAuthenticated, chatController.createAndInvite); 
-// -- 
+
 app.post('/chats/:id/delete', passportConfig.isAuthenticated, chatController.postDeleteChatGroup);
 app.get('/courses', passportConfig.isAuthenticated, courseController.getCourses);
 app.get('/courses/:id', passportConfig.isAuthenticated, courseController.getCourse);
@@ -189,7 +187,7 @@ app.post('/meetings/:id/finalize', passportConfig.isAuthenticated, meetingContro
 app.post('/meetings/:id/unfinalize', passportConfig.isAuthenticated, meetingController.postUnfinalizeMeeting);
 app.post('/meetings/:id/delete', passportConfig.isAuthenticated, meetingController.postDeleteMeeting);
 
-app.post('/notifications/create', passportConfig.isAuthenticated, notificationController.createNotification); 
+app.post('/notifications/create', passportConfig.isAuthenticated, notificationController.createNotification);
 
 /**
  * OAuth authentication routes.
