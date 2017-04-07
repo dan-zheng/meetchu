@@ -436,14 +436,33 @@ exports.postLeaveChatGroup = (req, res) => {
  */
 exports.postDeleteMeeting = (req, res) => {
   const id = req.params.id;
-  models.Meeting.findById(id).then((meeting) => {
+  models.Meeting.findOne({
+    where: {
+      id
+    },
+    include: [{
+      model: models.User
+    }]
+  }).then((meeting) => {
     if (!meeting) {
       req.flash('error', 'The meeting does not exist.');
       return res.redirect('/meetings');
     }
-    meeting.destroy().then(() => {
-      req.flash('info', 'Your meeting has been deleted.');
-      return res.redirect('/meetings');
+    async.eachOfLimit(meeting.Users, 1, (user, index, callback) => {
+      models.Notification.create({
+        message: `The meeting ${meeting.name} has been cancelled.`
+      }).then((notification) => {
+        user.addNotification(notification).then(() => {
+          callback();
+        });
+      }).catch((err) => {
+        callback(err);
+      });
+    }, (err) => {
+      meeting.destroy().then(() => {
+        req.flash('info', 'Your meeting has been deleted.');
+        return res.redirect('/meetings');
+      });
     });
   });
 };
