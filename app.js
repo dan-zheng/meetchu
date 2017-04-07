@@ -3,6 +3,9 @@
  */
 const dotenv = require('dotenv');
 const express = require('express');
+const app = express();
+const http = require('http').createServer(app);
+const io = require('socket.io')(http);
 const passport = require('passport');
 const session = require('express-session');
 const MySQLStore = require('express-mysql-session')(session);
@@ -56,7 +59,6 @@ const sessionStore = new MySQLStore({
 /**
  * Express configuration.
  */
-const app = express();
 app.set('port', process.env.PORT || 3000);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
@@ -126,24 +128,6 @@ app.use((req, res, next) => {
 app.use(express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 }));
 
 /*
- * Socket.io setup.
- */
-const http = require('http').createServer(app);
-const io = require('socket.io')(http);
-
-http.listen(8080, '127.0.0.1');
-io.on('connection', (socket) => {
-  socket.on('send message', (rec) => {
-    models.Message.create({
-      senderId: rec.senderId,
-      groupId: rec.groupId,
-      message: rec.message.body
-    });
-    io.emit(`receive message ${rec.groupId}`, rec.message);
-  });
-});
-
-/*
  * App routes.
  */
 app.get('/', homeController.index);
@@ -198,10 +182,24 @@ app.get('/auth/facebook', authController.getAuthFacebook);
 app.get('/auth/facebook/callback', authController.getAuthFacebookCallback);
 
 /**
+ * Socket.io configuration.
+ */
+io.on('connection', (socket) => {
+  socket.on('send message', (rec) => {
+    models.Message.create({
+      senderId: rec.senderId,
+      groupId: rec.groupId,
+      message: rec.message.body
+    });
+    io.emit(`receive message ${rec.groupId}`, rec.message);
+  });
+});
+
+/**
  * Create any missing database tables and start Express server.
  */
 models.sequelize.sync().then(() => {
-  app.listen(app.get('port'), () => {
+  http.listen(app.get('port'), () => {
     console.log('Express server listening on port %d in %s mode', app.get('port'), app.get('env'));
   });
 });

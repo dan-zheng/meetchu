@@ -1,3 +1,5 @@
+/* eslint-env browser jquery */
+
 // Search configuration
 const client = algoliasearch('4977PJKR36', '01af7222321161de5a290b840b90b456');
 const index = client.initIndex('users');
@@ -66,19 +68,20 @@ $('#icon-close').on('click', () => {
   inputContainer.removeClass('input-has-value');
 });
 
+/**
+ * Socket.io.
+ */
 const script = document.getElementById('chat');
 const groupId = script.getAttribute('data-group-id');
-const socketAddress = script.getAttribute('data-socket-address');
 const messageHistory = JSON.parse(script.getAttribute('data-message-history'));
 const sender = JSON.parse(script.getAttribute('data-sender'));
 const maxMessages = JSON.parse(script.getAttribute('data-max-messages'));
 
-// Socket.io
-const socket = io.connect(socketAddress);
+const socket = io();
 
 var messageCount = 0;
 
-function addMessage(msg) {
+const addMessage = (msg) => {
   while (messageCount >= maxMessages) {
     $('#chat-box li').first().remove();
     messageCount -= 1;
@@ -86,7 +89,7 @@ function addMessage(msg) {
   const line = $('<li>').text(`${msg.senderName}: ${msg.body}`);
   $('#chat-box').append(line);
   messageCount += 1;
-}
+};
 
 messageHistory.forEach((msg) => {
   addMessage(msg);
