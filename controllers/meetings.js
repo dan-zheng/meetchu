@@ -311,6 +311,19 @@ exports.postFinalizeMeeting = (req, res) => {
       }
     }]
   }).then((meeting) => {
+    async.eachOfLimit(meeting.Users, 1, (user, index, callback) => {
+      models.Notification.create({
+        message: `${meeting.name} has been finalized`
+      }).then((notification) => {
+        user.addNotification(notification).then(() => {
+          callback();
+        });
+      }).catch((err) => {
+        callback(err);
+      });
+    }, (err) => {
+      console.log(err);
+    });
     meeting.finalTimeId = meeting.DateTimes[0].id;
     meeting.save().then(() => {
       req.flash('success', 'Your meeting time has been finalized.');
