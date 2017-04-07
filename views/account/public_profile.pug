@@ -8,7 +8,7 @@ block content
   - const major = user.privacyShowMajor ? user.major : 'unset'
   h4 Major: #{major}
   img(src=`${user.profilePictureURL}`)
-  form.form-horizontal(method='POST', action=`/chats/${user.id}/createAndInvite`)
+  form.form-horizontal(method='POST', action=`/profile/${user.id}/chat`)
     .form-group
       .col-sm-offset-3.col-sm-6
         button.btn.btn-primary(type='submit')

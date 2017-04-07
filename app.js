@@ -170,9 +170,6 @@ app.get('/chats/:id', passportConfig.isAuthenticated, chatController.getChat);
 app.post('/chats/create', passportConfig.isAuthenticated, chatController.postCreateChatGroup);
 app.post('/chats/:id/invite', passportConfig.isAuthenticated, chatController.postInviteChatGroup);
 app.post('/chats/:id/leave', passportConfig.isAuthenticated, chatController.postLeaveChatGroup);
-//-- temp 
-app.post('/chats/:id/createAndInvite', passportConfig.isAuthenticated, chatController.createAndInvite); 
-// -- 
 app.post('/chats/:id/delete', passportConfig.isAuthenticated, chatController.postDeleteChatGroup);
 app.get('/courses', passportConfig.isAuthenticated, courseController.getCourses);
 app.get('/courses/:id', passportConfig.isAuthenticated, courseController.getCourse);
