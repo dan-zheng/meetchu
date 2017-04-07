@@ -41,6 +41,10 @@ const getChatMembers = `
     ORDER BY UserGroup.createdAt, person.firstName DESC
 `;
 
+const socketAddress = process.env.NODE_ENV === 'production' ?
+  process.env.process.env.SOCKET_ADDRESS :
+  'http://localhost:8080';
+
 /**
  * GET /chats
  * Chats page.
@@ -103,7 +107,8 @@ exports.getChat = (req, res) => {
         messageHistory,
         isAdmin,
         members,
-        maxMessages
+        maxMessages,
+        socketAddress
       });
     });
   }).catch((err) => {

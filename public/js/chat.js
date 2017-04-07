@@ -67,7 +67,7 @@ $('#icon-close').on('click', () => {
 });
 
 // Socket.io
-const socket = io.connect('http://localhost:8080');
+const socket = io.connect(document.getAttribute('data-socket-address'));
 
 const script = document.getElementById('chat');
 const groupId = script.getAttribute('data-group-id');
