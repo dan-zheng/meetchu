@@ -1,0 +1,18 @@
+@import '_variables';
+
+@mixin colorFamily($base-color) {
+  color: $base-color;
+
+  &:hover,
+  &:active {
+    color: darken($base-color, 10%);
+  }
+}
+
+.red {
+  @include colorFamily($brand-danger);
+}
+
+.blue {
+  @include colorFamily($brand-info);
+}
