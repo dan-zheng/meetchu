@@ -93,6 +93,7 @@ app.use(validator({
         if (!Array.isArray(obj[key]) || obj[key] === 0) {
           return false;
         }
+        return true;
       });
       return true;
     }
@@ -125,7 +126,8 @@ app.use((req, res, next) => {
   });
   next();
 });
-app.use(express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 }));
+// app.use(express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 }));
+app.use(express.static(path.join(__dirname, 'client', 'dist'), { maxAge: 31557600000 }));
 
 /*
  * App routes.

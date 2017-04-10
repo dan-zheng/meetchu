@@ -4,6 +4,7 @@
   "description": "A messaging and meeting app for group study.",
   "main": "app.js",
   "scripts": {
+    "build": "node client/build/build.js",
     "start": "node app.js",
     "algolia": "node config/algolia.js",
     "clean": "rimraf ./public/css",
