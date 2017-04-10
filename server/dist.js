@@ -13,7 +13,6 @@ const path = require('path');
 const compression = require('compression');
 const bodyParser = require('body-parser');
 const logger = require('morgan');
-const sass = require('node-sass-middleware');
 const flash = require('express-flash');
 const validator = require('express-validator');
 const nodemailer = require('nodemailer');
@@ -63,12 +62,6 @@ app.set('port', process.env.PORT || 3000);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 app.use(compression());
-app.use(sass({
-  src: path.join(__dirname, 'public/scss'),
-  dest: path.join(__dirname, 'public/css'),
-  prefix: '/css',
-  outputStyle: process.env.NODE_ENV === 'production' ? 'compressed' : 'nested'
-}));
 app.use(logger('dev'));
 if (process.env.NODE_ENV !== 'production') {
   app.locals.pretty = true;
