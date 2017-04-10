@@ -1,0 +1,98 @@
+@import '_variables';
+@import 'lib/keen-ui/keen-ui';
+@import 'lib/bootstrap/bootstrap/_variables';
+@import '_search';
+@import '_calendar';
+@import '_datetime';
+
+@mixin styling($sidebar-width, $icon-padding) {
+  #wrapper {
+    position: absolute;
+    left: 0;
+    overflow-x: hidden;
+    padding-left: $sidebar-width;
+    width: 100vw;
+    height: 100vh;
+
+    &.toggled {
+      #sidebar {
+        width: 0;
+      }
+
+      #content {
+        position: absolute;
+        left: 0;
+        width: 100vw;
+        margin-right: 0;
+      }
+    }
+  }
+
+  #sidebar {
+    position: fixed;
+    left: $sidebar-width;
+    width: $sidebar-width;
+    height: 100vh;
+    margin-left: -$sidebar-width;
+    overflow-y: auto;
+    background: #EBEBEB;
+    // transition: all 0.4s ease;
+  }
+
+  #content {
+    z-index: 2;
+    position: absolute;
+    left: $sidebar-width;
+    padding: 20px;
+    width: calc(100vw - #{$sidebar-width});
+    // transition: all 0.4s ease;
+  }
+
+  .nav > li > a {
+    padding: $sidebar-width * 0.10 $sidebar-width * 0.15;
+  }
+
+  .sidebar-nav {
+    list-style: none;
+    font-size: 48px;
+
+    img {
+      padding-top: $icon-padding;
+      padding-bottom: $icon-padding;
+      width: 100%;
+      max-width: 100%;
+    }
+
+    > li {
+      text-align: center;
+      line-height: $sidebar-width * 0.68;
+
+      a {
+        display: block;
+        text-decoration: none;
+        color: #000000;
+        transition: background 0.2s ease;
+
+        &:hover {
+          text-decoration: none;
+          color: blue;
+          background: #dbd9fa;
+        }
+
+        &:active {
+          text-decoration: none;
+        }
+
+        &:focus {
+          text-decoration: none;
+        }
+      }
+    }
+  }
+}
+@media (max-width: $screen-xs-max) {
+  @include styling($sidebar-width: 60px, $icon-padding: 3px);
+}
+@media (min-width: $screen-sm-min) {
+  @include styling($sidebar-width: 100px, $icon-padding: 5px);
+}

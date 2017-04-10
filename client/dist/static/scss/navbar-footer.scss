@@ -1,0 +1,125 @@
+@import '_variables';
+
+// General
+
+body {
+  padding-top: $navbar-height;
+  margin-bottom: 75px;
+}
+
+// Typography
+
+#title {
+  font-size: 5vw;
+  font-family: $title-font-family;
+  font-weight: bold;
+  margin-bottom: 1.8vw;
+}
+
+#subtitle {
+  font-size: 3vw;
+  font-family: $subtitle-font-family;
+  font-weight: lighter;
+  margin-bottom: 1.8vw;
+}
+
+@media (max-width: 600px) {
+  #title {
+    font-size: 30px;
+    margin-bottom: 10.8px;
+  }
+  #subtitle {
+    font-size: 18px;
+    margin-bottom: 10.8px;
+  }
+}
+
+@media (min-width: 1000px) {
+  #subtitle {
+    font-size: 30px;
+  }
+}
+
+@media (min-width: 1500px) {
+  #title {
+    font-size: 75px;
+    margin-bottom: 27px;
+  }
+  #subtitle {
+    margin-bottom: 27px;
+  }
+}
+
+// Navbar
+
+.navbar-default {
+    border: 0;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.15);
+
+    .navbar-nav {
+        > li > a {
+            transition: color 0.4s cubic-bezier(0.24, 0.45, 0.46, 0.92);
+        }
+    }
+}
+
+.navbar-default {
+  height: $navbar-height;
+  background-color: #fff;
+
+  .container {
+    height: inherit;
+  }
+
+  .navbar-header {
+    height: inherit !important;
+  }
+
+  .navbar-brand {
+    position: absolute;
+    padding-top: 0;
+    padding-bottom: 0;
+    font-family: $navbar-brand-font-family;
+    font-weight: bold;
+    font-size: $navbar-default-brand-size;
+    height: $navbar-height;
+    white-space: nowrap;
+    overflow: hidden;
+    // Meetchu logo
+    img {
+      display: inline-block;
+      vertical-align: middle;
+      padding-top: 12px;
+      padding-bottom: 12px;
+      padding-right: 12px;
+    }
+    // Meetchu title
+    span {
+      display: inline-block;
+      vertical-align: middle;
+      line-height: $navbar-default-brand-size;
+      padding-top: 20px;
+      padding-bottom: 16px;
+    }
+  }
+
+  .navbar-nav {
+    > li > a {
+      color: #444;
+    }
+    // Avatar
+    img {
+      height: 30px;
+      width: 30px;
+      margin: -15px 15px;
+    }
+  }
+
+  .navbar-collapse {
+    background-color: #fff;
+  }
+
+  .navbar-toggle {
+    z-index: 1;
+  }
+}

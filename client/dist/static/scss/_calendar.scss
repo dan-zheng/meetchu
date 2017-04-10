@@ -1,0 +1,72 @@
+.calendar {
+  max-width: calc(57px * 7);
+  font-size: 16px;
+  margin: auto;
+  border-collapse: collapse;
+
+  @media (max-width: $screen-xs-max) {
+    max-width: calc(40px * 7);
+    font-size: 13px;
+  }
+
+  .cal-cell {
+    display: inline-block;
+    color: #fff;
+    background-color: $brand-primary;
+    height: 40px;
+    line-height: 40px;
+    width: calc((100% / 7) - 3px);
+    margin: 1px;
+    border: 2px solid transparent;
+    text-align: center;
+    cursor: pointer;
+    user-select: none;
+    align-items: flex-start;
+
+    &.cal-cell-today {
+      background-color: lighten(#027fc7, 25%);
+
+      &:hover {
+        border-color: lighten(#027fc7, 20%);
+      }
+    }
+
+    &.cal-cell-past {
+      background-color: lighten($brand-primary, 25%);
+
+      &:hover {
+        border-color: lighten($brand-primary, 20%);
+      }
+    }
+
+    &.cal-cell-empty {
+      background-color: transparent;
+    }
+
+    //&.cell-selecting, &.cell-selected {
+    //&.ui-selecting, &.ui-selected {
+    &.selected {
+      background-color: $cal-green;
+      padding: 0;
+      border: 2px solid darken($cal-green, 5%);
+
+      &:hover {
+        border-color: darken($cal-green, 10%);
+      }
+    }
+
+    &:hover {
+      border-color: darken($brand-primary, 5%);
+    }
+
+    &:focus {
+      outline: none;
+    }
+  }
+  
+  .cal-cell-header {
+    color: white;
+    background: black;
+    pointer-events: none;
+  }
+}
