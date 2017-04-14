@@ -9,7 +9,7 @@
 **/node_modules
 **/bower_components
 
-# Environmental variables file
+# Environmental variables files
 **/.env
 
 # Compiled output

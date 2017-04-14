@@ -3,9 +3,10 @@
   "version": "1.0.0",
   "description": "A messaging and meeting app for group study.",
   "scripts": {
-    "start": "npm run server",
-    "dev": "./node_modules/.bin/npm-run-all --parallel server client",
-    "server": "node server/app.js",
+    "start": "npm run server:prod",
+    "dev": "./node_modules/.bin/npm-run-all --parallel server:dev client",
+    "server:prod": "node server/app.js",
+    "server:dev": "nodemon server/app.js",
     "client": "node client/app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
