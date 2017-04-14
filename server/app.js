@@ -124,7 +124,11 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(express.static(path.join(__dirname, '../client', 'dist'), { maxAge: 31557600000 }));
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 }));
+} else {
+  app.use(express.static(path.join(__dirname, '../client', 'dist'), { maxAge: 31557600000 }));
+}
 
 /*
  * App routes.
@@ -194,13 +198,7 @@ io.on('connection', (socket) => {
 /**
  * Create any missing database tables and start Express server.
  */
-<<<<<<< HEAD:server/app.js
-models.sequelize.sync().then(() => {
-  http.listen(app.get('port'), () => {
-    console.log('Express server listening on port %d in %s mode', app.get('port'), app.get('env'));
-=======
 models.sync();
-
 
 /*
 const userDao = require('./dao/user')(models);

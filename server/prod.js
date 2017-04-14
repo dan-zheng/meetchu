@@ -199,10 +199,9 @@ io.on('connection', (socket) => {
 /**
  * Create any missing database tables and start Express server.
  */
-models.sequelize.sync().then(() => {
-  http.listen(app.get('port'), () => {
-    console.log('Express server listening on port %d in %s mode', app.get('port'), app.get('env'));
-  });
+models.sync();
+http.listen(app.get('port'), () => {
+  console.log('Express server listening on port %d in %s mode', app.get('port'), app.get('env'));
 });
 
 module.exports = app;
