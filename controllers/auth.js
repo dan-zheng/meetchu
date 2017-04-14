@@ -1,29 +1,20 @@
-const models = require('../models');
 const passport = require('passport');
 
 /**
  * Login authentication helper function.
  */
 exports.loginCallback = ((strategy, req, res, next) => {
-  passport.authenticate(strategy, (err1, user, info) => {
-    if (err1) {
-      return next(err1);
-    }
-    if (!user) {
+  passport.authenticate(strategy, (err1, optionalUser, info) => {
+    if (err1) return next(err1);
+    optionalUser.fold(() => {
       req.flash('error', info.msg);
-      req.session.save(() => {
-        return res.redirect('/login');
-      });
-    } else {
+      res.redirect('/login');
+    }, (user) => {
       req.login(user, (err2) => {
-        if (err2) {
-          return next(err2);
-        }
-        req.session.save(() => {
-          return res.redirect('/');
-        });
+        if (err2) return next(err2);
+        res.redirect('/');
       });
-    }
+    });
   })(req, res, next);
 });
 

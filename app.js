@@ -3,6 +3,8 @@
  */
 const dotenv = require('dotenv');
 const express = require('express');
+const app = express();
+const http = require('http').createServer(app);
 const passport = require('passport');
 const session = require('express-session');
 const MySQLStore = require('express-mysql-session')(session);
@@ -56,7 +58,6 @@ const sessionStore = new MySQLStore({
 /**
  * Express configuration.
  */
-const app = express();
 app.set('port', process.env.PORT || 3000);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
@@ -96,6 +97,7 @@ app.use(validator({
     }
   }
 }));
+
 app.use(session({
   secret: process.env.SESSION_SECRET,
   store: sessionStore,
@@ -124,24 +126,6 @@ app.use((req, res, next) => {
   next();
 });
 app.use(express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 }));
-
-/*
- * Socket.io setup.
- */
-const http = require('http').createServer(app);
-const io = require('socket.io')(http);
-
-http.listen(8080, '127.0.0.1');
-io.on('connection', (socket) => {
-  socket.on('send message', (rec) => {
-    models.Message.create({
-      senderId: rec.senderId,
-      groupId: rec.groupId,
-      message: rec.message.body
-    });
-    io.emit(`receive message ${rec.groupId}`, rec.message);
-  });
-});
 
 /*
  * App routes.
@@ -200,10 +184,63 @@ app.get('/auth/facebook/callback', authController.getAuthFacebookCallback);
 /**
  * Create any missing database tables and start Express server.
  */
-models.sequelize.sync().then(() => {
-  app.listen(app.get('port'), () => {
-    console.log('Express server listening on port %d in %s mode', app.get('port'), app.get('env'));
+models.sync();
+
+
+/*
+const userDao = require('./dao/user')(models);
+userDao.externalLogin({ email: 'era878@gmail.com', first_name: 'Eric', last_name: 'Aguilera', google_id: 1233 })
+.then((res) => {
+  console.log(res);
+});
+
+const p = models.pool.query('SELECT * FROM users')
+  .map((row) => {
+    return new models.User(row);
   });
+
+p.then((users) => {
+  users.forEach((user) => {
+    const hash = user.genPasswordHash('hello');
+    user.password = hash;
+    user.verifyPassword('hello', (e, isMatch) => {
+      if (e) throw e;
+      console.log(isMatch);
+    });
+  });
+});
+
+const userDao = require('./dao/user')(models);
+userDao.findByEmail('era878@gmail.com').then((res) => {
+  res.fold(()=> console.log('nothing found'), u => console.log(u));
+});
+userDao.signUp({ email: 'adam@lol.com', first_name: 'Adam', last_name: 'Smith' })
+.then((wasCreated) => {
+  if (wasCreated) {
+    console.log('User created');
+  } else {
+    console.log('User already existed');
+  }
+});
+userDao.externalLogin({ email: 'adam@lol.com', first_name: 'Adam', last_name: 'Lol', facebook_id: '4444' })
+.then((wasCreated) => {
+  if (wasCreated) {
+    console.log('User oauthlogged in');
+  } else {
+    console.log('User not oauthlogged in :(');
+  }
+});
+userDao.loginWithEmail('era878@lol.com')
+.then((wasCreated) => {
+  if (wasCreated) {
+    console.log('User regular log in');
+  } else {
+    console.log('User not regular log in :(');
+  }
+});*/
+
+http.listen(app.get('port'), () => {
+  console.log('Express server listening on port %d in %s mode', app.get('port'), app.get('env'));
 });
 
 module.exports = app;

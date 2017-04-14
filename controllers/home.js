@@ -1,9 +1,8 @@
-const models = require('../models');
-
 /**
  * GET /
  * Home page.
  */
+ /*
 exports.index = (req, res) => {
   if (req.user) {
     req.user.getNotifications().then((notifications) => {
@@ -17,4 +16,11 @@ exports.index = (req, res) => {
       title: 'Home'
     });
   }
+};
+*/
+
+exports.index = (req, res) => {
+  res.render('home', {
+    title: 'Home',
+  });
 };
