@@ -14,6 +14,27 @@ const actions = {
   checkAuth () {
     return
   },
+  loginAuth ({ commit }, { email, password }) {
+    return Vue.axios.post('/login', {
+      email,
+      password
+    })
+    .then((res) => {
+      console.log('login success');
+      console.log(res);
+      commit(types.SET_USER, res.data)
+      console.log(state.user);
+    })
+    .catch((error) => {
+      console.log('login error');
+      console.log(error);
+      /*
+      if (error.response.status === 401) {
+        throw new Error('Bad credentials')
+      }
+      */
+    })
+  },
   login ({ commit }, { email, password }) {
     return Vue.axios.post('/login', {
       email,

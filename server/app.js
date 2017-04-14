@@ -22,9 +22,7 @@ const nodemailer = require('nodemailer');
 /**
  * Load environment variables from .env file.
  */
-if (process.env.NODE_ENV !== 'production') {
-  dotenv.load({ path: '.env' });
-}
+dotenv.load({ path: '.env', silent: process.env.NODE_ENV === 'production' });
 
 /**
  * Models.
@@ -61,8 +59,8 @@ const sessionStore = new MySQLStore({
  * Express configuration.
  */
 app.set('port', process.env.PORT || 3000);
-// app.set('views', path.join(__dirname, 'views'));
-// app.set('view engine', 'pug');
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'pug');
 app.use(compression());
 app.use(logger('dev'));
 if (process.env.NODE_ENV !== 'production') {

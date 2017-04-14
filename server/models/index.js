@@ -7,9 +7,7 @@ const debugging = false;
 /**
  * Load environment variables from .env file
  */
-if (process.env.NODE_ENV !== 'production') {
-  dotenv.load({ path: '.env' });
-}
+dotenv.load({ path: '.env', silent: process.env.NODE_ENV === 'production' });
 
 const pool = mysql.createPool({
   connectionLimit: 10,
