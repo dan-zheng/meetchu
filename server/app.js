@@ -200,7 +200,23 @@ io.on('connection', (socket) => {
  */
 models.sync();
 
+
 /*
+const userDao = require('./dao/user')(models);
+
+userDao.signUp({ email: 'era878@gmail.com', first_name: 'Eric', last_name: 'Aguilera', password: 'MyPassword' })
+.then((wasCreated) => {
+  if (wasCreated) {
+    console.log('user account created');
+  } else {
+    console.log('user account created');
+  }
+});
+
+userDao.loginWithEmail({ email: 'era878@gmail.cmm', password: 'lol' })
+.then((result) => {
+});
+
 const userDao = require('./dao/user')(models);
 userDao.externalLogin({ email: 'era878@gmail.com', first_name: 'Eric', last_name: 'Aguilera', google_id: 1233 })
 .then((res) => {

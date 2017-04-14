@@ -79,21 +79,15 @@ const oauthLogin = (oauthId, profile, done) => {
  * Sign in using email and password.
  */
 passport.use(new LocalStrategy({ usernameField: 'email' }, (email, password, done) => {
-  models.User.find({ where: { email } }).then((user) => {
-    if (!user) {
-      return done(null, false, { message: `Email ${email} not found.` });
-    }
-    user.verifyPassword(password, (err, isMatch) => {
-      if (err) {
-        return done(err);
-      }
-      if (isMatch) {
-        return done(null, user);
-      }
-      return done(null, false, { msg: 'Invalid email or password.' });
+  userDao.loginWithEmail({ email, password }).then((user) => {
+    user.left.map((message) => {
+      console.log('error');
+      done(null, false, { message });
     });
-  }).catch((err) => {
-    return done(err);
+    user.right.map((user) => {
+      console.log('received: ' + user);
+      done(null, user);
+    });
   });
 }));
 
