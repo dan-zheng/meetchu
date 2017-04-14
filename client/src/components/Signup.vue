@@ -26,6 +26,8 @@
         button.btn.btn-success(type='submit')
           i.fa.fa-user-plus
           | Sign up
+    input(v-model='msg', placeholder='edit me')
+    p Message is {{ msg }}
 </template>
 
 <script>

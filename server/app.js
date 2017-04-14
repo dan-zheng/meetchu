@@ -1,19 +1,20 @@
 /**
  * Module dependencies.
  */
+const path = require('path');
 const dotenv = require('dotenv');
 const express = require('express');
 const app = express();
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
 const passport = require('passport');
+const jwt = require('express-jwt');
 const session = require('express-session');
 const MySQLStore = require('express-mysql-session')(session);
-const path = require('path');
+const cors = require('cors');
 const compression = require('compression');
 const bodyParser = require('body-parser');
 const logger = require('morgan');
-const sass = require('node-sass-middleware');
 const flash = require('express-flash');
 const validator = require('express-validator');
 const nodemailer = require('nodemailer');
@@ -60,21 +61,16 @@ const sessionStore = new MySQLStore({
  * Express configuration.
  */
 app.set('port', process.env.PORT || 3000);
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'pug');
+// app.set('views', path.join(__dirname, 'views'));
+// app.set('view engine', 'pug');
 app.use(compression());
-app.use(sass({
-  src: path.join(__dirname, 'public/scss'),
-  dest: path.join(__dirname, 'public/css'),
-  prefix: '/css',
-  outputStyle: process.env.NODE_ENV === 'production' ? 'compressed' : 'nested'
-}));
 app.use(logger('dev'));
 if (process.env.NODE_ENV !== 'production') {
   app.locals.pretty = true;
 }
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cors());
 app.use(validator({
   customValidators: {
     isArray(value) {
@@ -126,8 +122,7 @@ app.use((req, res, next) => {
   });
   next();
 });
-app.use(express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 }));
-// app.use(express.static(path.join(__dirname, 'client', 'dist'), { maxAge: 31557600000 }));
+app.use(express.static(path.join(__dirname, '../client', 'dist'), { maxAge: 31557600000 }));
 
 /*
  * App routes.
@@ -149,15 +144,12 @@ app.post('/forgot', userController.postForgot);
 app.get('/reset/:token', userController.getPasswordReset);
 app.post('/reset/:token', userController.postPasswordReset);
 app.get('/chats', passportConfig.isAuthenticated, chatController.getChats);
-// temp
-app.get('/chats/proto', passportConfig.isAuthenticated, chatController.getProto);
-//----
 app.get('/chats/:id', passportConfig.isAuthenticated, chatController.getChat);
 app.post('/chats/create', passportConfig.isAuthenticated, chatController.postCreateChatGroup);
 app.post('/chats/:id/invite', passportConfig.isAuthenticated, chatController.postInviteChatGroup);
 app.post('/chats/:id/leave', passportConfig.isAuthenticated, chatController.postLeaveChatGroup);
-
 app.post('/chats/:id/delete', passportConfig.isAuthenticated, chatController.postDeleteChatGroup);
+
 app.get('/courses', passportConfig.isAuthenticated, courseController.getCourses);
 app.get('/courses/:id', passportConfig.isAuthenticated, courseController.getCourse);
 app.post('/courses/add', passportConfig.isAuthenticated, courseController.postAddCourse);

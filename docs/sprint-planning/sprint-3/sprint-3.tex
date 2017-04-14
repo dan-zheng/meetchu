@@ -1,0 +1,227 @@
+\documentclass[12pt]{article}
+
+\usepackage[margin=1in, headheight=15.05pt]{geometry}
+\usepackage{indentfirst}
+\usepackage{xcolor}
+\usepackage{soul}
+\usepackage{enumitem}
+\usepackage{url}
+\usepackage{tabularx}
+\usepackage{fancyhdr}
+
+\makeatletter
+\g@addto@macro\bfseries{\boldmath}
+\makeatother
+
+\newcommand{\br}{\vspace{2mm}}
+\newcommand{\brbig}{\vspace{4mm}}
+
+\definecolor{light-gray}{gray}{0.93}
+\DeclareRobustCommand{\hlgray}[1]{{\sethlcolor{light-gray}\hl{#1}}}
+\newcommand{\code}[1]{{\fontsize{11pt}{11pt}\selectfont\hlgray{\hbox{\texttt{#1}}}}}
+
+\newcolumntype{C}[1]{>{\centering}p{#1}}
+\newcolumntype{Y}{>{\centering\arraybackslash}X}
+
+\linespread{1.05}
+
+\newcommand{\hwTitle}{Sprint 3 Planning Document}
+\newcommand{\courseTitle}{CS 307 (Spring 2017)}
+\newcommand{\projectName}{Meetchu}
+\newcommand{\teamName}{Team 17}
+\newcommand{\authorName}{Eric Aguilera, Justin Bonner, Carson Harmon, Dan Zheng}
+
+\lhead{\fontsize{14pt}{14pt}\selectfont{}\courseTitle}
+\chead{\fontsize{14pt}{14pt}\selectfont{}\textbf{\projectName}}
+\rhead{\fontsize{14pt}{14pt}\selectfont{}\teamName}
+
+\pagestyle{fancy}
+
+\begin{document}
+
+\section*{\Large \centering \hwTitle}
+{\centering \authorName \par}
+
+\section{Sprint Overview}
+
+For our third sprint, we will focus on improving our frontend, refactoring our backend, and adding some small additional features. Currently, the primary features of our application are completed, but our app lacks polish and ``glue'': some parts of our application that logically should be connected are not.
+
+By the end of our sprint, users will be able to use a cleaner, more robust front-end interface. Our codebase will also be much more organized and modular.
+
+\section{Meeting Plans}
+
+Our SCRUM master will be Dan Zheng. We plan on meeting at least twice per week. We will meet starting at 11:30 on MWF for 1-2 hours.
+
+\section{Risks and Challenges}
+
+Like the previous sprint, the biggest risk of this sprint is the amount of work that needs to be done. Refactoring the entire application involves a significant amount of time and effort, and may break or negatively impact previously completed features of our application.
+
+\br
+
+However, we believe in the importance of high-quality, organized code and that refactoring is a meaningful, worthwhile endeavor.
+
+\section{Current Sprint Detail}
+
+Since we have completed the functional requirements for our project, the bulk of the work for this sprint involves refactoring or rewriting previous code. In previous sprints, we focused on creating a minimal viable product and writing code that worked. However, much of our code could be improved: we plan on refactoring our back-end code, particularly asynchronous functions, to be cleaner, as well as rewriting the front-end code to be more systematic and modular instead of being ad-hoc and performing direct DOM manipulations. Thus, some of our tasks are not related to particular user stories, but are related to user experience.
+
+\br
+
+\newpage
+
+\textbf{Refactor Frontend}
+
+\brbig
+
+\begin{tabularx}{\textwidth}{|C{0.02\textwidth}|X|C{0.12\textwidth}|p{0.10\textwidth}|}
+\hline
+\textbf{\#} & \textbf{Task description} & \textbf{Estimated Time} & \textbf{Owner} \\ \hline
+1 & Set up webpack/Vue.js for client code separation & 5 hrs & Dan \\ \hline
+2 & Set up Vue.js environment (views, router, store) & 5 hrs & Dan \\ \hline
+3 & Rewrite basic front-end views using Vue & 5 hrs & Dan, Carson \\ \hline
+4 & Rewrite chat/meetings views using Vue components & 15 hrs & Dan, Justin \\ \hline
+\end{tabularx}
+
+\brbig
+
+\textbf{Acceptance Criteria}
+\begin{itemize}[nolistsep]
+\item We will consider this task “completed” when our project front-end has been rewritten using Vue.js. The front-end code will be modular, with clear separation of components, routes, and stores. Various front-end views, particular chats and meetings, will be rewritten.
+\item From a user's experience, pages/actions will load more quickly. The chat interface will feature real-time data, as messages are sent and received.
+\end{itemize}
+
+\brbig
+
+\textbf{Refactor Backend}
+
+\brbig
+
+\begin{tabularx}{\textwidth}{|C{0.02\textwidth}|X|C{0.12\textwidth}|p{0.10\textwidth}|}
+\hline
+\textbf{\#} & \textbf{Task description} & \textbf{Estimated Time} & \textbf{Owner} \\ \hline
+1 & Rewrite database queries to improve efficiency & 15 hrs & Eric, Justin \\ \hline
+2 & Rewrite database schemas to improve efficiency & 5 hrs & Eric \\ \hline
+3 & Cleanup callbacks and prefer using Promises or Async/Await & 5 hrs & Eric \\ \hline
+\end{tabularx}
+
+\brbig
+
+\textbf{Acceptance Criteria}
+\begin{itemize}[nolistsep]
+\item Generally, changes in back-end code will not directly affect the user experience. However, our codebase should become cleaner, more modular, and easier to maintain.
+\item We will consider this task “completed” when our database schemas/queries written using the Sequelize ORM have been refactored into cleaner MySQL and when functions containing nested functions/Promises have been rewritten using cleaner Promises or using async/await.
+\end{itemize}
+
+\br
+
+\textbf{User story \#1}
+
+\br
+
+As a user, I would like to view links to public profiles of other users whenever possible.
+
+\brbig
+
+\begin{tabularx}{\textwidth}{|C{0.02\textwidth}|X|C{0.12\textwidth}|p{0.10\textwidth}|}
+\hline
+\textbf{\#} & \textbf{Task description} & \textbf{Estimated Time} & \textbf{Owner} \\ \hline
+1 & Add public profile links & 2 hrs & Carson \\ \hline
+2 & Rewrite database schemas to improve efficiency & 5 hrs & Eric \\ \hline
+\end{tabularx}
+
+\brbig
+
+\textbf{Acceptance Criteria}
+\begin{itemize}[nolistsep]
+\item Given that the links to public profiles of other users has been completed, when users visit any page with view elements containing information about other users, they should be able to click on the elements to view public profiles.
+\end{itemize}
+
+\br
+
+\textbf{User story \#2}
+
+\br
+
+As a user, I want to invite students in my courses to chat.
+
+\brbig
+
+\begin{tabularx}{\textwidth}{|C{0.02\textwidth}|X|C{0.12\textwidth}|p{0.10\textwidth}|}
+\hline
+\textbf{\#} & \textbf{Task description} & \textbf{Estimated Time} & \textbf{Owner} \\ \hline
+1 & Create back-end controller for creating a chat and inviting students & 7 hrs & Carson, Justin \\ \hline
+2 & Create front-end interface for inviting students to chat & 7 hrs & Carson, Justin \\ \hline
+\end{tabularx}
+
+\brbig
+
+\textbf{Acceptance Criteria}
+\begin{itemize}[nolistsep]
+\item Given that the front-end interface for inviting course students to chat is completed, when a user views a course page, they should be able to create a group chat by selecting students in the course and clicking a button.
+\item Given that the back-end controller for inviting course students to chat is completed, when a user requests to invite students to a group chat, a new chat should be created in the database with the requester as the chat creator and all other students as chat members.
+\end{itemize}
+
+\section{Remaining Backlog}
+
+\subsubsection*{Note: we have completed all ``required'' tasks in the backlog. We may attempt the optional tasks if there is time after our application refactor.}
+
+\subsubsection*{As a user, I would like to:}
+
+\begin{enumerate}[nolistsep]
+    \item \st{create a Meetchu account using a valid email and password.}
+    \item \st{recover my password using my email.}
+    \item \st{add profile information (name, photo, major, phone number, short bio) to my account.}
+    \item \st{update my account information at any time.}
+    \item \st{search for courses by title and number.}
+    \item \st{add a course to my account.}
+    \item \st{view people in my courses.}
+    \item \st{view a list of my courses.}
+    \item \st{create and join study groups with people in my classes.}
+    \item \st{send personal messages to any other user.}
+    \item \st{view message history with other users.}
+    \item see users who are online (if time allows)
+    \item \st{link my account with and authenticate using Google and Facebook (if time allows).}
+    \item view my class schedule (if time allows).
+    \item search for people in my classes by name or email (if time allows).
+    \item view the schedules of members in my study groups (if time allows).
+\end{enumerate}
+
+\subsubsection*{As a meeting creator, I would like to:}
+
+\begin{enumerate}[nolistsep]
+    \item \st{create a one-time meeting for a study group.}
+    \item \st{create a personal one-time meeting with selected members.}
+    \item \st{suggest possible dates and times for a meeting.}
+    \item \st{add a title, purpose, and location to a meeting.}
+    \item \st{add or remove people from a meeting and notify them.}
+    \item \st{cancel a meeting and notify participants.}
+    \item \st{finalize the date and time for a meeting and notify participants.}
+    \item \st{view participants who have RSVP'd to a meeting.}
+    \item add an address to a meeting and view on Google Maps (if time allows).
+    \item \st{view meeting attendance (if time allows)}.
+    \item create a recurring meeting for a study group (if time allows).
+\end{enumerate}
+
+\subsubsection*{As a meeting participant, I would like to:}
+
+\begin{enumerate}[nolistsep]
+    \item \st{view my meetings.}
+    \item \st{indicate my preferred times for a meeting.}
+    \item \st{RSVP to a meeting after its date and time have been finalized.}
+    \item \st{set time preferences for group meetings.}
+    \item \st{receive email notifications about upcoming meetings.}
+\end{enumerate}
+
+\subsubsection*{As a group creator, I would like to:}
+\begin{enumerate}[nolistsep]
+    \item \st{be able to delete the group and notify members.}
+\end{enumerate}
+
+\subsubsection*{As a group member, I would like to:}
+\begin{enumerate}[nolistsep]
+    \item \st{be able to leave the group.}
+    \item \st{invite people to the group.}
+    \item \st{send messages to the group.}
+    \item \st{view group messages.}
+\end{enumerate}
+
+\end{document}

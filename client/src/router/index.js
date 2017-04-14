@@ -5,6 +5,7 @@ import Main from '@/components/Main'
 import Home from '@/components/Home'
 import Login from '@/components/Login'
 import Signup from '@/components/Signup'
+import Dashboard from '@/components/Dashboard'
 import Test from '@/components/Test'
 
 Vue.use(Router)
@@ -20,24 +21,39 @@ export default new Router({
       component: Main,
       children: [
         {
-          path: 'home',
-          alias: '',
+          path: '',
           component: Home
         },
         {
           path: 'login',
-          component: Login
+          component: Login,
+          meta: { auth: false }
         },
         {
           path: 'signup',
-          component: Signup
-        }
+          component: Signup,
+          meta: { auth: false }
+        },
+        {
+          path: 'dashboard',
+          component: Dashboard,
+          meta: { auth: true }
+        },
       ]
-    },
-    {
-      path: '/test',
-      name: 'Test',
-      component: Test
-    },
-  ]
+    }
+  ],
+  beforeEach: (to, from, next) => {
+    if (to.matched.some(record => record.meta.auth)) {
+      if (!auth.loggedIn()) {
+        next({
+          path: '/login',
+          query: { redirect: to.fullPath }
+        })
+      } else {
+        next()
+      }
+    } else {
+      next()
+    }
+  }
 })

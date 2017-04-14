@@ -2,6 +2,12 @@ const models = require('../models');
 const passport = require('passport');
 
 /**
+ * Authentication helper function.
+ * Used by front-end to check if user is authenticated.
+ */
+
+
+/**
  * Login authentication helper function.
  */
 exports.loginCallback = ((strategy, req, res, next) => {
@@ -12,7 +18,8 @@ exports.loginCallback = ((strategy, req, res, next) => {
     if (!user) {
       req.flash('error', info.msg);
       req.session.save(() => {
-        return res.redirect('/login');
+        // return res.redirect('/login');
+        return res.status(400).json(info.msg);
       });
     } else {
       req.login(user, (err2) => {
@@ -20,7 +27,8 @@ exports.loginCallback = ((strategy, req, res, next) => {
           return next(err2);
         }
         req.session.save(() => {
-          return res.redirect('/');
+          // return res.redirect('/');
+          return res.json(req.user);
         });
       });
     }

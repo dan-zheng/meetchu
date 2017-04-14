@@ -82,9 +82,13 @@ exports.postSignup = (req, res, next) => {
     // Log in with Passport
     req.logIn(user, (err) => {
       if (err) {
-        return next(err);
+        // return next(err);
+        return res.status(401).json(err);
       }
-      return res.redirect(req.session.returnTo || '/');
+      // return res.redirect(req.session.returnTo || '/');
+      return res.status(200).json({
+        msg: 'success'
+      });
     });
   }).catch((err) => {
     req.flash('error', 'Database error: user was not created.');

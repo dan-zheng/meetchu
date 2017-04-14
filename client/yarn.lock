@@ -2,6 +2,10 @@
 # yarn lockfile v1
 
 
+Base64@^1.0.0:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/Base64/-/Base64-1.0.1.tgz#def45cc50c961bcc9bf2321d0f52bcbfec1f1bb1"
+
 abbrev@1, abbrev@1.0.x:
   version "1.0.9"
   resolved "https://registry.yarnpkg.com/abbrev/-/abbrev-1.0.9.tgz#91b4792588a7738c25f35dd6f63752a2f8776135"
@@ -5802,6 +5806,16 @@ vm-browserify@0.0.4:
 void-elements@^2.0.0:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/void-elements/-/void-elements-2.0.1.tgz#c066afb582bb1cb4128d60ea92392e94d5e9dbec"
+
+vue-auth@^1.0.0-alpha.1:
+  version "1.0.0-alpha.1"
+  resolved "https://registry.yarnpkg.com/vue-auth/-/vue-auth-1.0.0-alpha.1.tgz#3c9d1ddc2b20bda83c18fbdbb0b262cecefe4832"
+  dependencies:
+    Base64 "^1.0.0"
+
+vue-axios@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/vue-axios/-/vue-axios-2.0.1.tgz#fc7f5f06d1f9190f24feca232c4c11dffba54024"
 
 vue-hot-reload-api@^2.0.11:
   version "2.0.11"

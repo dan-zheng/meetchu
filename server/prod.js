@@ -12,6 +12,7 @@ const MySQLStore = require('express-mysql-session')(session);
 const path = require('path');
 const compression = require('compression');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 const logger = require('morgan');
 const flash = require('express-flash');
 const validator = require('express-validator');
@@ -68,6 +69,7 @@ if (process.env.NODE_ENV !== 'production') {
 }
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cors());
 app.use(validator({
   customValidators: {
     isArray(value) {
@@ -124,6 +126,11 @@ app.use(express.static(path.join(__dirname, '../client', 'dist'), { maxAge: 3155
 /*
  * App routes.
  */
+/*
+app.get('/', (req, res) => {
+  console.log('hi');
+});
+*/
 app.get('/api/', homeController.index);
 app.get('/api/signup', userController.getSignup);
 app.post('/api/signup', userController.postSignup);

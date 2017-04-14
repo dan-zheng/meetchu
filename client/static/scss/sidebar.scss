@@ -1,11 +1,13 @@
 @import '_variables';
-@import 'lib/keen-ui/keen-ui';
-@import 'lib/bootstrap/bootstrap/_variables';
-@import '_search';
-@import '_calendar';
-@import '_datetime';
+
+// General
+
+body {
+  padding-top: 0px;
+}
 
 @mixin styling($sidebar-width, $icon-padding) {
+  /*
   #wrapper {
     position: absolute;
     left: 0;
@@ -27,6 +29,7 @@
       }
     }
   }
+  */
 
   #sidebar {
     position: fixed;
@@ -45,11 +48,6 @@
     left: $sidebar-width;
     padding: 20px;
     width: calc(100vw - #{$sidebar-width});
-    // transition: all 0.4s ease;
-  }
-
-  .nav > li > a {
-    padding: $sidebar-width * 0.10 $sidebar-width * 0.15;
   }
 
   .sidebar-nav {
@@ -63,12 +61,13 @@
       max-width: 100%;
     }
 
-    > li {
+    li {
       text-align: center;
       line-height: $sidebar-width * 0.68;
 
       a {
         display: block;
+        padding: $sidebar-width * 0.10 $sidebar-width * 0.15;
         text-decoration: none;
         color: #000000;
         transition: background 0.2s ease;
@@ -90,9 +89,11 @@
     }
   }
 }
+
 @media (max-width: $screen-xs-max) {
   @include styling($sidebar-width: 60px, $icon-padding: 3px);
 }
+
 @media (min-width: $screen-sm-min) {
   @include styling($sidebar-width: 100px, $icon-padding: 5px);
 }

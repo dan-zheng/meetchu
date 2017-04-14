@@ -2,7 +2,7 @@
 .container
   .page-header
     h3 Sign in
-  form.form-horizontal(method='POST')
+  form.form-horizontal(@submit.prevent='login')
     .form-group
       label.col-sm-3.control-label(for='email') Email
       .col-sm-7
@@ -13,7 +13,7 @@
         input.form-control(type='password', name='password', id='password', placeholder='Password', required)
     .form-group
       .col-sm-offset-3.col-sm-7
-        button.col-sm-3.btn.btn-primary(@click='login', type='submit')
+        button.col-sm-3.btn.btn-primary(type='submit')
           i.fa.fa-user
           | Login
         a.btn.btn-link(href='/forgot') Forgot your password?
@@ -36,10 +36,12 @@ import { mapGetters } from 'vuex'
 export default {
   name: 'login',
   computed: {
+    /*
     ...mapGetters({
       thread: 'currentThread',
       messages: 'currentMessages'
     })
+    */
   },
   data () {
     return {
@@ -48,13 +50,15 @@ export default {
   },
   methods: {
     login() {
+      console.log(this.$store);
       this.$store.dispatch('login', {
-        username: 'John',
+        email: 'a@a.com',
         password: 'asdf'
       }).then(() => {
         console.log('success');
+        this.$router.push('/');
       }).catch((e) => {
-        console.log('ERROR');
+        console.log('error');
         console.log(e);
       })
     }
