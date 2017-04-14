@@ -25,6 +25,10 @@ block content
             .col-sm-9.course-box.flex-column
               h4.list-group-item-heading #{user.firstName} #{user.lastName}
               p.list-group-item-text #{user.email}
+              .col-xs-3.flex-center.flex-btn-group
+                -console.log(user)
+                a.btn.transparent(href=`/profile/${user.id}`)
+                  i.blue.fa.fa-info-circle
 
     .col-md-8
       .container-full

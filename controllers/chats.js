@@ -33,7 +33,7 @@ const getChatQuery = `
 `;
 
 const getChatMembers = `
-  SELECT person.firstName, person.lastName, person.email
+  SELECT person.id, person.firstName, person.lastName, person.email
     FROM Users AS person
     JOIN UserGroup
     ON UserGroup.UserId = person.id
@@ -84,6 +84,9 @@ exports.getChat = (req, res) => {
       return `${first} ${last.charAt(0)}`;
     };
     const sender = { id: req.user.id, name: senderName(req.user.firstName, req.user.lastName) };
+    console.log(req.user.id);
+    console.log(req.user.firstName);
+    console.log(req.user.lastName); 
     const chatName = chat.name;
     const messageHistory = chat.map((q) => {
       return {
