@@ -1,4 +1,3 @@
-const models = require('../models');
 const passport = require('passport');
 const auth = require('./auth');
 const async = require('async');
@@ -6,6 +5,10 @@ const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const algoliasearch = require('algoliasearch');
 const pug = require('pug');
+const Promise = require('bluebird');
+
+const models = require('../models');
+const userDao = require('../dao/user')(models);
 
 /**
  * Nodemailer transport configuration.
@@ -38,10 +41,26 @@ exports.getSignup = (req, res) => {
 };
 
 /**
+ * Adds a new user to algolia.
+ * @param {User} user - a user model.
+ * @return {Promise} a bluebird promise.
+ */
+function addUserToAlgolia(user) {
+  // Add user to Algolia index
+  const userValues = {
+    objectID: user.dataValues.id,
+    firstName: user.dataValues.firstName,
+    lastName: user.dataValues.lastName,
+    email: user.dataValues.email
+  };
+  return Promise.resolve(userIndex.addObjects([userValues]));
+}
+
+/**
  * POST /signup
  * User signup.
  */
-exports.postSignup = (req, res, next) => {
+exports.postSignup = (req, res) => {
   req.assert('email', 'Email is not valid.').isEmail();
   req.assert('password', 'Password must be at least 4 characters long.').len(4);
   req.assert('confirmPassword', 'Passwords do not match.').equals(req.body.password);
@@ -53,32 +72,16 @@ exports.postSignup = (req, res, next) => {
     return res.redirect('/signup');
   }
 
-  models.User.findOrCreate({
-    where: {
-      email: req.body.email
-    },
-    defaults: {
-      firstName: req.body.firstName,
-      lastName: req.body.lastName,
-      password: req.body.password
-    }
-  }).spread((user, wasCreated) => {
+  userDao.signUp({
+    email: req.body.email,
+    first_name: req.body.firstName,
+    last_name: req.body.lastName
+  }).then((wasCreated) => {
     if (!wasCreated) {
       req.flash('error', 'An account with that email already exists.');
       return res.redirect('/signup');
     }
-    // Add user to Algolia index
-    const userValues = {
-      objectID: user.dataValues.id,
-      firstName: user.dataValues.firstName,
-      lastName: user.dataValues.lastName,
-      email: user.dataValues.email
-    };
-    userIndex.addObjects([userValues], (err, content) => {
-      if (err) {
-        return next(err);
-      }
-    });
+    console.log(req.logIn);
     // Log in with Passport
     req.logIn(user, (err) => {
       if (err) {
@@ -92,7 +95,7 @@ exports.postSignup = (req, res, next) => {
     });
   }).catch((err) => {
     req.flash('error', 'Database error: user was not created.');
-    return res.redirect('/signup');
+    res.redirect('/signup');
   });
 };
 

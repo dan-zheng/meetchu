@@ -95,6 +95,7 @@ app.use(validator({
     }
   }
 }));
+
 app.use(session({
   secret: process.env.SESSION_SECRET,
   store: sessionStore,
@@ -122,6 +123,7 @@ app.use((req, res, next) => {
   });
   next();
 });
+
 app.use(express.static(path.join(__dirname, '../client', 'dist'), { maxAge: 31557600000 }));
 
 /*
@@ -192,10 +194,69 @@ io.on('connection', (socket) => {
 /**
  * Create any missing database tables and start Express server.
  */
+<<<<<<< HEAD:server/app.js
 models.sequelize.sync().then(() => {
   http.listen(app.get('port'), () => {
     console.log('Express server listening on port %d in %s mode', app.get('port'), app.get('env'));
+=======
+models.sync();
+
+
+/*
+const userDao = require('./dao/user')(models);
+userDao.externalLogin({ email: 'era878@gmail.com', first_name: 'Eric', last_name: 'Aguilera', google_id: 1233 })
+.then((res) => {
+  console.log(res);
+});
+
+const p = models.pool.query('SELECT * FROM users')
+  .map((row) => {
+    return new models.User(row);
+>>>>>>> mysql:app.js
   });
+
+p.then((users) => {
+  users.forEach((user) => {
+    const hash = user.genPasswordHash('hello');
+    user.password = hash;
+    user.verifyPassword('hello', (e, isMatch) => {
+      if (e) throw e;
+      console.log(isMatch);
+    });
+  });
+});
+
+const userDao = require('./dao/user')(models);
+userDao.findByEmail('era878@gmail.com').then((res) => {
+  res.fold(()=> console.log('nothing found'), u => console.log(u));
+});
+userDao.signUp({ email: 'adam@lol.com', first_name: 'Adam', last_name: 'Smith' })
+.then((wasCreated) => {
+  if (wasCreated) {
+    console.log('User created');
+  } else {
+    console.log('User already existed');
+  }
+});
+userDao.externalLogin({ email: 'adam@lol.com', first_name: 'Adam', last_name: 'Lol', facebook_id: '4444' })
+.then((wasCreated) => {
+  if (wasCreated) {
+    console.log('User oauthlogged in');
+  } else {
+    console.log('User not oauthlogged in :(');
+  }
+});
+userDao.loginWithEmail('era878@lol.com')
+.then((wasCreated) => {
+  if (wasCreated) {
+    console.log('User regular log in');
+  } else {
+    console.log('User not regular log in :(');
+  }
+});*/
+
+http.listen(app.get('port'), () => {
+  console.log('Express server listening on port %d in %s mode', app.get('port'), app.get('env'));
 });
 
 module.exports = app;

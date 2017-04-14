@@ -7,7 +7,10 @@ const LocalStrategy = require('passport-local').Strategy;
 const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 const FacebookStrategy = require('passport-facebook').Strategy;
 const algoliasearch = require('algoliasearch');
+const Promise = require('bluebird');
+
 const models = require('../models');
+const userDao = require('../dao/user')(models);
 
 /**
  * Load environment variables from .env file
@@ -27,66 +30,48 @@ passport.serializeUser((user, done) => {
 });
 
 passport.deserializeUser((id, done) => {
-  models.User.findById(id).then((user) => {
+  userDao.findById(id).then((user) => {
     return done(null, user);
   }).catch((err) => {
-    return done(err, null);
+    return done(err, null, { msg: 'Db error occurred' });
   });
 });
 
 /**
  * Add user to Algolia.
  */
-const addUserToAlgolia = (user, done) => {
+const addUserToAlgolia = (user) => {
   // Add user to Algolia index
   const userValues = {
-    objectID: user.dataValues.id,
-    firstName: user.dataValues.firstName,
-    lastName: user.dataValues.lastName,
-    email: user.dataValues.email
+    objectID: user.id,
+    firstName: user.first_name,
+    lastName: user.last_name,
+    email: user.email
   };
-  userIndex.addObjects([userValues], (err, content) => {
-    if (err) {
-      return done(err);
-    }
-  });
-  return done(null, user);
+  return Promise.resolve(userIndex.addObjects([userValues]));
 };
 
 const oauthLogin = (oauthId, profile, done) => {
-  const query = {};
-  query.$or = [];
-  query.$or.push({
-    email: profile.emails[0].value
-  });
-  const temp = {};
-  temp[oauthId] = profile.id;
-  query.$or.push(temp);
+  const oauth = {};
+  oauth[oauthId] = profile.id;
 
-  const opts = {};
-  opts.where = query;
-  opts.defaults = {
+  const identity = Object.assign({
     email: profile.emails[0].value,
-    firstName: profile.name.givenName,
-    lastName: profile.name.familyName
-  };
-  opts.defaults[oauthId] = profile.id;
+    first_name: profile.name.givenName,
+    last_name: profile.name.familyName
+  }, oauth);
 
-  models.User.findOrCreate(opts).spread((user, userWasCreated) => {
-    if (userWasCreated) {
-      return addUserToAlgolia(user, done);
-    }
-    if (user[oauthId]) {
-      return done(null, user);
-    }
-    user[oauthId] = profile.id;
-    user.save(() => {
-      return done(null, user);
-    });
-  }).catch((err) => {
-    return done(null, false, {
-      message: `${profile.provider} account not found for email ${profile.emails[0].value}`
-    });
+  userDao.externalLogin(identity)
+  .then((user) => {
+    //if (userWasCreated) {
+    //return addUserToAlgolia(user, done);
+    //}
+
+
+    //    return done(null, false, {
+    //      message: `${profile.provider} account not found for email ${profile.emails[0].value}`
+    //    });
+    return done(null, user);
   });
 };
 

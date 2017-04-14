@@ -1,7 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 const dotenv = require('dotenv');
-const Sequelize = require('sequelize');
+const mysql = require('promise-mysql');
+const debugging = false;
 
 /**
  * Load environment variables from .env file
@@ -10,34 +11,59 @@ if (process.env.NODE_ENV !== 'production') {
   dotenv.load({ path: '.env' });
 }
 
-/**
- * Intialize Sequelize using database url
- * Intialize db object used to store models
- */
-const sequelize = new Sequelize(process.env.DB_URL, {
-  logging: false
+const pool = mysql.createPool({
+  connectionLimit: 10,
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASS,
+  database: process.env.DB_NAME
 });
-const db = {};
 
 const dirs = [__dirname, path.join(__dirname, 'joins')];
-for (let i = 0; i < dirs.length; i++) {
-  fs.readdirSync(dirs[i])
-  .filter((file) => {
-    return (file.indexOf('.') !== 0) && (file !== 'index.js') && (file !== 'joins');
-  })
-  .forEach((file) => {
-    const model = sequelize.import(path.join(dirs[i], file));
-    db[model.name] = model;
-  });
+// Flatten and filter directory files
+const files = [].concat.apply([], dirs.map((dir) => {
+  return fs.readdirSync(dir)
+    .filter((file) => {
+      return (file === 'course.js' || file === 'user.js') && file !== 'index.js'
+    })
+    // Get fully qualified path
+    .map((file) => {
+      return path.join(dir, file);
+    })
+    // Ignore directories
+    .filter((file) => {
+      return fs.statSync(file).isFile();
+    });
+}));
 
-  Object.keys(db).forEach((modelName) => {
-    if ('associate' in db[modelName]) {
-      db[modelName].associate(db);
+const fileExports = files.map(file => require(file));
+
+function withModels(models) {
+  fileExports.forEach((model) => {
+    if (model.object) {
+      models[model.object.name] = model.object;
+    }
+  });
+  return models;
+}
+
+function executeQuery(query) {
+  if (debugging) console.log(`Executing Query: \n${query}`);
+  pool.query(query).catch((error) => {
+    console.log(`Error creating table.`);
+    throw error;
+  });
+}
+
+function sync() {
+  console.log('Creating database models.');
+  fileExports.forEach((model) => {
+    if (model.query) {
+      model.query.forEach((query) => {
+        executeQuery(query);
+      });
     }
   });
 }
 
-db.sequelize = sequelize;
-db.Sequelize = Sequelize;
-
-module.exports = db;
+module.exports = withModels({ pool, sync });
