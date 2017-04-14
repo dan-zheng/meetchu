@@ -15,9 +15,7 @@ const userDao = require('../dao/user')(models);
 /**
  * Load environment variables from .env file
  */
-if (process.env.NODE_ENV !== 'production') {
-  dotenv.load({ path: '.env' });
-}
+dotenv.load({ path: '.env', silent: process.env.NODE_ENV === 'production' });
 
 /*
  * Algolia configuration.

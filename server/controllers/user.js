@@ -2,6 +2,7 @@ const passport = require('passport');
 const auth = require('./auth');
 const async = require('async');
 const crypto = require('crypto');
+const dotenv = require('dotenv')
 const nodemailer = require('nodemailer');
 const algoliasearch = require('algoliasearch');
 const pug = require('pug');
@@ -9,6 +10,11 @@ const Promise = require('bluebird');
 
 const models = require('../models');
 const userDao = require('../dao/user')(models);
+
+/**
+ * Load environment variables from .env file
+ */
+dotenv.load({ path: '.env', silent: process.env.NODE_ENV === 'production' });
 
 /**
  * Nodemailer transport configuration.

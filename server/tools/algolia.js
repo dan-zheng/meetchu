@@ -2,7 +2,7 @@
  * Module dependencies.
  */
 const async = require('async');
-const dotenv = require('dotenv');
+const dotenv = require('dotenv'); // .config({ silent: true });
 const request = require('superagent');
 const algoliasearch = require('algoliasearch');
 const readlineSync = require('readline-sync');
@@ -12,9 +12,7 @@ const models = require('../models');
 /**
  * Load environment variables from .env file.
  */
-if (process.env.NODE_ENV !== 'production') {
-  dotenv.load({ path: '.env' });
-}
+dotenv.load({ path: '.env', silent: process.env.NODE_ENV === 'production' });
 
 /*
  * Algolia configuration.
