@@ -1,14 +1,14 @@
-import Vue from 'vue'
-import Router from 'vue-router'
+import Vue from 'vue';
+import Router from 'vue-router';
 
-import Main from '@/components/Main'
-import Home from '@/components/Home'
-import Login from '@/components/Login'
-import Signup from '@/components/Signup'
-import Dashboard from '@/components/Dashboard'
-import Test from '@/components/Test'
+import Main from '@/components/Main';
+import Home from '@/components/Home';
+import Login from '@/components/Login';
+import Signup from '@/components/Signup';
+import Dashboard from '@/components/Dashboard';
+import Test from '@/components/Test';
 
-Vue.use(Router)
+Vue.use(Router);
 
 export default new Router({
   // Remove hashbang from url.
@@ -43,17 +43,20 @@ export default new Router({
     }
   ],
   beforeEach: (to, from, next) => {
+    // TODO: route guarding
+    /*
     if (to.matched.some(record => record.meta.auth)) {
       if (!auth.loggedIn()) {
         next({
           path: '/login',
           query: { redirect: to.fullPath }
-        })
+        });
       } else {
-        next()
+        next();
       }
     } else {
-      next()
+      next();
     }
+    */
   }
-})
+});

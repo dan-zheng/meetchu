@@ -2,7 +2,7 @@ const passport = require('passport');
 const auth = require('./auth');
 const async = require('async');
 const crypto = require('crypto');
-const dotenv = require('dotenv')
+const dotenv = require('dotenv');
 const nodemailer = require('nodemailer');
 const algoliasearch = require('algoliasearch');
 const pug = require('pug');
@@ -81,7 +81,8 @@ exports.postSignup = (req, res) => {
   userDao.signUp({
     email: req.body.email,
     first_name: req.body.firstName,
-    last_name: req.body.lastName
+    last_name: req.body.lastName,
+    password: req.body.password,
   }).then((result) => {
     if (result.isLeft()) {
       req.flash('error', result.left());
