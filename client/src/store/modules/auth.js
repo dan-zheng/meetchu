@@ -11,7 +11,7 @@ const getters = {
 };
 
 const actions = {
-  checkAuth() {
+  loggedIn() {
     return !!state.user;
   },
   loginAuth({ commit }, { provider }) {
