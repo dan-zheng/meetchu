@@ -8,59 +8,75 @@ const state = {
 const getters = {
   user: state => state.user,
   isLoggedIn: state => state.user !== null
-}
+};
 
 const actions = {
-  checkAuth () {
-    return
+  checkAuth() {
+    return !!state.user;
   },
-  loginAuth ({ commit }, { provider }) {
+  loginAuth({ commit }, { provider }) {
     // TODO: Needs to be rewritten
     // window.location.href = `http://localhost:3000/auth/${provider}`
     return Vue.axios.get(`/auth/${provider}`)
     .then((res) => {
-      commit(types.SET_USER, res.data)
-      console.log(state.user)
+      commit(types.SET_USER, res.data);
+      console.log(state.user);
     })
     .catch((error) => {
-      throw error
-    })
+      throw error;
+    });
   },
-  login ({ commit }, { email, password }) {
+  signup({ commit }, { firstName, lastName, email, password }) {
+    return Vue.axios.post('/signup', {
+      firstName,
+      lastName,
+      email,
+      password
+    })
+    .then((res) => {
+      commit(types.SET_USER, res.data);
+      console.log(state.user);
+    })
+    .catch((error) => {
+      throw error;
+    });
+  },
+  login({ commit }, { email, password }) {
     return Vue.axios.post('/login', {
       email,
       password
     })
     .then((res) => {
-      commit(types.SET_USER, res.data)
-      console.log(state.user)
+      commit(types.SET_USER, res.data);
+      console.log(state.user);
     })
     .catch((error) => {
-      throw error
-    })
+      console.log(JSON.stringify(error, null, 2));
+      throw error;
+    });
   },
-  logout ({ commit }) {
+  logout({ commit }) {
     return Vue.axios.post('/logout')
     .then(() => {
-      commit(types.SET_USER, null)
-    })
+      commit(types.SET_USER, null);
+    });
   }
-}
+};
 
 const mutations = {
-  [types.SET_USER] (state, user) {
-    state.user = user
-    localStorage.setItem('user', user)
+  [types.SET_USER](state, user) {
+    state.user = user;
+    localStorage.setItem('user', JSON.stringify(user));
   },
-  [types.UNSET_USER] (state, user) {
-    state.user = null
-    localStorage.deleteItem('user')
+  [types.UNSET_USER](state, user) {
+    state.user = null;
+    localStorage.deleteItem('user');
   }
-}
+};
 
 export default {
   state,
   getters,
   actions,
   mutations
-}
+};

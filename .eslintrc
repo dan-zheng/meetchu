@@ -27,6 +27,6 @@
     "prefer-template": 0,
     "import/newline-after-import": 0,
     "consistent-return": 0,
-    "arrow-body-style": ["error", "as-needed"]
+    "arrow-body-style": [1, "as-needed"]
   }
 }

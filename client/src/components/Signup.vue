@@ -34,7 +34,7 @@
         field-messages.form-control-feedback(name='confirmPassword', show='$touched || $submitted')
           div(slot='pattern') Passwords do not match.
     .py-2.text-center
-      button.btn.btn-primary(type='submit') Submit
+      button.btn.btn-primary(v-on:click='signup()') Submit
   pre.
     {{ formstate }}
 </template>
@@ -71,6 +71,23 @@ export default {
     },
     onSubmit() {
       console.log(this.formstate.$valid);
+    },
+    login() {
+      if (!this.formstate.$valid) {
+        return;
+      }
+      this.$store.dispatch('signup', {
+        firstName: this.model.firstName,
+        lastName: this.model.lastName,
+        email: this.model.email,
+        password: this.model.password
+      }).then(() => {
+        console.log('Local login success.');
+        // this.$router.push('/');
+      }).catch((e) => {
+        console.log('Local login fail.');
+        console.log(e);
+      })
     }
   }
 }

@@ -199,17 +199,15 @@ io.on('connection', (socket) => {
 models.sync();
 
 
+// Example sign up
+
 /*
-
-Example SignUp
-
 const userDao = require('./dao/user')(models);
 
-userDao.signUp({ email: 'era878@gmail.com', first_name: 'Eric', last_name: 'Aguilera', password: 'MyPassword' })
+userDao.signUp({ email: 'test@test.com', first_name: 'Testy', last_name: 'Tester', password: 'asdf' })
 .then((result) => {
   console.log(result);
 });
-
 */
 
 http.listen(app.get('port'), () => {

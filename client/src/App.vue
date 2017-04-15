@@ -27,6 +27,9 @@ export default {
 $fa-font-path: '../static/fonts/font-awesome';
 @import '~font-awesome/scss/font-awesome.scss';
 
+// Import sweetalert2
+@import '~sweetalert2/dist/sweetalert2.css';
+
 // Import main styles
 @import 'static/scss/main.scss';
 </style>

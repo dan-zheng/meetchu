@@ -78,7 +78,7 @@ exports.postSignup = (req, res) => {
     return res.redirect('/signup');
   }
 
-  userDao.signUp({
+  userDao.signup({
     email: req.body.email,
     first_name: req.body.firstName,
     last_name: req.body.lastName,
@@ -87,19 +87,18 @@ exports.postSignup = (req, res) => {
     if (result.isLeft()) {
       req.flash('error', result.left());
       return res.redirect('/signup');
-    } else {
-      // Log in with Passport
-      req.logIn(result.right(), (err) => {
-        if (err) {
-          // return next(err);
-          return res.status(401).json(err);
-        }
-        // return res.redirect(req.session.returnTo || '/');
-        return res.status(200).json({
-          msg: 'success'
-        });
-      });
     }
+    // Log in with Passport
+    req.logIn(result.right(), (err) => {
+      if (err) {
+        // return next(err);
+        return res.status(401).json(err);
+      }
+      // return res.redirect(req.session.returnTo || '/');
+      return res.status(200).json({
+        msg: 'success'
+      });
+    });
   }).catch((err) => {
     req.flash('error', 'Database error: user was not created.');
     res.redirect('/signup');
@@ -149,7 +148,7 @@ exports.getForgot = (req, res) => {
 };
 
 /**
- * POST /login
+ * POST /forgot
  * Send password recovery email.
  */
 exports.postForgot = (req, res, next) => {

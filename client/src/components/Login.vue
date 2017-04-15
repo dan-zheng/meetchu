@@ -36,12 +36,14 @@
         .col-md-10
           input.form-control(type='email', name='email', required, v-model.lazy='model.email')
           field-messages.form-control-feedback(auto-label, name='email', show='$touched || $submitted')
+            div(slot='required') Please enter your email.
       validate.form-group.row.required-field(auto-label, :class='fieldClassName(formstate.password)')
         label.col-md-2.col-form-label Password
         .col-md-10
           // input.form-control(type='password', name='password', required, minlength='4', v-model.lazy='model.password')
           input.form-control(type='password', name='password', required, v-model.lazy='model.password')
           field-messages.form-control-feedback(name='password', show='$touched || $submitted')
+            div(slot='required') Please enter your password.
       .py-2.text-center
         button.btn.btn-primary(v-on:click='login()') Login
       .py-2.text-center
@@ -56,6 +58,8 @@
 </template>
 
 <script>
+import { default as swal } from 'sweetalert2';
+
 export default {
   name: 'login',
   metaInfo: {
@@ -77,7 +81,8 @@ export default {
         return '';
       }
       if((field.$touched || field.$submitted) && field.$valid) {
-        return 'has-success';
+        return '';
+        // return 'has-success';
       }
       if((field.$touched || field.$submitted) && field.$invalid) {
         return 'has-danger';
@@ -95,10 +100,24 @@ export default {
         password: this.model.password
       }).then(() => {
         console.log('Local login success.');
-        // this.$router.push('/');
+        // Redirect page
+        this.$router.push('/');
+        // Alert message
+        swal({
+          type: 'success',
+          title: 'Hurray!',
+          text: 'You are now logged in.',
+        })
+        .catch(swal.noop);
       }).catch((e) => {
         console.log('Local login fail.');
-        console.log(e);
+        // Alert message
+        swal({
+          type: 'error',
+          title: 'Oops.',
+          text: e.response.data,
+        })
+        .catch(swal.noop);
       })
     },
     loginAuth(provider) {
