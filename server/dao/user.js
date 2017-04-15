@@ -1,5 +1,7 @@
-const option = require('scala-like-option');
-const Either = require('monet');
+const monet = require('monet');
+require('../../lib/monet-pimp.js')(monet);
+const Maybe = monet.Maybe;
+const Either = monet.Either;
 
 module.exports = models => ({
   /**
@@ -10,8 +12,8 @@ module.exports = models => ({
    */
   findById(id) {
     return models.pool.query('SELECT * FROM users WHERE id = ? LIMIT 1', [id])
-      .then(rows => option.Option(rows[0]))
-      .then(headOption => headOption.map(user => new models.User(user)));
+      .then(rows => rows.list().headMaybe()
+        .map(user => new models.User(user)));
   },
   /**
    * Retrieves a user by email.
@@ -21,8 +23,8 @@ module.exports = models => ({
    */
   findByEmail(email) {
     return models.pool.query('SELECT * FROM users WHERE email = ? LIMIT 1', [email])
-      .then(rows => option.Option(rows[0]))
-      .then(headOption => headOption.map(user => new models.User(user)));
+      .then(rows => rows.list().headMaybe()
+        .map(user => new models.User(user)));
   },
   /**
    * Inserts a new user if not already in database.
@@ -74,23 +76,27 @@ module.exports = models => ({
   },
   /**
    * Updates the user's last_login field.
-   * @param {String} email - the user's email.
+   * @param {Object} login { email: the user's email, password: the user's hashed password }
    * @return {Promise} a boolean promise, true if user was updated.
    */
   loginWithEmail(login) {
-    return models.pool.query(
-      `UPDATE users
-        SET last_login = CURRENT_TIMESTAMP
-      WHERE email = ?
-      `, [login.email])
-      .then(result => this.findByEmail(login.email))
-      .then(maybeUser => maybeUser.fold(() => Either.Left('Email not found.'), u => Either.Right(u)))
+    return this.findByEmail(login.email)
+      .then(maybeUser => maybeUser.toEither('Email not found.'))
       .then(result => result.flatMap((user) => {
         if (user.verifyPassword(login.password)) {
           return Either.Right(user);
         }
         return Either.Left('Password does not match.');
-      }));
+      }))
+      .then(result => result.flatMap(user =>
+        this.updateLastLogin(user.id)
+          .then((wasUpdated) => {
+            if (wasUpdated) {
+              return Either.Right(user);
+            }
+            return Either.Left('Database error (failed to update last login)');
+          })
+      ));
   },
   updatePassword(id, password) {
     return models.pool.query(
@@ -98,6 +104,14 @@ module.exports = models => ({
         SET password = ?
       WHERE id = ?
       `, [password, id])
+      .then(result => result.affectedRows > 0);
+  },
+  updateLastLogin(id) {
+    return models.pool.query(
+      `UPDATE users
+        SET last_login = CURRENT_TIMESTAMP
+      WHERE id = ?
+      `, [id])
       .then(result => result.affectedRows > 0);
   }
 });

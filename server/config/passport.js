@@ -27,8 +27,9 @@ passport.serializeUser = ((user, done) => done(null, user.id));
 
 passport.deserializeUser = ((id, done) => {
   userDao.findById(id)
-  .then(user => done(null, user))
-  .catch(err => done(err, null, { msg: 'Db error occurred' }));
+  .tap(maybeUser => maybeUser.cata(
+    () => done('User not found', null),
+    user => done(null, user)))
 });
 
 /**
@@ -72,13 +73,32 @@ const oauthLogin = (oauthId, profile, done) => {
 /**
  * Sign in using email and password.
  */
-passport.use(new LocalStrategy({ usernameField: 'email' }, (email, password, done) => {
-  userDao.loginWithEmail({ email, password }).then((user) => {
-    user.bimap((err) => {
-      done(err);
-    }, (user) => {
-      done(null, user);
-    });
+passport.use('signup', new LocalStrategy({
+  usernameField: 'email',
+  passReqToCallback: true
+}, (req, email, password, done) => {
+  userDao.signup({
+    email: req.body.email,
+    first_name: req.body.firstName,
+    last_name: req.body.lastName,
+    password: req.body.password
+  }).tap(result =>
+    result.cata(
+      err => done(err, null),
+      user => done(null, user)
+    )
+  );
+}));
+
+passport.use('login', new LocalStrategy({
+  usernameField: 'email',
+}, (email, password, done) => {
+  userDao.loginWithEmail({ email, password })
+  .tap((result) => {
+    result.cata(
+      err => done(err, null),
+      user => done(null, user)
+    )
   });
 }));
 
