@@ -4,10 +4,11 @@
   "description": "A messaging and meeting app for group study.",
   "scripts": {
     "start": "npm run server:prod",
-    "dev": "./node_modules/.bin/npm-run-all --parallel server:dev client",
+    "dev": "./node_modules/.bin/npm-run-all --parallel server:dev client:dev",
     "server:prod": "cross-env NODE_ENV=production node server/app.js",
     "server:dev": "nodemon server/app.js",
-    "client": "node client/app.js",
+    "client:prod": "cross-env NODE_ENV=production node client/app.js",
+    "client:dev": "node client/app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

@@ -1,25 +1,13 @@
 <template lang='pug'>
-.navbar.navbar-default.navbar-fixed-top
+b-navbar(toggleable, type='inverse', variant='primary', fixed)
+  b-nav-toggle(target='nav_collapse_example')
   .container
-    .navbar-header
-      button.navbar-toggle(type='button', data-toggle='collapse', data-target='.navbar-collapse')
-        span.sr-only Toggle navigation
-        span.icon-bar
-        span.icon-bar
-        span.icon-bar
-      router-link.navbar-brand(to='/')
-        span
-          | MEETCHU
-    .collapse.navbar-collapse
-      ul.nav.navbar-nav.navbar-right
-        li.divider
-        li(class=(title == 'Login') ? 'active' : undefined)
-          router-link(to='/login')
-            | Log in
-        li.divider
-        li(class=(title == 'Sign up') ? 'active' : undefined)
-          router-link(to='/signup')
-            | Sign up
+    b-link.navbar-brand(to='/')
+      span Meetchu
+    b-collapse#nav_collapse_example(is-nav)
+      b-nav.ml-auto(is-nav-bar)
+        b-nav-item(to='/login') Login
+        b-nav-item(to='/signup') Sign up
 </template>
 
 <script>

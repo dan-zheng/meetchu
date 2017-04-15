@@ -61,14 +61,14 @@ const oauthLogin = (oauthId, profile, done) => {
 
   userDao.externalLogin(identity)
   .then((user) => {
-    //if (userWasCreated) {
-    //return addUserToAlgolia(user, done);
-    //}
+    // if (userWasCreated) {
+    //   return addUserToAlgolia(user, done);
+    // }
 
 
-    //    return done(null, false, {
-    //      message: `${profile.provider} account not found for email ${profile.emails[0].value}`
-    //    });
+    // return done(null, false, {
+    //   message: `${profile.provider} account not found for email ${profile.emails[0].value}`
+    // });
     return done(null, user);
   });
 };

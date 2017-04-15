@@ -1,17 +1,9 @@
 <template lang='pug'>
-.container
+div
   app-nav
+  .container
   #main
     router-view
-  //-
-    div(v-if='authenticated')
-      app-sidebar
-      #main
-        router-view
-    div(v-else)
-      app-nav
-      #main
-        router-view
 </template>
 
 <script>

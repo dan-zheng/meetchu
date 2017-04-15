@@ -5,22 +5,28 @@
 
 <script>
 export default {
-  name: 'app'
+  name: 'app',
+  metaInfo: {
+    title: 'Meetchu',
+    titleTemplate: '%s | Meetchu'
+  }
 }
 </script>
 
 <style lang='scss'>
-// Import scss config
+// Import custom scss
 @import 'static/scss/_fonts';
 @import 'static/scss/_variables';
-@import 'static/scss/_colors';
+
+// Import Bootstrap
+@import '~bootstrap/scss/bootstrap.scss';
+@import '~bootstrap-vue/dist/bootstrap-vue.css';
+@import 'static/scss/bootstrap-social.scss';
+
 // Import font-awesome
 $fa-font-path: '../static/fonts/font-awesome';
-@import '../node_modules/font-awesome/scss/font-awesome.scss';
-// Import bootstrap-sass, bootstrap-social
-$icon-font-path: '../node_modules/bootstrap-sass/assets/fonts/bootstrap/';
-@import '../node_modules/bootstrap-sass/assets/stylesheets/_bootstrap';
-@import '../node_modules/bootstrap-social/bootstrap-social.scss';
+@import '~font-awesome/scss/font-awesome.scss';
+
 // Import main styles
 @import 'static/scss/main.scss';
 </style>

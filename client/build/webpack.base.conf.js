@@ -8,8 +8,11 @@ const resolve = (dir) => {
 }
 
 module.exports = {
+  devtool: 'source-map',
   entry: {
-    app: './src/main.js'
+    app: [
+      './src/main.js'
+    ]
   },
   output: {
     path: config.build.assetsRoot,
@@ -23,7 +26,7 @@ module.exports = {
     alias: {
       'vue$': 'vue/dist/vue.esm.js',
       '@': resolve('src'),
-      // Static resources
+      '~': resolve('node_modules'),
       'static': resolve('static')
     }
   },
