@@ -82,7 +82,7 @@ exports.postSignup = (req, res) => {
     email: req.body.email,
     first_name: req.body.firstName,
     last_name: req.body.lastName,
-    password: req.body.password,
+    password: req.body.password
   }).then((result) => {
     if (result.isLeft()) {
       req.flash('error', result.left());
