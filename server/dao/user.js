@@ -1,5 +1,7 @@
-const option = require('scala-like-option');
-const Either = require('monet');
+const monet = require('monet');
+require('../../lib/monet-pimp.js')(monet);
+const Maybe = monet.Maybe;
+const Either = monet.Either;
 
 module.exports = models => ({
   /**
@@ -10,8 +12,8 @@ module.exports = models => ({
    */
   findById(id) {
     return models.pool.query('SELECT * FROM users WHERE id = ? LIMIT 1', [id])
-      .then(rows => option.Option(rows[0]))
-      .then(headOption => headOption.map(user => new models.User(user)));
+      .then(rows => rows.list().headMaybe()
+        .map(user => new models.User(user)));
   },
   /**
    * Retrieves a user by email.
@@ -21,8 +23,8 @@ module.exports = models => ({
    */
   findByEmail(email) {
     return models.pool.query('SELECT * FROM users WHERE email = ? LIMIT 1', [email])
-      .then(rows => option.Option(rows[0]))
-      .then(headOption => headOption.map(user => new models.User(user)));
+      .then(rows => rows.list().headMaybe()
+        .map(user => new models.User(user)));
   },
   /**
    * Inserts a new user if not already in database.
@@ -79,8 +81,7 @@ module.exports = models => ({
    */
   loginWithEmail(login) {
     return this.findByEmail(login.email)
-      .then(result => this.findByEmail(login.email))
-      .then(maybeUser => maybeUser.fold(() => Either.Left('Email not found.'), u => Either.Right(u)))
+      .then(maybeUser => maybeUser.toEither('Email not found.'))
       .then(result => result.flatMap((user) => {
         if (user.verifyPassword(login.password)) {
           return Either.Right(user);
@@ -88,7 +89,7 @@ module.exports = models => ({
         return Either.Left('Password does not match.');
       }))
       .then(result => result.flatMap(user =>
-        this.updateLastLogin(result.right().id)
+        this.updateLastLogin(user.id)
           .then((wasUpdated) => {
             if (wasUpdated) {
               return Either.Right(user);

@@ -56,7 +56,6 @@
     "promise-mysql": "^3.0.1",
     "pug": "^2.0.0-beta11",
     "readline-sync": "^1.4.6",
-    "scala-like-option": "^1.0.3",
     "sequelize": "^3.30.2",
     "socket.io": "^1.7.3",
     "superagent": "^3.4.4",
