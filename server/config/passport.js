@@ -92,8 +92,7 @@ passport.use('signup', new LocalStrategy({
 
 passport.use('login', new LocalStrategy({
   usernameField: 'email',
-  passReqToCallback: true
-}, (req, email, password, done) => {
+}, (email, password, done) => {
   userDao.loginWithEmail({ email, password })
   .tap((result) => {
     result.cata(
