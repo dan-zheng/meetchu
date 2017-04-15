@@ -10,17 +10,16 @@ const passport = require('passport');
  * Login authentication helper function.
  */
 exports.loginCallback = ((strategy, req, res, next) => {
-  passport.authenticate(strategy, (err1, optionalUser, info) => {
+  passport.authenticate(strategy, (err1, result, info) => {
     if (err1) return next(err1);
-    optionalUser.fold(() => {
-      req.flash('error', info.msg);
-      return res.status(400).json(info.msg);
-    }, (user) => {
-      req.login(user, (err2) => {
-        if (err2) return next(err2);
+    if (result && result.isRight()) {
+      result.right().map((user) => {
         return res.status(200).json(req.user);
       });
-    });
+    } else {
+      req.flash('error', info.msg);
+      return res.status(400).json(info.msg);
+    }
   })(req, res, next);
 });
 

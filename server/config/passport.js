@@ -78,12 +78,9 @@ const oauthLogin = (oauthId, profile, done) => {
  */
 passport.use(new LocalStrategy({ usernameField: 'email' }, (email, password, done) => {
   userDao.loginWithEmail({ email, password }).then((user) => {
-    user.left.map((message) => {
-      console.log('error');
-      done(null, false, { message });
-    });
-    user.right.map((user) => {
-      console.log('received: ' + user);
+    user.bimap((err) => {
+      done(null, false, { message: err });
+    }, (user) => {
       done(null, user);
     });
   });
