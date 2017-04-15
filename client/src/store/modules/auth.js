@@ -14,25 +14,16 @@ const actions = {
   checkAuth () {
     return
   },
-  loginAuth ({ commit }, { email, password }) {
-    return Vue.axios.post('/login', {
-      email,
-      password
-    })
+  loginAuth ({ commit }, { provider }) {
+    // TODO: Needs to be rewritten
+    // window.location.href = `http://localhost:3000/auth/${provider}`
+    return Vue.axios.get(`/auth/${provider}`)
     .then((res) => {
-      console.log('login success');
-      console.log(res);
       commit(types.SET_USER, res.data)
-      console.log(state.user);
+      console.log(state.user)
     })
     .catch((error) => {
-      console.log('login error');
-      console.log(error);
-      /*
-      if (error.response.status === 401) {
-        throw new Error('Bad credentials')
-      }
-      */
+      throw error
     })
   },
   login ({ commit }, { email, password }) {
@@ -41,19 +32,11 @@ const actions = {
       password
     })
     .then((res) => {
-      console.log('login success');
-      console.log(res);
       commit(types.SET_USER, res.data)
-      console.log(state.user);
+      console.log(state.user)
     })
     .catch((error) => {
-      console.log('login error');
-      console.log(error);
-      /*
-      if (error.response.status === 401) {
-        throw new Error('Bad credentials')
-      }
-      */
+      throw error
     })
   },
   logout ({ commit }) {

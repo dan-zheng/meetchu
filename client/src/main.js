@@ -3,17 +3,20 @@
 import Vue from 'vue'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
-import VueAuth from 'vue-auth'
+import VueMeta from 'vue-meta'
+import VueForm from 'vue-form'
+import BootstrapVue from 'bootstrap-vue'
 
-// Set up vue-axios
-const port = process.env.PORT || 3000;
 Vue.use(VueAxios, axios)
-Vue.axios.defaults.baseURL = `http://localhost:${port}`;
+Vue.use(VueMeta)
+Vue.use(VueForm)
+Vue.use(BootstrapVue)
 
-// Include jQuery and Bootstrap JS
-import jQuery from 'jquery'
-global.jQuery = jQuery
-const Bootstrap = require('bootstrap-sass')
+const port = process.env.PORT || 3000
+Vue.axios.defaults.baseURL = `http://localhost:${port}`
+// Vue.axios.defaults.headers.common['Access-Control-Allow-Origin'] = 'http://localhost:8080'
+Vue.axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*'
+// Vue.axios.defaults.headers.common['Access-Control-Request-Method'] = '*'
 
 import router from './router'
 import store from './store'

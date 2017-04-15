@@ -1,6 +1,4 @@
-// Font Awesome fonts path
-
-$fa-font-path: '../fonts/font-awesome' !default;
+@import '~bootstrap/scss/_variables';
 
 // Colors
 
@@ -11,67 +9,22 @@ $gray-dark: #404040;
 $gray-darker: #121212;
 
 $brand-primary: #584cfd;
-$brand-success: #0f9d58;
-$brand-warning: #f4b400;
-$brand-danger: #d80017;
-$brand-info: #5bc0dd;
-
-$cal-green: #1cd078;
 
 // Typography
 
-$font-size-base: 13px;
-
-$font-family-sans-serif: 'Benton Sans', Helvetica, Arial, sans-serif;
-$font-family-serif: Georgia, 'Times New Roman', Times, serif !default;
-$font-family-monospace: Menlo, Monaco, Consolas, 'Courier New', monospace !default;
-$font-family-base: $font-family-sans-serif !default;
-
-$navbar-brand-font-family: 'Uni Sans';
-$title-font-family: Roboto;
-$subtitle-font-family: Roboto;
-
-// Forms
-
-$input-border-radius: 2px;
-$input-border-focus: #999;
-$input-border: #f0f0f0;
-$input-color: #444;
-$input-color-placeholder: #999;
-$input-height-base: 44px;
-
-// Form states and alerts
-
-$state-success-text: #569845;
-$state-success-bg: #dbf5d3;
-$state-success-border: #aed3a5;
-
-$state-info-text: #3a87ad;
-$state-info-bg: #d9edf7;
-$state-info-border: #98cce7;
-
-$state-warning-text: #bf9853;
-$state-warning-bg: #fdf8e2;
-$state-warning-border: #f2daab;
-
-$state-danger-text: #b94a48;
-$state-danger-bg: #f2dede;
-$state-danger-border: #e0b1b8;
-
-// Navbar
-
-$navbar-height: 64px;
-$navbar-default-bg: rgba(255, 255, 255, 0.95);
-$navbar-default-link-color: $gray-darker;
-$navbar-default-link-active-color: $brand-primary;
-$navbar-default-link-active-bg: transparent;
-$navbar-default-link-hover-color: $brand-primary;
-$navbar-default-link-hover-bg: transparent;
-$navbar-default-brand-color: $brand-primary;
-$navbar-default-brand-hover-color: darken($brand-primary, 20%);
-$navbar-default-brand-size: 28px;
+$font-family-sans-serif: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+$font-family-serif: Georgia, 'Times New Roman', Times, serif;
+$font-family-monospace: Consolas, Menlo, Monaco, 'Courier New', monospace;
+$font-family-base: $font-family-monospace;
 
 // Buttons
 
-$btn-primary-bg: #7166ff;
 $btn-primary-color: #fff;
+$btn-primary-bg: #7166ff;
+$btn-primary-border: #7166ff;
+
+// Links
+
+$link-color: $brand-primary;
+$link-decoration: none;
+$link-hover-color: darken($link-color, 15%);
