@@ -82,23 +82,23 @@ exports.postSignup = (req, res) => {
     email: req.body.email,
     first_name: req.body.firstName,
     last_name: req.body.lastName
-  }).then((wasCreated) => {
-    if (!wasCreated) {
-      req.flash('error', 'An account with that email already exists.');
+  }).then((result) => {
+    if (result.isLeft()) {
+      req.flash('error', result.left());
       return res.redirect('/signup');
-    }
-    console.log(req.logIn);
-    // Log in with Passport
-    req.logIn(user, (err) => {
-      if (err) {
-        // return next(err);
-        return res.status(401).json(err);
-      }
-      // return res.redirect(req.session.returnTo || '/');
-      return res.status(200).json({
-        msg: 'success'
+    } else {
+      // Log in with Passport
+      req.logIn(result.right(), (err) => {
+        if (err) {
+          // return next(err);
+          return res.status(401).json(err);
+        }
+        // return res.redirect(req.session.returnTo || '/');
+        return res.status(200).json({
+          msg: 'success'
+        });
       });
-    });
+    }
   }).catch((err) => {
     req.flash('error', 'Database error: user was not created.');
     res.redirect('/signup');

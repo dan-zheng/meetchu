@@ -30,17 +30,24 @@ module.exports = (models) => {
      * @param {Object} identity - an object containing
      *  the user's email, first_name, last_name
      *  and an associated OAuth id (e.g. facebook_id, google_id)
-     * @return {Promise} an integer promise containing the id of the newly.
+     * @return {Promise}
      */
     signUp: (identity) => {
       const user = new models.User(identity);
       const hash = user.genPasswordHash(identity.password);
+      user.password = hash;
       return models.pool.query(
         `INSERT IGNORE INTO users
           (email, first_name, last_name, password)
           VALUES(?, ?, ?, ?)`,
         [identity.email, identity.first_name, identity.last_name, hash])
-        .then(result => result.insertId);
+        .then(result => {
+          if (result.affectedRows === 0) {
+            return Either.Left('An account with that email already exists.');
+          } else {
+            return Either.Right(user);
+          }
+        });
     },
     /**
      * Inserts or updates the user's first_name, last_name, last_login
