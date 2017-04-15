@@ -1,9 +1,9 @@
-import Vue from 'vue'
-import * as types from '../mutation-types'
+import Vue from 'vue';
+import * as types from '../mutation-types';
 
 const state = {
   user: null
-}
+};
 
 const getters = {
   user: state => state.user,
