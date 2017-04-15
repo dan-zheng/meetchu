@@ -110,9 +110,7 @@ app.use((req, res, next) => {
 });
 app.use((req, res, next) => {
   // Force responses with code 304 to have code 200
-  req.header('if-none-match', 'no-match-for-this');
-  // res.header('Access-Control-Allow-Origin', '*');
-  // res.header('Access-Control-Allow-Headers', 'X-Requested-With');
+  req.headers['if-none-match'] = 'no-match-for-this';
   // Save last visited valid page
   req.on('end', () => {
     if (res.statusCode === 200 && req.path !== '/login' && req.path !== '/signup' && !req.path.match(/^\/reset/)
@@ -125,9 +123,9 @@ app.use((req, res, next) => {
 });
 
 if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../client', 'dist'), { maxAge: 31557600000 }));
-} else {
   app.use(express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 }));
+} else {
+  app.use(express.static(path.join(__dirname, '../client', 'dist'), { maxAge: 31557600000 }));
 }
 
 /*
