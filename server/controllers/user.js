@@ -72,10 +72,12 @@ exports.postSignup = (req, res) => {
   req.assert('confirmPassword', 'Passwords do not match.').equals(req.body.password);
   req.sanitize('email').normalizeEmail({ remove_dots: false });
 
-  const errors = req.validationErrors();
+  // const errors = req.validationErrors();
+  let errors = req.validationErrors();
   if (errors) {
+    errors = errors.map(e => e.msg);
     req.flash('error', errors);
-    return res.redirect('/signup');
+    return res.status(401).json(errors);
   }
 
   userDao.signup({
@@ -86,22 +88,22 @@ exports.postSignup = (req, res) => {
   }).then((result) => {
     if (result.isLeft()) {
       req.flash('error', result.left());
-      return res.redirect('/signup');
+      return res.status(401).json(result.left());
     }
     // Log in with Passport
     req.logIn(result.right(), (err) => {
       if (err) {
-        // return next(err);
-        return res.status(401).json(err);
+        console.log('error here');
+        console.log(err);
+        return res.status(402).json(err);
       }
-      // return res.redirect(req.session.returnTo || '/');
       return res.status(200).json({
         msg: 'success'
       });
     });
   }).catch((err) => {
     req.flash('error', 'Database error: user was not created.');
-    res.redirect('/signup');
+    return res.status(403).json(err);
   });
 };
 
@@ -241,9 +243,7 @@ exports.postPasswordReset = (req, res) => {
         return res.redirect('/login');
       });
     });
-  }).catch((err) => {
-    return res.redirect('/');
-  });
+  }).catch((err) => res.redirect('/'));
 };
 
 /**

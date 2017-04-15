@@ -23,16 +23,12 @@ dotenv.load({ path: '.env', silent: process.env.NODE_ENV === 'production' });
 const client = algoliasearch(process.env.ALGOLIA_ID, process.env.ALGOLIA_ADMIN_KEY);
 const userIndex = client.initIndex('users');
 
-passport.serializeUser((user, done) => {
-  return done(null, user.id);
-});
+passport.serializeUser = ((user, done) => done(null, user.id));
 
-passport.deserializeUser((id, done) => {
-  userDao.findById(id).then((user) => {
-    return done(null, user);
-  }).catch((err) => {
-    return done(err, null, { msg: 'Db error occurred' });
-  });
+passport.deserializeUser = ((id, done) => {
+  userDao.findById(id)
+  .then(user => done(null, user))
+  .catch(err => done(err, null, { msg: 'Db error occurred' }));
 });
 
 /**

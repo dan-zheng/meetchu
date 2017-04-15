@@ -2,35 +2,35 @@ const option = require('scala-like-option');
 const Either = require('monet');
 
 module.exports = models => ({
-    /**
-     * Retrieves a user by email.
-     * @param {Object} email - the user's email.
-     *  and an associated OAuth id (e.g. facebook_id, google_id)
-     * @return {Promise} an optional User promise.
-     */
+  /**
+   * Retrieves a user by email.
+   * @param {Object} email - the user's email.
+   *  and an associated OAuth id (e.g. facebook_id, google_id)
+   * @return {Promise} an optional User promise.
+   */
   findById(id) {
     return models.pool.query('SELECT * FROM users WHERE id = ? LIMIT 1', [id])
       .then(rows => option.Option(rows[0]))
       .then(headOption => headOption.map(user => new models.User(user)));
   },
-    /**
-     * Retrieves a user by email.
-     * @param {Object} email - the user's email.
-     *  and an associated OAuth id (e.g. facebook_id, google_id)
-     * @return {Promise} an optional User promise.
-     */
+  /**
+   * Retrieves a user by email.
+   * @param {Object} email - the user's email.
+   *  and an associated OAuth id (e.g. facebook_id, google_id)
+   * @return {Promise} an optional User promise.
+   */
   findByEmail(email) {
     return models.pool.query('SELECT * FROM users WHERE email = ? LIMIT 1', [email])
       .then(rows => option.Option(rows[0]))
       .then(headOption => headOption.map(user => new models.User(user)));
   },
-    /**
-     * Inserts a new user if not already in database.
-     * @param {Object} identity - an object containing
-     *  the user's email, first_name, last_name
-     *  and an associated OAuth id (e.g. facebook_id, google_id)
-     * @return {Promise}
-     */
+  /**
+   * Inserts a new user if not already in database.
+   * @param {Object} identity - an object containing
+   *  the user's email, first_name, last_name
+   *  and an associated OAuth id (e.g. facebook_id, google_id)
+   * @return {Promise}
+   */
   signup(identity) {
     const user = new models.User(identity);
     const hash = user.genPasswordHash(identity.password);
@@ -44,17 +44,18 @@ module.exports = models => ({
         if (result.affectedRows === 0) {
           return Either.Left('An account with that email already exists.');
         }
+        user.id = result.insertId;
         return Either.Right(user);
       });
   },
-    /**
-     * Inserts or updates the user's first_name, last_name, last_login
-     *  and associated OAuth id fields.
-     * @param {Object} identity - an object containing
-     *  the user's email, first_name, last_name
-     *  and an associated OAuth id (e.g. facebook_id, google_id)
-     * @return {Promise} a User promise.
-     */
+  /**
+   * Inserts or updates the user's first_name, last_name, last_login
+   *  and associated OAuth id fields.
+   * @param {Object} identity - an object containing
+   *  the user's email, first_name, last_name
+   *  and an associated OAuth id (e.g. facebook_id, google_id)
+   * @return {Promise} a User promise.
+   */
   externalLogin(identity) {
     return models.pool.query(
       `INSERT INTO users
@@ -71,11 +72,11 @@ module.exports = models => ({
         identity.facebook_id, identity.google_id])
       .then(result => this.findById(result.insertId));
   },
-    /**
-     * Updates the user's last_login field.
-     * @param {String} email - the user's email.
-     * @return {Promise} a boolean promise, true if user was updated.
-     */
+  /**
+   * Updates the user's last_login field.
+   * @param {String} email - the user's email.
+   * @return {Promise} a boolean promise, true if user was updated.
+   */
   loginWithEmail(login) {
     return models.pool.query(
       `UPDATE users

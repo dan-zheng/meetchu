@@ -20,24 +20,25 @@ const actions = {
     return Vue.axios.get(`/auth/${provider}`)
     .then((res) => {
       commit(types.SET_USER, res.data);
-      console.log(state.user);
     })
     .catch((error) => {
       throw error;
     });
   },
-  signup({ commit }, { firstName, lastName, email, password }) {
+  signup({ commit }, { firstName, lastName, email, password, confirmPassword }) {
     return Vue.axios.post('/signup', {
       firstName,
       lastName,
       email,
-      password
+      password,
+      confirmPassword
     })
     .then((res) => {
       commit(types.SET_USER, res.data);
       console.log(state.user);
     })
     .catch((error) => {
+      console.log(JSON.stringify(error, null, 2));
       throw error;
     });
   },

@@ -2,33 +2,6 @@
 .container
   .page-header
     h3 Sign in
-  //-
-    form.form-horizontal(@submit.prevent='onSubmit')
-      .form-group
-        label.col-md-3.control-label(for='email') Email
-        .col-md-7
-          input.form-control(type='email', name='email', id='email', placeholder='Email', autofocus, required)
-      .form-group
-        label.col-md-3.control-label(for='password') Password
-        .col-md-7
-          input.form-control(type='password', name='password', id='password', placeholder='Password', required)
-      .form-group
-        .col-md-offset-3.col-md-7
-          button.col-md-3.btn.btn-primary(type='submit')
-            i.fa.fa-user
-            | Login
-          a.btn.btn-link(href='/forgot') Forgot your password?
-      .form-group
-        .col-md-offset-3.col-md-7
-          hr
-      .form-group
-        .col-md-offset-3.col-md-7
-          a.btn.btn-block.btn-google.btn-social(href='/auth/google')
-            i.fa.fa-google-plus
-            | Sign in with Google
-          a.btn.btn-block.btn-facebook.btn-social(href='/auth/facebook')
-            i.fa.fa-facebook
-            | Sign in with Facebook
   .offset-md-1.col-md-10
     vue-form(:state='formstate', v-model='formstate', @submit.prevent='onSubmit')
       validate.form-group.row.required-field(auto-label, :class='fieldClassName(formstate.email)')
@@ -46,13 +19,13 @@
             div(slot='required') Please enter your password.
       .py-2.text-center
         button.btn.btn-primary(v-on:click='login()') Login
-      .py-2.text-center
-        button.btn.btn-block.btn-google.btn-social.offset-md-3.col-md-6(v-on:click='loginAuth("google")')
-          i.fa.fa-google-plus
-          | Sign in with Google
-        button.btn.btn-block.btn-facebook.btn-social.offset-md-3.col-md-6(v-on:click='loginAuth("facebook")')
-          i.fa.fa-facebook
-          | Sign in with Facebook
+    .py-2.text-center
+      button.btn.btn-block.btn-google.btn-social.offset-md-3.col-md-6(v-on:click='loginAuth("google")')
+        i.fa.fa-google-plus
+        | Sign in with Google
+      button.btn.btn-block.btn-facebook.btn-social.offset-md-3.col-md-6(v-on:click='loginAuth("facebook")')
+        i.fa.fa-facebook
+        | Sign in with Facebook
     pre.
       {{formstate}}
 </template>
