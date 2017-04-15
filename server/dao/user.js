@@ -1,4 +1,5 @@
 const option = require('scala-like-option');
+const Either = require('monet');
 
 module.exports = (models) => {
   return {
@@ -32,11 +33,13 @@ module.exports = (models) => {
      * @return {Promise} an integer promise containing the id of the newly.
      */
     signUp: (identity) => {
+      const user = new models.User(identity);
+      const hash = user.genPasswordHash(identity.password);
       return models.pool.query(
-        `INSERT INTO users
-          (email, first_name, last_name)
-          VALUES(?, ?, ?)`,
-        [identity.email, identity.first_name, identity.last_name])
+        `INSERT IGNORE INTO users
+          (email, first_name, last_name, password)
+          VALUES(?, ?, ?, ?)`,
+        [identity.email, identity.first_name, identity.last_name, hash])
         .then(result => result.insertId);
     },
     /**
@@ -47,7 +50,7 @@ module.exports = (models) => {
      *  and an associated OAuth id (e.g. facebook_id, google_id)
      * @return {Promise} a User promise.
      */
-    externalLogin: (identity) => {
+    externalLogin(identity) {
       return models.pool.query(
         `INSERT INTO users
           (email, first_name, last_name, google_id, facebook_id)
@@ -62,24 +65,45 @@ module.exports = (models) => {
         [identity.email, identity.first_name, identity.last_name,
           identity.facebook_id, identity.google_id
         ]).then((result) => {
-          return models.pool.query(
-              'SELECT * FROM users WHERE id = ?', [result.insertId]);
-        })
-        .then(rows => option.Option(rows[0]))
-        .then(headOption => headOption.map(user => new models.User(user)));
+          return this.findById(result.insertId);
+        });
     },
     /**
      * Updates the user's last_login field.
      * @param {String} email - the user's email.
      * @return {Promise} a boolean promise, true if user was updated.
      */
-    loginWithEmail: (email) => {
+    loginWithEmail(login) {
       return models.pool.query(
         `UPDATE users
           SET last_login = CURRENT_TIMESTAMP
         WHERE email = ?
-        `, [email])
-        .then(result => result.affectedRows > 0);
+        `, [login.email])
+        .then((result) => {
+          return this.findByEmail(login.email);
+        })
+        .then((maybeUser) => {
+          return maybeUser.fold(() => Either.Left('Email not found.'), u => Either.Right(u))
+        })
+        .then((result) => {
+          return result.flatMap((user) => {
+            if (user.verifyPassword(login.password)) {
+              return Either.Right(user);
+            } else {
+              return Either.Left('Password does not match.')
+            }
+          });
+        });
+    },
+    updatePassword: (id, password) => {
+      return models.pool.query(`
+          UPDATE users
+            SET password = ?
+          WHERE id = ?
+        `, [password, id])
+        .then((result) => {
+          return result.affectedRows > 0;
+        });
     }
   };
 };
