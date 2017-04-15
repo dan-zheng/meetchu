@@ -12,6 +12,7 @@ const passport = require('passport');
 exports.loginCallback = ((strategy, req, res, next) => {
   passport.authenticate(strategy, (err, user) => {
     if (err) {
+      req.flash('error', err);
       return res.status(401).json(err);
     }
     return res.status(200).json(user);

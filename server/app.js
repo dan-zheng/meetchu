@@ -198,7 +198,6 @@ io.on('connection', (socket) => {
  */
 models.sync();
 
-
 // Example sign up
 
 /*

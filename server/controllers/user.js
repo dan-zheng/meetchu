@@ -7,6 +7,9 @@ const nodemailer = require('nodemailer');
 const algoliasearch = require('algoliasearch');
 const pug = require('pug');
 const Promise = require('bluebird');
+const monet = require('monet');
+const Either = monet.Either;
+const Maybe = monet.Maybe;
 
 const models = require('../models');
 const userDao = require('../dao/user')(models);
@@ -66,46 +69,20 @@ function addUserToAlgolia(user) {
  * POST /signup
  * User signup.
  */
-exports.postSignup = (req, res) => {
+exports.postSignup = (req, res, next) => {
   req.assert('email', 'Email is not valid.').isEmail();
   req.assert('password', 'Password must be at least 4 characters long.').len(4);
   req.assert('confirmPassword', 'Passwords do not match.').equals(req.body.password);
   req.sanitize('email').normalizeEmail({ remove_dots: false });
 
-  // const errors = req.validationErrors();
-  let errors = req.validationErrors();
-  if (errors) {
-    errors = errors.map(e => e.msg);
-    req.flash('error', errors);
-    return res.status(401).json(errors);
-  }
-
-  userDao.signup({
-    email: req.body.email,
-    first_name: req.body.firstName,
-    last_name: req.body.lastName,
-    password: req.body.password
-  }).then((result) => {
-    if (result.isLeft()) {
-      req.flash('error', result.left());
-      return res.status(401).json(result.left());
+  passport.authenticate('signup', (err, user) => {
+    if (err) {
+      req.flash('error', err);
+      return res.status(401).json(err);
     }
-    // Log in with Passport
-    req.logIn(result.right(), (err) => {
-      if (err) {
-        console.log('error here');
-        console.log(err);
-        return res.status(402).json(err);
-      }
-      return res.status(200).json({
-        msg: 'success'
-      });
-    });
-  }).catch((err) => {
-    req.flash('error', 'Database error: user was not created.');
-    return res.status(403).json(err);
-  });
-};
+    return res.status(200).json(user);
+  })(req, res, next);
+}
 
 /**
  * GET /login
@@ -125,7 +102,7 @@ exports.getLogin = (req, res) => {
  * User login.
  */
 exports.postLogin = (req, res, next) => {
-  auth.loginCallback('local', req, res, next);
+  auth.loginCallback('login', req, res, next);
 };
 
 /**

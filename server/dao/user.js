@@ -74,15 +74,11 @@ module.exports = models => ({
   },
   /**
    * Updates the user's last_login field.
-   * @param {String} email - the user's email.
+   * @param {Object} login { email: the user's email, password: the user's hashed password }
    * @return {Promise} a boolean promise, true if user was updated.
    */
   loginWithEmail(login) {
-    return models.pool.query(
-      `UPDATE users
-        SET last_login = CURRENT_TIMESTAMP
-      WHERE email = ?
-      `, [login.email])
+    return this.findByEmail(login.email)
       .then(result => this.findByEmail(login.email))
       .then(maybeUser => maybeUser.fold(() => Either.Left('Email not found.'), u => Either.Right(u)))
       .then(result => result.flatMap((user) => {
@@ -90,7 +86,16 @@ module.exports = models => ({
           return Either.Right(user);
         }
         return Either.Left('Password does not match.');
-      }));
+      }))
+      .then(result => result.flatMap(user =>
+        this.updateLastLogin(result.right().id)
+          .then((wasUpdated) => {
+            if (wasUpdated) {
+              return Either.Right(user);
+            }
+            return Either.Left('Database error (failed to update last login)');
+          })
+      ));
   },
   updatePassword(id, password) {
     return models.pool.query(
@@ -98,6 +103,14 @@ module.exports = models => ({
         SET password = ?
       WHERE id = ?
       `, [password, id])
+      .then(result => result.affectedRows > 0);
+  },
+  updateLastLogin(id) {
+    return models.pool.query(
+      `UPDATE users
+        SET last_login = CURRENT_TIMESTAMP
+      WHERE id = ?
+      `, [id])
       .then(result => result.affectedRows > 0);
   }
 });

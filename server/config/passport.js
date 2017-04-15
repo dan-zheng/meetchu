@@ -72,13 +72,32 @@ const oauthLogin = (oauthId, profile, done) => {
 /**
  * Sign in using email and password.
  */
-passport.use(new LocalStrategy({ usernameField: 'email' }, (email, password, done) => {
-  userDao.loginWithEmail({ email, password }).then((user) => {
-    user.bimap((err) => {
-      done(err);
-    }, (user) => {
-      done(null, user);
-    });
+passport.use('signup', new LocalStrategy({
+  usernameField: 'email',
+  passReqToCallback: true
+}, (req, email, password, done) => {
+  userDao.signup({
+    email: req.body.email,
+    first_name: req.body.firstName,
+    last_name: req.body.lastName,
+    password: req.body.password
+  }).then(result =>
+    result.cata(
+      err => done(err, null),
+      user => done(null, user)
+    )
+  );
+}));
+
+passport.use('login', new LocalStrategy({
+  usernameField: 'email',
+  passReqToCallback: true
+}, (req, email, password, done) => {
+  userDao.loginWithEmail({ email, password }).then((result) => {
+    result.cata(
+      err => done(err, null),
+      user => done(null, user)
+    )
   });
 }));
 

@@ -60,6 +60,7 @@
     "sequelize": "^3.30.2",
     "socket.io": "^1.7.3",
     "superagent": "^3.4.4",
+    "sweetalert2": "^6.6.0",
     "vue-form": "^4.0.0",
     "vue-meta": "^0.5.6"
   },
