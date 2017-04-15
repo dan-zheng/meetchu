@@ -1,2 +1,4 @@
-public/dist/**/*
-public/js/lib/*.min.js
+server/public/dist/**/*
+server/public/js/lib/*.min.js
+client/build/*.js
+client/config/*.js
