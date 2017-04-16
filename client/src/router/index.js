@@ -4,7 +4,6 @@ import Router from 'vue-router';
 // Get store (necssary for route guarding)
 import store from '../store';
 
-import Main from '../components/Main';
 import Home from '../components/Home';
 import Login from '../components/Login';
 import Signup from '../components/Signup';
@@ -18,29 +17,23 @@ const router = new Router({
   routes: [
     {
       path: '/',
-      component: Main,
-      children: [
-        {
-          path: '',
-          component: Home,
-          meta: { auth: false }
-        },
-        {
-          path: 'login',
-          component: Login,
-          meta: { auth: false }
-        },
-        {
-          path: 'signup',
-          component: Signup,
-          meta: { auth: false }
-        },
-        {
-          path: 'dashboard',
-          component: Dashboard,
-          meta: { auth: true }
-        },
-      ]
+      component: Home,
+      meta: { auth: false }
+    },
+    {
+      path: '/login',
+      component: Login,
+      meta: { auth: false }
+    },
+    {
+      path: '/signup',
+      component: Signup,
+      meta: { auth: false }
+    },
+    {
+      path: '/dashboard',
+      component: Dashboard,
+      meta: { auth: true }
     }
   ]
 });
