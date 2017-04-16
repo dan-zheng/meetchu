@@ -10,5 +10,6 @@ export default new Vuex.Store({
   // mutations,
   modules: {
     auth
-  }
+  },
+  strict: process.env.NODE_ENV !== 'production'
 });

@@ -2,17 +2,17 @@
 #sidebar
   ul.nav.sidebar-nav
     li.sidebar-brand
-      a(href='/')
-        img(src='../../assets/img/icon-avatar.svg')
+      router-link(to='/dashboard')
+        img(src='static/img/icon-avatar.svg')
     li
-      a(href='/chats')
-        img(src='../../assets/img/icon-chat.svg')
+      router-link(to='/chats')
+        img(src='static/img/icon-chat.svg')
     li
-      a(href='/meetings')
-        img(src='../../assets/img/icon-cal.svg')
+      router-link(to='/meetings')
+        img(src='static/img/icon-cal.svg')
     li
-      a(href='/courses')
-        img(src='../../assets/img/icon-pencil.svg')
+      router-link(to='/courses')
+        img(src='static/img/icon-pencil.svg')
 </template>
 
 <script>
@@ -20,16 +20,13 @@ export default {
   name: 'sidebar',
   data () {
     return {
-      msg: 'Navbar'
+      msg: 'Sidebar'
     }
   }
 }
 </script>
 
-<!-- Add 'scoped' attribute to limit CSS to this component only -->
 <style lang='scss'>
-// Import scss config
-@import 'static/scss/_variables';
-@import '../../../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/_variables';
-@import 'static/scss/sidebar.scss';
+@import '~bootstrap/scss/_mixins';
+@import 'static/styles/sidebar.scss';
 </style>

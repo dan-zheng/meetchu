@@ -22,7 +22,8 @@ const router = new Router({
       children: [
         {
           path: '',
-          component: Home
+          component: Home,
+          meta: { auth: false }
         },
         {
           path: 'login',
@@ -45,34 +46,40 @@ const router = new Router({
 });
 
 router.beforeEach((to, from, next) => {
-  // Route guarding
-  const loggedIn = router.app.$store.getters.isLoggedIn;
-  console.log(`${loggedIn ? 'Logged in.' : 'Not logged in.'}`);
+  // Authentication check/route guarding
+  // TODO: Edit function to be synchronous, currently runs multiple times
+  const promise = router.app.$store.getters.isLoggedIn ? true : router.app.$store.dispatch('checkAuth');
 
-  if (to.matched.some(record => record.meta.auth)) {
-    // Check if route requires auth
-    if (!loggedIn) {
-      next({
-        path: '/login',
-        query: { redirect: to.fullPath }
-      });
+  Promise.all([promise]).then((values) => {
+    console.log(values);
+    const loggedIn = router.app.$store.getters.isLoggedIn;
+    console.log(`${loggedIn ? 'Logged in.' : 'Not logged in.'}`);
+
+    if (to.matched.some(record => record.meta.auth)) {
+      // Check if route requires auth
+      if (!loggedIn) {
+        next({
+          path: '/login',
+          query: { redirect: to.fullPath }
+        });
+      } else {
+        next();
+      }
+    } else if (to.matched.some(record => !record.meta.auth)) {
+      // Check if route requires un-auth
+      if (loggedIn) {
+        next({
+          path: '/dashboard',
+          query: { redirect: to.fullPath }
+        });
+      } else {
+        next();
+      }
     } else {
+      // Otherwise proceed with redirect
       next();
     }
-  } else if (to.matched.some(record => !record.meta.auth)) {
-    // Check if route requires un-auth
-    if (loggedIn) {
-      next({
-        path: '/dashboard',
-        query: { redirect: to.fullPath }
-      });
-    } else {
-      next();
-    }
-  } else {
-    // Otherwise redirect
-    next();
-  }
+  });
 });
 
 export default router;

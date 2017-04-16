@@ -11,6 +11,7 @@ import BootstrapVue from 'bootstrap-vue';
 
 import router from './router';
 import store from './store';
+import * as types from './store/mutation-types';
 import App from './App';
 
 Vue.use(VueAxios, axios);
@@ -26,7 +27,7 @@ Vue.axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
 Vue.config.productionTip = false;
 
 /* eslint-disable no-new */
-new Vue({
+const vue = new Vue({
   el: '#app',
   store,
   router,

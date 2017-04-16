@@ -11,6 +11,15 @@ const getters = {
 };
 
 const actions = {
+  checkAuth({ commit }) {
+    commit(types.GET_USER);
+  },
+  /*
+  checkAuth() {
+    const user = localStorage.getItem('user');
+    return !!user;
+  },
+  */
   loggedIn() {
     return !!state.user;
   },
@@ -21,8 +30,8 @@ const actions = {
     .then((res) => {
       commit(types.SET_USER, res.data);
     })
-    .catch((error) => {
-      throw error;
+    .catch((err) => {
+      throw err;
     });
   },
   signup({ commit }, { firstName, lastName, email, password, confirmPassword }) {
@@ -35,11 +44,11 @@ const actions = {
     })
     .then((res) => {
       commit(types.SET_USER, res.data);
-      console.log(state.user);
+      // console.log(state.user);
     })
-    .catch((error) => {
-      console.log(JSON.stringify(error, null, 2));
-      throw error;
+    .catch((err) => {
+      // console.log(JSON.stringify(err, null, 2));
+      throw err;
     });
   },
   login({ commit }, { email, password }) {
@@ -49,29 +58,39 @@ const actions = {
     })
     .then((res) => {
       commit(types.SET_USER, res.data);
-      console.log(state.user);
+      // console.log(state.user);
     })
-    .catch((error) => {
-      console.log(JSON.stringify(error, null, 2));
-      throw error;
+    .catch((err) => {
+      // console.log(JSON.stringify(err, null, 2));
+      throw err;
     });
   },
   logout({ commit }) {
-    return Vue.axios.post('/logout')
+    return Vue.axios.get('/logout')
     .then(() => {
-      commit(types.SET_USER, null);
+      commit(types.UNSET_USER, null);
+    })
+    .catch((err) => {
+      // console.log(JSON.stringify(err, null, 2));
+      throw err;
     });
   }
 };
 
 const mutations = {
+  [types.GET_USER](state) {
+    const temp = localStorage.getItem('user');
+    if (temp) {
+      state.user = JSON.parse(temp);
+    }
+  },
   [types.SET_USER](state, user) {
     state.user = user;
     localStorage.setItem('user', JSON.stringify(user));
   },
   [types.UNSET_USER](state, user) {
     state.user = null;
-    localStorage.deleteItem('user');
+    localStorage.removeItem('user');
   }
 };
 

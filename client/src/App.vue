@@ -15,13 +15,13 @@ export default {
 
 <style lang='scss'>
 // Import custom scss
-@import 'static/scss/_fonts';
-@import 'static/scss/_variables';
+@import 'static/styles/_fonts';
+@import 'static/styles/_variables';
 
 // Import Bootstrap
 @import '~bootstrap/scss/bootstrap.scss';
 @import '~bootstrap-vue/dist/bootstrap-vue.css';
-@import 'static/scss/bootstrap-social.scss';
+@import 'static/styles/bootstrap-social.scss';
 
 // Import font-awesome
 $fa-font-path: '../static/fonts/font-awesome';
@@ -31,5 +31,5 @@ $fa-font-path: '../static/fonts/font-awesome';
 @import '~sweetalert2/dist/sweetalert2.css';
 
 // Import main styles
-@import 'static/scss/main.scss';
+@import 'static/styles/main.scss';
 </style>

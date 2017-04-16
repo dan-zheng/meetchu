@@ -18,12 +18,12 @@
           field-messages.form-control-feedback(name='password', show='$touched || $submitted')
             div(slot='required') Please enter your password.
       .py-2.text-center
-        button.btn.btn-primary(v-on:click='login()') Login
+        button.btn.btn-primary(@click='login()') Login
     .py-2.text-center
-      button.btn.btn-block.btn-google.btn-social.offset-md-3.col-md-6(v-on:click='loginAuth("google")')
+      button.btn.btn-block.btn-google.btn-social.offset-md-3.col-md-6(@click='loginAuth("google")')
         i.fa.fa-google-plus
         | Sign in with Google
-      button.btn.btn-block.btn-facebook.btn-social.offset-md-3.col-md-6(v-on:click='loginAuth("facebook")')
+      button.btn.btn-block.btn-facebook.btn-social.offset-md-3.col-md-6(@click='loginAuth("facebook")')
         i.fa.fa-facebook
         | Sign in with Facebook
     pre.
@@ -109,12 +109,5 @@ export default {
 </script>
 
 <style lang='scss' scoped>
-/*
-.required-field > label::after {
-  content: '*';
-  color: red;
-  margin-left: 0.25rem;
-}
-*/
-@import '../../node_modules/bootstrap-social/bootstrap-social.css';
+@import '~bootstrap-social/bootstrap-social.css';
 </style>
