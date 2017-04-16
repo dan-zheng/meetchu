@@ -1,5 +1,5 @@
 <template lang='pug'>
-.ml-2
+#content.ml-2
   .page-header
     h1 Home
   h3 Hello, {{ user.first_name }}!
@@ -60,7 +60,7 @@ export default {
 </script>
 
 <style lang='scss' scoped>
-.container {
-  padding-top: 1.5vw;
+#content {
+  padding: 20px;
 }
 </style>

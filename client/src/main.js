@@ -21,11 +21,15 @@ Vue.use(BootstrapVue);
 
 sync(store, router);
 
+import jQuery from 'jquery';
+window.$ = jQuery;
+
+// TODO: Fix baseURL for production/development server
+// May require splitting client/server into separate repos
 const protocol = window.location.protocol;
 const hostname = window.location.hostname;
 const port = process.env.PORT || 3000;
 Vue.axios.defaults.baseURL = `${protocol}//${hostname}:${port}`;
-console.log(Vue.axios.defaults.baseURL);
 Vue.axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
 Vue.config.productionTip = false;
 

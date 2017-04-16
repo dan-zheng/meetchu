@@ -10,62 +10,16 @@ body {
 
 @mixin styling($sidebar-width, $icon-padding) {
   #wrapper {
-    position: absolute;
-    left: 0;
-    overflow-x: hidden;
-    padding-left: $sidebar-width;
-    width: 100vw;
-    height: 100vh;
-
-    &.toggled {
-      #sidebar {
-        width: 0;
-      }
-
-      #content {
-        position: absolute;
-        left: 0;
-        width: 100vw;
-        margin-right: 0;
-      }
-    }
+    width: 100%;
+    height: 100%;
   }
 
   #sidebar {
-    position: fixed;
-    left: $sidebar-width;
+    // left: $sidebar-width;
     width: $sidebar-width;
-    height: 100vh;
-    margin-left: -$sidebar-width;
-    overflow-y: auto;
     background: #EBEBEB;
-    // transition: all 0.4s ease;
-  }
-
-  #content {
-    z-index: 2;
-    position: absolute;
-    left: $sidebar-width;
-    padding: 20px;
-    width: calc(100vw - #{$sidebar-width});
-  }
-
-  .sidebar-nav {
-    flex-direction: column;
-    list-style: none;
-    font-size: 48px;
-
-    li {
-      width: $sidebar-width;
-      height: $sidebar-width;
-    }
 
     a {
-      display: flex;
-      flex: 1 0 100%;
-      height: 100%;
-      padding-top: $icon-padding;
-      padding-bottom: $icon-padding;
       transition: background 0.2s ease;
 
       &:hover {
@@ -74,18 +28,20 @@ body {
         background: #dbd9fa;
       }
 
-      &:active {
-        text-decoration: none;
-      }
-
+      &:active,
       &:focus {
         text-decoration: none;
       }
-    }
 
-    img {
-      width: 100%;
+      img {
+        padding: $icon-padding;
+        width: 100%;
+      }
     }
+  }
+
+  #content {
+    // flex: 1;
   }
 }
 

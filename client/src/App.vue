@@ -4,10 +4,9 @@
     app-nav
     #main
       router-view
-  div(v-else)
-    app-sidebar
-    #content
-      router-view
+  div#wrapper.d-flex.flex-row.align-items-stretch(v-else)
+    app-sidebar.d-flex.flex-column
+    router-view
 </template>
 
 <script>

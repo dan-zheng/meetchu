@@ -8,6 +8,9 @@ import Home from '../components/Home';
 import Login from '../components/Login';
 import Signup from '../components/Signup';
 import Dashboard from '../components/Dashboard';
+import { Chats } from '../components/chat';
+// console.log(chat);
+// Test view
 import Test from '../components/Test';
 
 Vue.use(Router);
@@ -34,6 +37,15 @@ const router = new Router({
       path: '/dashboard',
       component: Dashboard,
       meta: { auth: true }
+    },
+    {
+      path: '/chats',
+      component: Chats,
+      meta: { auth: true }
+    },
+    {
+      path: '/test',
+      component: Test
     }
   ]
 });
