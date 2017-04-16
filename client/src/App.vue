@@ -2,8 +2,7 @@
 #app
   div(v-if='!isLoggedIn')
     app-nav
-    #main
-      router-view
+    router-view
   div#wrapper.d-flex.flex-row.align-items-stretch(v-else)
     app-sidebar.d-flex.flex-column
     router-view

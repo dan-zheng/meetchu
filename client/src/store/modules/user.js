@@ -74,6 +74,30 @@ const actions = {
       // console.log(JSON.stringify(err, null, 2));
       throw err;
     });
+  },
+  updateAccount({ commit }, type, values) {
+    // TODO: back-end controller for updating account profile/password
+    return Vue.axios.post(`/account/${type}`, values)
+    .then((res) => {
+      // Assume that response returns new user
+      commit(types.SET_USER, res.data);
+    })
+    .catch((err) => {
+      console.log(JSON.stringify(err, null, 2));
+      throw err;
+    });
+  },
+  deleteAccount({ commit }) {
+    // TODO: back-end controller for deleting account
+    // Assume that request receives user as input, not secure
+    return Vue.axios.post('/account/delete', state.user)
+    .then((res) => {
+      commit(types.UNSET_USER);
+    })
+    .catch((err) => {
+      console.log(JSON.stringify(err, null, 2));
+      throw err;
+    });
   }
 };
 

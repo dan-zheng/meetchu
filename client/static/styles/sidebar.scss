@@ -17,6 +17,7 @@ body {
   #sidebar {
     // left: $sidebar-width;
     width: $sidebar-width;
+    border-right: 1px solid $grid-border-color;
     background: #EBEBEB;
 
     a {
@@ -49,6 +50,6 @@ body {
   @include styling($sidebar-width: 60px, $icon-padding: 3px);
 }
 
-@include media-breakpoint-up(sm) {
+@include media-breakpoint-up(md) {
   @include styling($sidebar-width: 100px, $icon-padding: 5px);
 }

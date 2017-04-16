@@ -8,8 +8,8 @@ import Home from '../components/Home';
 import Login from '../components/Login';
 import Signup from '../components/Signup';
 import Dashboard from '../components/Dashboard';
-import { Chats } from '../components/chat';
-// console.log(chat);
+import Account from '../components/Account';
+import Chats from '../components/Chats';
 // Test view
 import Test from '../components/Test';
 
@@ -39,10 +39,27 @@ const router = new Router({
       meta: { auth: true }
     },
     {
+      path: '/account',
+      component: Account,
+      meta: { auth: true }
+    },
+    {
       path: '/chats',
       component: Chats,
       meta: { auth: true }
     },
+    /*
+    {
+      path: '/meetings',
+      component: Meetings,
+      meta: { auth: true }
+    },
+    {
+      path: '/Courses',
+      component: Courses,
+      meta: { auth: true }
+    },
+    */
     {
       path: '/test',
       component: Test

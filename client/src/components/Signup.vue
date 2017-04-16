@@ -1,5 +1,5 @@
 <template lang='pug'>
-.container
+#main.container
   .page-header
     h3 Sign up
   .offset-md-1.col-md-10
@@ -22,7 +22,7 @@
           input.form-control(type='email', name='email', placeholder='Email', required, v-model.lazy='model.email')
           field-messages.form-control-feedback(auto-label, name='email', show='$touched || $submitted')
             div(slot='required') Email is required.
-            div(slot='email') Email is invalid
+            div(slot='email') Email is invalid.
       validate.form-group.row.required-field(auto-label, :class='fieldClassName(formstate.password)')
         label.col-md-3.col-form-label Password
         .col-md-9
@@ -38,7 +38,7 @@
             div(slot='pattern') Passwords do not match.
       .py-2.text-center
         button.btn.btn-primary(v-on:click='signup()') Submit
-  pre.
+  //- pre.
     {{ formstate }}
 </template>
 

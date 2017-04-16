@@ -1,13 +1,22 @@
 <template lang='pug'>
 #content.d-flex
-  #chats.col-md-4.px-0.d-flex.flex-column
-    .page-header
-      h2.text-center.my-2 Chats
+  #chats.d-flex.flex-column.col-sm-4.px-0
+    .d-flex.text-center.px-4.align-items-stretch
+      h2.my-2 Chats
+      span.d-flex.px-0.ml-auto.align-items-center
+        a.fa.fa-lg.fa-plus-square.text-primary(@click='createChat')
+        // img(src='static/img/icon-chat.svg', style='height: 45px')
     #chats-list
       b-list-group
-        b-list-group-item.chat.rounded-0.border(v-for='chat in chats', :key='chat.name')
-          | {{ chat }}
-  #messages.col-md-8.px-0.d-flex.flex-column
+        b-list-group-item.chat.rounded-0.border(v-for='chat in chats', :key='chat.name', action)
+          // | {{ chat }}
+          .d-flex.w-100.justify-content-between
+            h5.mb-1 {{ chat.name }}
+            small {{ chat.lastSent }}
+          p.mb-1
+            strong {{ chat.lastSender }}:
+            |  {{ chat.lastMsg }}
+  #messages.d-flex.flex-column.col-sm-8.px-0
     .page-header
       h2.text-center.my-2 Messages
     #messages-list
@@ -24,7 +33,10 @@ import { default as swal } from 'sweetalert2';
 
 const chat = {
   name: 'Test',
-  description: 'A test chat.'
+  description: 'A test chat.',
+  lastSender: 'Eric Aguilera',
+  lastMsg: 'Functional programming is so nice! I love Scala.',
+  lastSent: '2:09 PM'
 };
 
 const message = {
@@ -32,13 +44,13 @@ const message = {
   text: 'Hello World.'
 };
 
-const chats = Array(20).fill(chat);
+const chats = Array(3).fill(chat);
 const messages = Array(20).fill(message);
 
 export default {
-  name: 'dashboard',
+  name: 'chats',
   metaInfo: {
-    title: 'Dashboard'
+    title: 'Chats'
   },
   data () {
     return {
@@ -53,27 +65,8 @@ export default {
     })
   },
   methods: {
-    logout() {
-      this.$store.dispatch('logout').then(() => {
-        console.log('Logout success.');
-        // Redirect page
-        this.$router.push('/');
-        // Alert message
-        swal({
-          type: 'success',
-          text: 'You have logged out.',
-        })
-        .catch(swal.noop);
-      }).catch((e) => {
-        console.log('Logout fail.');
-        // Alert message
-        swal({
-          type: 'error',
-          title: 'Oops.',
-          text: e.response.data,
-        })
-        .catch(swal.noop);
-      })
+    createChat() {
+      this.chats.push(chat);
     }
   }
 }
@@ -81,7 +74,6 @@ export default {
 
 <style lang='scss' scoped>
 @import 'static/styles/_variables';
-$grid-border-color: rgba($list-group-border-color, .5);
 
 #content {
   flex: 1;
@@ -97,6 +89,12 @@ $grid-border-color: rgba($list-group-border-color, .5);
     border-bottom-right-radius: 0;
   }
 }
+
+/*
+#chats {
+  min-width: 400px;
+}
+*/
 
 #messages {
   border-left: 1px solid $grid-border-color;

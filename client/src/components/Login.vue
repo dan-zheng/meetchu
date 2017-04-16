@@ -1,5 +1,5 @@
 <template lang='pug'>
-.container
+#main.container
   .page-header
     h3 Sign in
   .offset-md-1.col-md-10
@@ -26,8 +26,8 @@
       button.btn.btn-block.btn-facebook.btn-social.offset-md-3.col-md-6(@click='loginAuth("facebook")')
         i.fa.fa-facebook
         | Sign in with Facebook
-    pre.
-      {{formstate}}
+  //- pre.
+    {{ formstate }}
 </template>
 
 <script>
