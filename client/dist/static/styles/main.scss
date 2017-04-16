@@ -27,6 +27,12 @@ a {
   }
 }
 
+a[role='button'] {
+  &:focus {
+    color: #fff;
+  }
+}
+
 button,
 input,
 optgroup,

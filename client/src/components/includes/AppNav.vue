@@ -17,5 +17,8 @@ export default {
 </script>
 
 <style lang='scss'>
+.navbar-toggler {
+  z-index: 100;
+}
 @import 'static/styles/navbar-footer.scss';
 </style>

@@ -12,7 +12,6 @@ export default {
 }
 </script>
 
-<!-- Add 'scoped' attribute to limit CSS to this component only -->
 <style lang='scss' scoped>
-@import '../../../static/scss/navbar-footer.scss';
+@import 'static/styles/navbar-footer.scss';
 </style>

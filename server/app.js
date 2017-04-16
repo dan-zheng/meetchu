@@ -123,9 +123,9 @@ app.use((req, res, next) => {
 });
 
 if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 }));
-} else {
   app.use(express.static(path.join(__dirname, '../client', 'dist'), { maxAge: 31557600000 }));
+} else {
+  app.use(express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 }));
 }
 
 /*
