@@ -4,8 +4,8 @@
     h1 Home
   h3 Hello, {{ user.first_name }}!
   p Your email is {{ user.email }}.
-  .btn-group
-    router-link.btn.btn-primary(to='/account')
+  .btn-group(role='group')
+    router-link.btn.btn-primary(to='/account', role='button')
       i.fa.fa-id-card-o
       | Profile
     button.btn.btn-primary(@click='logout')

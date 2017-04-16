@@ -24,9 +24,4 @@ export default {
 #home-logo {
   max-width: 80%;
 }
-#btn-login {
-  &:focus {
-    color: #fff;
-  }
-}
 </style>
