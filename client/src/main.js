@@ -21,8 +21,11 @@ Vue.use(BootstrapVue);
 
 sync(store, router);
 
+const protocol = window.location.protocol;
+const hostname = window.location.hostname;
 const port = process.env.PORT || 3000;
-Vue.axios.defaults.baseURL = `http://localhost:${port}`;
+Vue.axios.defaults.baseURL = `${protocol}//${hostname}:${port}`;
+console.log(Vue.axios.defaults.baseURL);
 Vue.axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
 Vue.config.productionTip = false;
 

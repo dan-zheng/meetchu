@@ -83,6 +83,7 @@ export default {
         })
         .catch(swal.noop);
       }).catch((e) => {
+        console.log(e);
         console.log('Local login fail.');
         // Alert message
         swal({
