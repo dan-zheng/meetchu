@@ -139,6 +139,10 @@ export default {
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
   }
+  &.active {
+    background-color: $brand-primary;
+    border-color: $brand-primary;
+  }
 }
 
 /*

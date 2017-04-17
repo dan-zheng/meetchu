@@ -110,7 +110,7 @@ module.exports = models => ({
     const query = ['UPDATE users', `SET ${updates}`, 'WHERE id = ?'].join('\n');
     return models.pool.query(query, [...values, user.id])
       .then(result => Either.Right(result.affectedRows))
-      .catch(err => Either.Left(err))
+      .catch(err => Either.Left(err));
   },
   erase(user) {
     return models.pool.query(`DELETE FROM users WHERE id = ?`, [user.id])
