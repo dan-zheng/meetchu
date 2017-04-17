@@ -11,7 +11,6 @@ module.exports = {
       PRIMARY KEY (id),
       FOREIGN KEY (final_time_id)
         REFERENCES meeting_time(id)
-        ON DELETE CASCADE
     )`,
     `CREATE TABLE IF NOT EXISTS meeting_time (
       id INT NOT NULL AUTO_INCREMENT,
@@ -20,6 +19,7 @@ module.exports = {
       PRIMARY KEY (id)
       FOREIGN KEY (meeting_id)
         REFERENCES meeting(id)
+        ON DELETE CASCADE
     )`,
   ]
 };
