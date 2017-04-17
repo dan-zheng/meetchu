@@ -75,9 +75,9 @@ const actions = {
       throw err;
     });
   },
-  updateAccount({ commit }, { updatedUser, fields }) {
+  updateAccount({ commit }, { user, fields }) {
     return Vue.axios.post('/account/update', {
-      updatedUser,
+      user,
       fields
     })
     .then((res) => {
@@ -85,19 +85,20 @@ const actions = {
       commit(types.SET_USER, res.data);
     })
     .catch((err) => {
-      console.log(JSON.stringify(err, null, 2));
+      // console.log(JSON.stringify(err, null, 2));
       throw err;
     });
   },
-  deleteAccount({ commit }) {
+  deleteAccount({ commit }, { user }) {
     // TODO: back-end controller for deleting account
-    // Assume that request receives user as input, not secure
-    return Vue.axios.post('/account/delete', state.user)
+    return Vue.axios.post('/account/delete', {
+      user
+    })
     .then((res) => {
       commit(types.UNSET_USER);
     })
     .catch((err) => {
-      console.log(JSON.stringify(err, null, 2));
+      // console.log(JSON.stringify(err, null, 2));
       throw err;
     });
   }

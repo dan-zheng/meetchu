@@ -238,15 +238,15 @@ exports.getProfile = (req, res) => {
  * Update account information.
  */
 exports.postUpdateAccount = (req, res) => {
-  const updatedUser = new models.User(req.body.updatedUser);
+  const user = new models.User(req.body.user);
   const fields = req.body.fields;
 
-  updatedUser.updatePassword(updatedUser.password);
+  user.updatePassword(user.password);
 
-  userDao.update(updatedUser, fields).tap(result =>
+  userDao.update(user, fields).tap(result =>
     result.cata(
       err => res.status(401).json(err),
-      wasUpdated => res.status(200).json(updatedUser)
+      wasUpdated => res.status(200).json(user)
     )
   );
 };
@@ -321,13 +321,14 @@ exports.postPublicProfileCreateChat = (req, res) => {
  * Delete user account.
  */
 exports.postDeleteAccount = (req, res, next) => {
-  userIndex.deleteObject(req.user.id, (err) => {
-    if (err) {
-      return next(err);
-    }
-  });
-  req.user.destroy().then(() => {
-    req.flash('info', 'Your account has been deleted.');
-    return res.redirect('/');
-  });
+  const user = req.body.user;
+
+  // TODO: handle Algolia
+
+  userDao.erase(user).tap(result =>
+    result.cata(
+      err => res.status(401).json(err),
+      wasDeleted => res.status(200).json(wasDeleted)
+    )
+  );
 };

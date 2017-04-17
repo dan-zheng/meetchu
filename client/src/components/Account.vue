@@ -130,7 +130,7 @@ export default {
         return;
       }
       this.$store.dispatch('updateAccount', {
-        updatedUser: this.userModel,
+        user: this.userModel,
         fields: fields[type]
       }).then(() => {
         console.log(`Update ${type} success.`);
@@ -153,7 +153,9 @@ export default {
       });
     },
     deleteAccount() {
-      this.$store.dispatch('deleteAccount').then(() => {
+      this.$store.dispatch('deleteAccount', {
+        user: this.userModel
+      }).then(() => {
         console.log(`Account delete success.`);
         // Redirect page
         this.$router.push('/');
