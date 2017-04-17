@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const dotenv = require('dotenv');
 const mysql = require('promise-mysql');
-const debugging = false;
+const debugging = true;
 
 /**
  * Load environment variables from .env file

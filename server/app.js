@@ -197,6 +197,17 @@ io.on('connection', (socket) => {
  * Create any missing database tables and start Express server.
  */
 models.sync();
+const userDao = require('./dao/user')(models);
+/*
+userDao.findByEmail('era878@gmail.com').then((maybeUser) => {
+  maybeUser.map((user) => {
+    userDao.update(user, ['id', 'password']).then((wasUpdated) => {
+        console.log(wasUpdated);
+    });
+    return user;
+  });
+});
+*/
 
 // Example sign up
 

@@ -12,8 +12,7 @@ module.exports = models => ({
    */
   findById(id) {
     return models.pool.query('SELECT * FROM users WHERE id = ? LIMIT 1', [id])
-      .then(rows => rows.list().headMaybe()
-        .map(user => new models.User(user)));
+      .then(rows => rows.list().headMaybe().map(user => new models.User(user)));
   },
   /**
    * Retrieves a user by email.
@@ -23,8 +22,7 @@ module.exports = models => ({
    */
   findByEmail(email) {
     return models.pool.query('SELECT * FROM users WHERE email = ? LIMIT 1', [email])
-      .then(rows => rows.list().headMaybe()
-        .map(user => new models.User(user)));
+      .then(rows => rows.list().headMaybe().map(user => new models.User(user)));
   },
   /**
    * Inserts a new user if not already in database.
@@ -98,13 +96,17 @@ module.exports = models => ({
           })
       ));
   },
-  updatePassword(id, password) {
-    return models.pool.query(
-      `UPDATE users
-        SET password = ?
-      WHERE id = ?
-      `, [password, id])
-      .then(result => result.affectedRows > 0);
+  update(user, fields) {
+    if (user.id) {
+      const keys = fields || Object.keys(user);
+      const values = keys.map(key => user[key]);
+      const updates = keys.map(key => `${key} = ?`).join(', ');
+      const query = `UPDATE users \nSET ${updates}\nWHERE id = ?`;
+      return models.pool.query(query, [...values, 'id'])
+        .then(result => Either.Right(result.affectedRows > 0));
+    } else {
+      return Promise.resolve(Either.Left('Cannot execute query without a user id.'))
+    }
   },
   updateLastLogin(id) {
     return models.pool.query(
