@@ -75,6 +75,8 @@ const fields = {
   password: ['id', 'password']
 };
 
+const hiddenFields = ['password', 'confirmPassword'];
+
 export default {
   name: 'account',
   metaInfo: {
@@ -96,14 +98,12 @@ export default {
     }
   },
   created () {
-    console.log(this.$store.getters.user);
     const temp = this.$store.getters.user;
     Object.keys(temp)
-      .filter(key => key !== 'password')
+      .filter(key => !hiddenFields.includes(key))
       .forEach(key => {
         this.userModel[key] = temp[key];
       });
-    console.log(JSON.stringify(this.userModel, null, 2));
   },
   computed: {
     ...mapGetters({
@@ -129,15 +129,16 @@ export default {
       if (!this.formstate[type].$valid) {
         return;
       }
-      this.$store.dispatch('updateAccount', this.userModel, fields[type]).then(() => {
+      this.$store.dispatch('updateAccount', {
+        updatedUser: this.userModel,
+        fields: fields[type]
+      }).then(() => {
         console.log(`Update ${type} success.`);
-        // Redirect page
-        this.$router.push('/');
         // Alert message
         swal({
           type: 'success',
           title: 'Yay!',
-          text: 'Your ${type} has been updated.',
+          text: `Your ${type} has been updated.`,
         })
         .catch(swal.noop);
       }).catch((e) => {

@@ -237,26 +237,14 @@ exports.getProfile = (req, res) => {
  * POST /account/update
  * Update account information.
  */
-exports.postUpdateProfile = (req, res) => {
-  /*
-  req.assert('first_name', 'First name is required.').notEmpty();
-  req.assert('last_name', 'Last name is empty.').notEmpty();
-  req.assert('email', 'Email is not valid.').isEmail();
-  req.sanitize('email').normalizeEmail({ remove_dots: false });
-
-  const errors = req.validationErrors();
-  if (errors) {
-    return res.status(401).json(errors);
-  }
-  */
-
+exports.postUpdateAccount = (req, res) => {
   const updatedUser = req.body.updatedUser;
   const fields = req.body.fields;
 
   userDao.update(updatedUser, fields).tap(result =>
     result.cata(
       err => res.status(401).json(err),
-      user => res.status(200).json(user)
+      wasUpdated => res.status(200).json(updatedUser)
     )
   );
 };
@@ -323,27 +311,6 @@ exports.postPublicProfileCreateChat = (req, res) => {
         return res.redirect(`/chats/${group.id}`);
       });
     });
-  });
-};
-
-/**
- * POST /account/password
- * Update password.
- */
-exports.postUpdatePassword = (req, res) => {
-  req.assert('password', 'Password must be at least 4 characters long.').len(4);
-  req.assert('confirmPassword', 'Passwords do not match.').equals(req.body.password);
-
-  const errors = req.validationErrors();
-  if (errors) {
-    req.flash('error', errors);
-    return res.redirect('/account');
-  }
-
-  req.user.set('password', req.body.password);
-  req.user.save().then(() => {
-    req.flash('success', 'Your password has been updated.');
-    return res.redirect('/account');
   });
 };
 
