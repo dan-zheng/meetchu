@@ -2,6 +2,21 @@ const monet = require('monet');
 require('../../lib/monet-pimp.js')(monet);
 const Maybe = monet.Maybe;
 const Either = monet.Either;
+const Promise = require('bluebird');
+
+Promise.prototype.flatMap = function (mapper, options) {
+  return this.then(val => Promise.map(mapper, options)
+   .reduce((prev, curr) => prev.concat(curr), []));
+};
+
+function verifyLogin(user, password) {
+  return user.verifyPassword(password).then((passwordMatches) => {
+    if (passwordMatches) {
+      return Either.Right(user);
+    }
+    Either.Left('Password does not match.');
+  });
+}
 
 module.exports = models => ({
   /**
@@ -33,6 +48,7 @@ module.exports = models => ({
    */
   signup(identity) {
     const user = new models.User(identity);
+    // TODO change password to be async
     const hash = user.genPasswordHash(identity.password);
     user.password = hash;
     return models.pool.query(
@@ -84,7 +100,7 @@ module.exports = models => ({
         if (user.verifyPassword(login.password)) {
           return Either.Right(user);
         }
-        return Either.Left('Password does not match.');
+        return Promise.resolve(Either.Left('Password does not match.'));
       }))
       .then(result => result.flatMap(user =>
         this.updateLastLogin(user.id)
@@ -103,7 +119,8 @@ module.exports = models => ({
       const updates = keys.map(key => `${key} = ?`).join(', ');
       const query = `UPDATE users \nSET ${updates}\nWHERE id = ?`;
       return models.pool.query(query, [...values, 'id'])
-        .then(result => Either.Right(result.affectedRows > 0));
+        .then(result => Either.Right(result.affectedRows > 0))
+        .catch(err => Either.Left(err));
     }
     return Promise.resolve(Either.Left('Cannot execute update query without a user id.'));
   },
