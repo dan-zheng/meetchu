@@ -38,6 +38,7 @@ module.exports = {
       UNIQUE (facebook_id),
       UNIQUE (reset_password_token)
     )`,
+    /*
     `CREATE TABLE IF NOT EXISTS user_chat (
       created_at DATETIME,
       FOREIGN KEY (chat_id)
@@ -55,6 +56,6 @@ module.exports = {
       FOREIGN KEY (user_id)
         REFERENCES user(id)
         ON DELETE CASCADE
-    )`
+    )`*/
   ]
 };

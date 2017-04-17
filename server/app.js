@@ -198,25 +198,17 @@ io.on('connection', (socket) => {
  */
 models.sync();
 const userDao = require('./dao/user')(models);
-/*
-userDao.findByEmail('era878@gmail.com').then((maybeUser) => {
-  maybeUser.map((user) => {
-    userDao.update(user, ['id', 'password']).then((wasUpdated) => {
-        console.log(wasUpdated);
-    });
-    return user;
-  });
-});
-*/
-
-// Example sign up
 
 /*
-const userDao = require('./dao/user')(models);
-
-userDao.signUp({ email: 'test@test.com', first_name: 'Testy', last_name: 'Tester', password: 'asdf' })
+userDao.signup({ email: 'era878@gmail.com', first_name: 'Eric', last_name: 'Aguilera', password: 'asdf' })
 .then((result) => {
   console.log(result);
+});
+
+userDao.findByEmail('era878@gmail.com').then((maybeUser) => {
+  maybeUser.map(user => userDao.erase(user).then((result) => {
+    console.log(result);
+  }));
 });
 */
 

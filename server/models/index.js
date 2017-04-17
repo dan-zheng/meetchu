@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const dotenv = require('dotenv');
 const mysql = require('promise-mysql');
-const debugging = true;
+const debugging = false;
 
 /**
  * Load environment variables from .env file
@@ -17,12 +17,12 @@ const pool = mysql.createPool({
   database: process.env.DB_NAME
 });
 
-const dirs = [__dirname, path.join(__dirname, 'joins')];
+const dirs = [__dirname];
 // Flatten and filter directory files
 const files = [].concat.apply([], dirs.map((dir) => {
   return fs.readdirSync(dir)
     .filter((file) => {
-      return (file === 'course.js' || file === 'user.js') && file !== 'index.js'
+      return (file === 'user.js') && file !== 'index.js'
     })
     // Get fully qualified path
     .map((file) => {
