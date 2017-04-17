@@ -1,4 +1,3 @@
-
 <template lang='pug'>
 #content.ml-2
   .page-header
