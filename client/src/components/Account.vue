@@ -71,8 +71,8 @@ import { mapGetters } from 'vuex';
 import { default as swal } from 'sweetalert2';
 
 const fields = {
-  profile: ['id', 'first_name', 'last_name', 'email'],
-  password: ['id', 'password']
+  profile: ['first_name', 'last_name', 'email'],
+  password: ['password']
 };
 
 const hiddenFields = ['password', 'confirmPassword'];

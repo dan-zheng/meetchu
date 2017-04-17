@@ -9,6 +9,11 @@ Promise.prototype.flatMap = function (mapper, options) {
    .reduce((prev, curr) => prev.concat(curr), []));
 };
 
+const recoverDatabaseError = (err) => {
+  console.log(err);
+  return Either.Left('A database error occured.');
+};
+
 const verifyLoginAsync = (user, password) =>
   user.verifyPassword(password)
   .then((passwordMatches) => {
@@ -22,7 +27,7 @@ const verifyLoginSync = (user, password) => {
   if (user.verifyPassword(password)) {
     return Either.Right(user);
   }
-  return Promise.resolve(Either.Left('Password does not match.'));
+  return Either.Left('Password does not match.');
 };
 
 module.exports = models => ({
@@ -55,7 +60,7 @@ module.exports = models => ({
   signup(identity) {
     const user = new models.User(identity);
     const hash = user.genPasswordHash(identity.password);
-    user.password = hash;
+    const userWithHash = Object.assign(user, { password: hash });
     return models.pool.query(
       `INSERT IGNORE INTO users
         (email, first_name, last_name, password)
@@ -65,8 +70,8 @@ module.exports = models => ({
         if (result.affectedRows === 0) {
           return Either.Left('An account with that email already exists.');
         }
-        user.id = result.insertId;
-        return Either.Right(user);
+        const userWithId = Object.assign(userWithHash, { id: result.insertId });
+        return Either.Right(userWithId);
       });
   },
   /**
@@ -90,7 +95,7 @@ module.exports = models => ({
       [identity.email, identity.first_name, identity.last_name,
         identity.facebook_id, identity.google_id])
       .then(result => this.findById(result.insertId))
-      .catch(err => Either.Left(err));
+      .catch(err => recoverDatabaseError(err));
   },
   /**
    * Updates the user's last_login field.
@@ -101,27 +106,28 @@ module.exports = models => ({
     return this.findByEmail(login.email)
       .then(maybeUser => maybeUser.toEither('Email not found.'))
       .then(result => result.flatMap(user => verifyLoginSync(user, login.password)))
-      .then(result => result.flatMap(user => this.updateLastLogin(user)));
+      .then(result => result.flatMap(user => this.updateLastLogin(user)))
+      .catch(err => recoverDatabaseError(err));
   },
   update(user, fields) {
     const keys = fields || Object.keys(user);
     const values = keys.map(key => user[key]);
     const updates = keys.map(key => `${key} = ?`).join(', ');
-    const query = ['UPDATE users', `SET ${updates}`, 'WHERE id = ?'].join('\n');
+    const query = ['UPDATE users', `SET ${updates}`, 'WHERE id = ?'].join('\n\t');
     return models.pool.query(query, [...values, user.id])
       .then(result => Either.Right(result.affectedRows))
-      .catch(err => Either.Left(err));
+      .catch(err => recoverDatabaseError(err));
   },
   erase(user) {
     return models.pool.query(`DELETE FROM users WHERE id = ?`, [user.id])
       .then(result => Either.Right(result.affectedRows))
-      .catch(err => Either.Left(err));
+      .catch(err => recoverDatabaseError(err));
   },
-  updateLastLogin(id) {
+  updateLastLogin(user) {
     return models.pool.query(`UPDATE users
       SET last_login = CURRENT_TIMESTAMP
-      WHERE id = ?`, [id])
+      WHERE id = ?`, [user.id])
     .then(result => Either.Right(result.affectedRows))
-    .catch(err => Either.Left(err));
+    .catch(err => recoverDatabaseError(err));
   }
 });

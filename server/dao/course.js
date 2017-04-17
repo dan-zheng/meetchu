@@ -5,6 +5,6 @@ const Either = monet.Either;
 
 module.exports = models => ({
   findByUser(user) {
-    user.
+    return models.pool.query(``);
   }
 });

@@ -56,13 +56,22 @@ textarea {
    color: $gray-light;
 }
 
+// List groups
+
+.list-group-item {
+  &.active {
+    background-color: $brand-primary;
+    border-color: $brand-primary;
+  }
+}
+
 // Modal
 
 .modal.show {
   display: block;
 }
 
-// Font Icons
+// Font icons
 
 .fa {
   margin-right: 6px;
