@@ -4,30 +4,29 @@
     .d-flex.text-center.px-4.align-items-stretch
       h2.my-2 Courses
       span.d-flex.px-0.ml-auto.align-items-center
-        // a.fa.fa-lg.fa-plus-square.text-primary(@click="$root.$emit('show::modal','modal1')")
         a.text-primary(@click="$root.$emit('show::modal','modal1')")
           i.fa.fa-lg.fa-plus-square
         // input(type='text', v-model='courseQuery', @keyup='search')
         // img(src='static/img/icon-course.svg', style='height: 45px')
     #courses-list
-      b-list-group
-        b-list-group-item.course.rounded-0.border(v-for='course in courses', :key='course.uuid', action)
+      .list-group
+        .list-group-item.list-group-item-action.course.rounded-0.border(v-for='course in courses', :key='course.uuid', v-bind:class='{ active: currentCourse == course }', @click='setCurrentCourse(course, $event)')
           .d-flex.w-100.justify-content-between
             h5.mb-1 {{ course.subject + ' ' + course.number }}
           p.mb-1
             strong {{ course.title }}
-  #users.d-flex.flex-column.col-sm-8.px-0
+  #current-course.d-flex.flex-column.col-sm-8.px-0(v-model='currentCourse')
     .page-header
       h2.text-center.my-2 {{ currentCourse.subject + ' ' + currentCourse.number }}
     #users-list
       b-list-group
         b-list-group-item.user.rounded-0.border(v-for='user in users', :key='user.email')
           | {{ user }}
-  b-modal#modal1(title='Add a course', @shown='clearQuery')
-    b-form-input.mb-1(type='text', placeholder='Enter a course title...', v-model='courseQuery', @keyup='search')
+  b-modal#modal1(title='Add a course', @shown='clearQuery', hide-footer)
+    b-form-input.mb-1(type='text', placeholder='Search for a course...', v-model='courseQuery', @keyup='search')
     b-list-group
-      b-list-group-item.rounded-0.border.px-3(v-for='course in courseHits', :key='course.uuid', action)
-        .d-flex.w-100.justify-content-between(@click='addCourse(course)')
+      b-list-group-item.rounded-0.border(v-for='course in courseHits', :key='course.uuid', action)
+        .d-flex.w-100.justify-content-between.mx-3(@click='addCourse(course)')
           h5 {{ course.title }}
           small.text-right(style='min-width: 80px;') {{ course.subject + ' ' + course.number }}
 </template>
@@ -41,7 +40,7 @@ const course = {
   uuid: '8dd62248-6424-4e33-a745-852fdd31c78a',
   title: 'Software Engineering I',
   subject: 'CS',
-  number: '307',
+  number: '30700',
   creditHours: 3
 };
 
@@ -51,7 +50,7 @@ const user = {
   email: 'test@test.com'
 }
 
-const courses = Array(3).fill(course);
+const courses = Array(1).fill(course);
 const users = Array(5).fill(user);
 
 export default {
@@ -65,7 +64,7 @@ export default {
       users,
       courseQuery: '',
       courseHits: [],
-      currentCourse: courses.length > 1 ? courses[0] : null
+      currentCourse: courses.length > 0 ? courses[0] : null
     }
   },
   computed: {
@@ -92,6 +91,9 @@ export default {
     addCourse(course) {
       this.courses.push(course);
       this.$root.$emit('hide::modal','modal1');
+    },
+    setCurrentCourse(course) {
+      this.currentCourse = course;
     }
   }
 }
@@ -116,7 +118,7 @@ export default {
   }
 }
 
-#users {
+#current-course {
   border-left: 1px solid $grid-border-color;
 }
 

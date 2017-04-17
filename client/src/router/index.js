@@ -79,7 +79,6 @@ router.beforeEach((to, from, next) => {
     console.log(`${loggedIn ? 'Logged in.' : 'Not logged in.'}`);
 
     if (to.matched.some(record => record.meta.auth)) {
-      console.log('hi');
       // Check if route requires auth
       if (!loggedIn) {
         next({
@@ -90,7 +89,6 @@ router.beforeEach((to, from, next) => {
         next();
       }
     } else if (to.matched.some(record => !record.meta.auth)) {
-      console.log('hi2');
       // Check if route requires un-auth
       if (loggedIn) {
         next({
