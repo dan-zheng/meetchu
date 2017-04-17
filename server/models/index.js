@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const dotenv = require('dotenv');
 const mysql = require('promise-mysql');
-const debugging = false;
+const debugging = true;
 
 /**
  * Load environment variables from .env file
@@ -17,22 +17,28 @@ const pool = mysql.createPool({
   database: process.env.DB_NAME
 });
 
-const dirs = [__dirname];
-// Flatten and filter directory files
-const files = [].concat.apply([], dirs.map((dir) => {
-  return fs.readdirSync(dir)
-    .filter((file) => {
-      return (file === 'user.js') && file !== 'index.js'
-    })
-    // Get fully qualified path
-    .map((file) => {
-      return path.join(dir, file);
-    })
-    // Ignore directories
-    .filter((file) => {
-      return fs.statSync(file).isFile();
+if (debugging) {
+  pool.on('connection', (connection) => {
+    connection.on('enqueue', (sequence) => {
+      if (sequence && sequence.sql) {
+        console.log(`MySQL Query Enqueued: \n> ${sequence.sql}`);
+      }
     });
-}));
+  });
+}
+
+const dirs = [__dirname];
+const valid = ['user.js', 'course.js'];
+// Flatten and filter directory files
+const files = [].concat.apply([], dirs.map(dir =>
+  fs.readdirSync(dir)
+    // TODO remove once all models have been converted to new format
+    .filter(file => valid.includes(file))
+    // Get fully qualified path
+    .map(file => path.join(dir, file))
+    // Ignore directories
+    .filter(file => fs.statSync(file).isFile()
+  )));
 
 const fileExports = files.map(file => require(file));
 
@@ -46,7 +52,6 @@ function withModels(models) {
 }
 
 function executeQuery(query) {
-  if (debugging) console.log(`Executing Query: \n${query}`);
   pool.query(query).catch((error) => {
     console.log(`Error creating table.`);
     throw error;
@@ -54,7 +59,7 @@ function executeQuery(query) {
 }
 
 function sync() {
-  console.log('Creating database models.');
+  console.log('Creating database tables.');
   fileExports.forEach((model) => {
     if (model.query) {
       model.query.forEach((query) => {
