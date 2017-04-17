@@ -16,7 +16,7 @@ User.prototype.verifyPassword = function(password) {
 module.exports = {
   object: User,
   query: [
-    `CREATE TABLE IF NOT EXISTS user (
+    `CREATE TABLE IF NOT EXISTS users (
       id INT NOT NULL AUTO_INCREMENT,
       google_id INT,
       facebook_id INT,
@@ -42,6 +42,15 @@ module.exports = {
       created_at DATETIME,
       FOREIGN KEY (chat_id)
         REFERENCES chat(id)
+        ON DELETE CASCADE,
+      FOREIGN KEY (user_id)
+        REFERENCES user(id)
+        ON DELETE CASCADE
+    )`,
+    `CREATE TABLE IF NOT EXISTS user_notification (
+      created_at DATETIME,
+      FOREIGN KEY (notification_id)
+        REFERENCES notification(id)
         ON DELETE CASCADE,
       FOREIGN KEY (user_id)
         REFERENCES user(id)

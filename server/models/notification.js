@@ -1,4 +1,17 @@
-module.exports = (sequelize, Sequelize) => {
+
+module.exports = {
+  query: [
+    `CREATE TABLE IF NOT EXISTS notification (
+      id INT AUTO_INCREMENT,
+      message VARCHAR(255) NOT NULL,
+      seen BOOLEAN DEFAULT 0,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      PRIMARY KEY (id)
+    )`
+  ]
+};
+
+/*module.exports = (sequelize, Sequelize) => {
   const Notification = sequelize.define('Notification', {
     id: {
       type: Sequelize.INTEGER,
@@ -25,4 +38,4 @@ module.exports = (sequelize, Sequelize) => {
     }
   });
   return Notification;
-};
+};*/
