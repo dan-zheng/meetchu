@@ -4,39 +4,51 @@
     .d-flex.text-center.px-4.align-items-stretch
       h2.my-2 Chats
       span.d-flex.px-0.ml-auto.align-items-center
-        a.fa.fa-lg.fa-plus-square.text-primary(@click='createChat')
+        a.text-primary(@click="$root.$emit('show::modal','new-chat-modal')")
+          i.fa.fa-lg.fa-plus-square
         // img(src='static/img/icon-chat.svg', style='height: 45px')
     #chats-list
-      b-list-group
-        b-list-group-item.chat.rounded-0.border(v-for='chat in chats', :key='chat.name', action)
-          // | {{ chat }}
+      .list-group
+        .list-group-item.list-group-item-action.chat.rounded-0.border(v-for='chat in chats', :key='chat.name', v-bind:class='{ active: currentChat == chat }', @click='setCurrentChat(chat)')
           .d-flex.w-100.justify-content-between
             h5.mb-1 {{ chat.name }}
             small {{ chat.lastSent }}
           p.mb-1
             strong {{ chat.lastSender }}:
             |  {{ chat.lastMsg }}
-  #messages.d-flex.flex-column.col-sm-8.px-0
+  #current-chat.d-flex.flex-column.col-sm-8.px-0(v-model='currentChat')
     .page-header
-      h2.text-center.my-2 Messages
+      h2.text-center.my-2 {{ currentChat.name }}
     #messages-list
       b-list-group
         b-list-group-item.message.rounded-0.border(v-for='msg in messages', :key='msg.id')
           | {{ msg }}
     #message-box
       input.px-3(v-model='currentMsg', placeholder='Type message...')
+  b-modal#new-chat-modal(title='Create a chat', @shown='clearQuery("userHits", userQuery)', @ok='createChat(model.newChat)')
+    vue-form(:state='formstate.newChat', v-model='formstate.newChat', @submit.prevent='createChat')
+    b-form-input.mb-1(type='text', placeholder='Chat name', v-model='model.newChat.title')
+    b-form-input.mb-1(type='text', placeholder='Description', v-model='model.newChat.description')
+    b-form-input.mb-1(type='text', placeholder='Search for a user...', v-model='userQuery', @keyup='search("userHits", userQuery)')
+    .list-group
+      .list-group-item.list-group-item-action.rounded-0.border(v-for='user in userHits', :key='user.objectId', @click='addUser(model.newChat, user)')
+        .d-flex.w-100.justify-content-between.mx-3
+          h5 {{ user.firstName + ' ' + user.lastName }}
+          small.text-right(style='min-width: 80px;') {{ user.email }}
 </template>
 
 <script>
 import { mapGetters } from 'vuex';
 import { default as swal } from 'sweetalert2';
+import { userIndex } from '../services/algolia';
 
 const chat = {
   name: 'Test',
   description: 'A test chat.',
   lastSender: 'Eric Aguilera',
   lastMsg: 'Functional programming is so nice! I love monads.',
-  lastSent: '2:09 PM'
+  lastSent: '2:09 PM',
+  users: []
 };
 
 const message = {
@@ -44,7 +56,7 @@ const message = {
   text: 'Hello World.'
 };
 
-const chats = Array(3).fill(chat);
+const chats = Array(1).fill(chat);
 const messages = Array(20).fill(message);
 
 export default {
@@ -56,7 +68,20 @@ export default {
     return {
       chats,
       messages,
-      currentMsg: ''
+      currentChat: chats.length > 0 ? chats[0] : null,
+      formstate: {
+        newChat: {}
+      },
+      model: {
+        newChat: {
+          title: '',
+          description: '',
+          users: []
+        }
+      },
+      currentMsg: '',
+      userQuery: '',
+      userHits: []
     }
   },
   computed: {
@@ -66,7 +91,32 @@ export default {
   },
   methods: {
     createChat() {
-      this.chats.push(chat);
+      if (!this.formstate.$valid) {
+        return;
+      }
+      this.chats.push(newChat);
+      this.$root.$emit('hide::modal','new-chat-modal');
+    },
+    addChat(chat, user) {
+      this.chat.users.push(user);
+    },
+    search(hits, query) {
+      if (!query) {
+        this[hits] = [];
+        return false;
+      }
+      userIndex.search(query, {
+        hitsPerPage: 5
+      }, (error, results) => {
+        this[hits] = results.hits;
+      });
+    },
+    clearQuery(hits, query) {
+      this[hits] = [];
+      query = '';
+    },
+    setCurrentChat(chat) {
+      this.currentChat = chat;
     }
   }
 }
@@ -82,7 +132,8 @@ export default {
 .list-group-item {
   flex: 1;
   &:first-child {
-    border-top: 0;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
   }
   &:last-child {
     border-bottom-left-radius: 0;
@@ -96,7 +147,7 @@ export default {
 }
 */
 
-#messages {
+#current-chat {
   border-left: 1px solid $grid-border-color;
 }
 

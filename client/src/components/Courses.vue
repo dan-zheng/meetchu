@@ -4,13 +4,13 @@
     .d-flex.text-center.px-4.align-items-stretch
       h2.my-2 Courses
       span.d-flex.px-0.ml-auto.align-items-center
-        a.text-primary(@click="$root.$emit('show::modal','modal1')")
+        a.text-primary(@click="$root.$emit('show::modal','course-modal')")
           i.fa.fa-lg.fa-plus-square
         // input(type='text', v-model='courseQuery', @keyup='search')
         // img(src='static/img/icon-course.svg', style='height: 45px')
     #courses-list
       .list-group
-        .list-group-item.list-group-item-action.course.rounded-0.border(v-for='course in courses', :key='course.uuid', v-bind:class='{ active: currentCourse == course }', @click='setCurrentCourse(course, $event)')
+        .list-group-item.list-group-item-action.course.rounded-0.border(v-for='course in courses', :key='course.uuid', v-bind:class='{ active: currentCourse == course }', @click='setCurrentCourse(course)')
           .d-flex.w-100.justify-content-between
             h5.mb-1 {{ course.subject + ' ' + course.number }}
           p.mb-1
@@ -22,11 +22,11 @@
       b-list-group
         b-list-group-item.user.rounded-0.border(v-for='user in users', :key='user.email')
           | {{ user }}
-  b-modal#modal1(title='Add a course', @shown='clearQuery', hide-footer)
-    b-form-input.mb-1(type='text', placeholder='Search for a course...', v-model='courseQuery', @keyup='search')
-    b-list-group
-      b-list-group-item.rounded-0.border(v-for='course in courseHits', :key='course.uuid', action)
-        .d-flex.w-100.justify-content-between.mx-3(@click='addCourse(course)')
+  b-modal#course-modal(title='Add a course', @shown='clearQuery("courseHits", courseQuery)', hide-footer)
+    b-form-input.mb-1(type='text', placeholder='Search for a course...', v-model='courseQuery', @keyup='search("courseHits", courseQuery)')
+    .list-group
+      .list-group-item.list-group-item-action.rounded-0.border(v-for='course in courseHits', :key='course.objectId', @click='addCourse(course)')
+        .d-flex.w-100.justify-content-between.mx-3
           h5 {{ course.title }}
           small.text-right(style='min-width: 80px;') {{ course.subject + ' ' + course.number }}
 </template>
@@ -73,24 +73,24 @@ export default {
     })
   },
   methods: {
-    search() {
-      if (!this.courseQuery) {
-        this.courseHits = [];
+    search(hits, query) {
+      if (!query) {
+        this[hits] = [];
         return false;
       }
-      courseIndex.search(this.courseQuery, {
+      courseIndex.search(query, {
         hitsPerPage: 5
       }, (error, results) => {
-        this.courseHits = results.hits;
+        this[hits] = results.hits;
       });
     },
-    clearQuery() {
-      this.courseHits = [];
-      this.courseQuery = '';
+    clearQuery(hits, query) {
+      this[hits] = [];
+      query = '';
     },
     addCourse(course) {
       this.courses.push(course);
-      this.$root.$emit('hide::modal','modal1');
+      this.$root.$emit('hide::modal','course-modal');
     },
     setCurrentCourse(course) {
       this.currentCourse = course;
