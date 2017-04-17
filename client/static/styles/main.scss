@@ -56,6 +56,12 @@ textarea {
    color: $gray-light;
 }
 
+// Modal
+
+.modal.show {
+  display: block;
+}
+
 // Font Icons
 
 .fa {

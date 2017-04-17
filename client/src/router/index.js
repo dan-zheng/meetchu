@@ -10,6 +10,7 @@ import Signup from '../components/Signup';
 import Dashboard from '../components/Dashboard';
 import Account from '../components/Account';
 import Chats from '../components/Chats';
+import Courses from '../components/Courses';
 // Test view
 import Test from '../components/Test';
 
@@ -54,12 +55,12 @@ const router = new Router({
       component: Meetings,
       meta: { auth: true }
     },
+    */
     {
       path: '/Courses',
       component: Courses,
       meta: { auth: true }
     },
-    */
     {
       path: '/test',
       component: Test
@@ -78,6 +79,7 @@ router.beforeEach((to, from, next) => {
     console.log(`${loggedIn ? 'Logged in.' : 'Not logged in.'}`);
 
     if (to.matched.some(record => record.meta.auth)) {
+      console.log('hi');
       // Check if route requires auth
       if (!loggedIn) {
         next({
@@ -88,6 +90,7 @@ router.beforeEach((to, from, next) => {
         next();
       }
     } else if (to.matched.some(record => !record.meta.auth)) {
+      console.log('hi2');
       // Check if route requires un-auth
       if (loggedIn) {
         next({

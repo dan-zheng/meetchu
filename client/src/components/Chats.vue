@@ -35,7 +35,7 @@ const chat = {
   name: 'Test',
   description: 'A test chat.',
   lastSender: 'Eric Aguilera',
-  lastMsg: 'Functional programming is so nice! I love Scala.',
+  lastMsg: 'Functional programming is so nice! I love monads.',
   lastSent: '2:09 PM'
 };
 
@@ -107,10 +107,7 @@ export default {
   overflow-y: scroll;
 }
 
-#chats-list {
-  flex: 1;
-}
-
+#chats-list,
 #messages-list {
   flex: 1;
 }

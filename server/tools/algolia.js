@@ -2,7 +2,7 @@
  * Module dependencies.
  */
 const async = require('async');
-const dotenv = require('dotenv'); // .config({ silent: true });
+const dotenv = require('dotenv');
 const request = require('superagent');
 const algoliasearch = require('algoliasearch');
 const readlineSync = require('readline-sync');
