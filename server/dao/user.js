@@ -9,21 +9,28 @@ Promise.prototype.flatMap = function (mapper, options) {
    .reduce((prev, curr) => prev.concat(curr), []));
 };
 
-function verifyLogin(user, password) {
-  return user.verifyPassword(password).then((passwordMatches) => {
+const verifyLoginAsync = (user, password) =>
+  user.verifyPassword(password)
+  .then((passwordMatches) => {
     if (passwordMatches) {
       return Either.Right(user);
     }
     Either.Left('Password does not match.');
   });
-}
+
+const verifyLoginSync = (user, password) => {
+  if (user.verifyPassword(password)) {
+    return Either.Right(user);
+  }
+  return Promise.resolve(Either.Left('Password does not match.'));
+};
 
 module.exports = models => ({
   /**
    * Retrieves a user by email.
    * @param {Object} email - the user's email.
    *  and an associated OAuth id (e.g. facebook_id, google_id)
-   * @return {Promise} an optional User promise.
+   * @return {Promise} Maybe[User]
    */
   findById(id) {
     return models.pool.query('SELECT * FROM users WHERE id = ? LIMIT 1', [id])
@@ -32,8 +39,7 @@ module.exports = models => ({
   /**
    * Retrieves a user by email.
    * @param {Object} email - the user's email.
-   *  and an associated OAuth id (e.g. facebook_id, google_id)
-   * @return {Promise} an optional User promise.
+   * @return {Maybe} Maybe[User]
    */
   findByEmail(email) {
     return models.pool.query('SELECT * FROM users WHERE email = ? LIMIT 1', [email])
@@ -44,11 +50,10 @@ module.exports = models => ({
    * @param {Object} identity - an object containing
    *  the user's email, first_name, last_name
    *  and an associated OAuth id (e.g. facebook_id, google_id)
-   * @return {Promise}
+   * @return {Promise} Either[String, User]
    */
   signup(identity) {
     const user = new models.User(identity);
-    // TODO change password to be async
     const hash = user.genPasswordHash(identity.password);
     user.password = hash;
     return models.pool.query(
@@ -70,72 +75,53 @@ module.exports = models => ({
    * @param {Object} identity - an object containing
    *  the user's email, first_name, last_name
    *  and an associated OAuth id (e.g. facebook_id, google_id)
-   * @return {Promise} a User promise.
+   * @return {Promise} Maybe[Left]
    */
   externalLogin(identity) {
-    return models.pool.query(
-      `INSERT INTO users
-        (email, first_name, last_name, google_id, facebook_id)
-        VALUES (?, ?, ?, ?, ?)
-        ON DUPLICATE KEY UPDATE
-          last_login = CURRENT_TIMESTAMP,
-          first_name = VALUES(first_name),
-          last_name = VALUES(last_name),
-          facebook_id = IFNULL(facebook_id, VALUES(facebook_id)),
-          google_id = IFNULL(google_id, VALUES(google_id));
-      `,
+    return models.pool.query(`INSERT INTO users
+      (email, first_name, last_name, google_id, facebook_id)
+      VALUES (?, ?, ?, ?, ?)
+      ON DUPLICATE KEY UPDATE
+        last_login = CURRENT_TIMESTAMP,
+        first_name = VALUES(first_name),
+        last_name = VALUES(last_name),
+        facebook_id = IFNULL(facebook_id, VALUES(facebook_id)),
+        google_id = IFNULL(google_id, VALUES(google_id))`,
       [identity.email, identity.first_name, identity.last_name,
         identity.facebook_id, identity.google_id])
-      .then(result => this.findById(result.insertId));
+      .then(result => this.findById(result.insertId))
+      .catch(err => Either.Left(err));
   },
   /**
    * Updates the user's last_login field.
    * @param {Object} login { email: the user's email, password: the user's hashed password }
-   * @return {Promise} a boolean promise, true if user was updated.
+   * @return {Promise}
    */
   loginWithEmail(login) {
     return this.findByEmail(login.email)
       .then(maybeUser => maybeUser.toEither('Email not found.'))
-      .then(result => result.flatMap((user) => {
-        if (user.verifyPassword(login.password)) {
-          return Either.Right(user);
-        }
-        return Promise.resolve(Either.Left('Password does not match.'));
-      }))
-      .then(result => result.flatMap(user =>
-        this.updateLastLogin(user.id)
-          .then((wasUpdated) => {
-            if (wasUpdated) {
-              return Either.Right(user);
-            }
-            return Either.Left('Database error (failed to update last login)');
-          })
-      ));
+      .then(result => result.flatMap(user => verifyLoginSync(user, login.password)))
+      .then(result => result.flatMap(user => this.updateLastLogin(user)));
   },
   update(user, fields) {
-    if (user.id) {
-      const keys = fields || Object.keys(user);
-      const values = keys.map(key => user[key]);
-      const updates = keys.map(key => `${key} = ?`).join(', ');
-      const query = `UPDATE users \nSET ${updates}\nWHERE id = ?`;
-      return models.pool.query(query, [...values, user.id])
-        .then(result => Either.Right(result.affectedRows > 0));
-    }
-    return Promise.resolve(Either.Left('Cannot execute update query without a user id.'));
+    const keys = fields || Object.keys(user);
+    const values = keys.map(key => user[key]);
+    const updates = keys.map(key => `${key} = ?`).join(', ');
+    const query = ['UPDATE users', `SET ${updates}`, 'WHERE id = ?'].join('\n');
+    return models.pool.query(query, [...values, user.id])
+      .then(result => Either.Right(result.affectedRows))
+      .catch(err => Either.Left(err))
   },
   erase(user) {
-    if (user.id) {
-      return models.pool.query(`DELETE FROM users WHERE id = ?`, [user.id])
-        .then(result => Either.Right(result.affectedRows > 0));
-    }
-    return Promise.resolve(Either.Left('Cannot execute erase query without a user id.'));
+    return models.pool.query(`DELETE FROM users WHERE id = ?`, [user.id])
+      .then(result => Either.Right(result.affectedRows))
+      .catch(err => Either.Left(err));
   },
   updateLastLogin(id) {
-    return models.pool.query(
-      `UPDATE users
-        SET last_login = CURRENT_TIMESTAMP
-      WHERE id = ?
-      `, [id])
-      .then(result => result.affectedRows > 0);
+    return models.pool.query(`UPDATE users
+      SET last_login = CURRENT_TIMESTAMP
+      WHERE id = ?`, [id])
+    .then(result => Either.Right(result.affectedRows))
+    .catch(err => Either.Left(err));
   }
 });

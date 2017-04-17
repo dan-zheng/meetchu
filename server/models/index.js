@@ -18,21 +18,17 @@ const pool = mysql.createPool({
 });
 
 const dirs = [__dirname];
+const valid = ['user.js', 'course.js'];
 // Flatten and filter directory files
-const files = [].concat.apply([], dirs.map((dir) => {
-  return fs.readdirSync(dir)
-    .filter((file) => {
-      return (file === 'user.js') && file !== 'index.js'
-    })
+const files = [].concat.spread([], dirs.map(dir =>
+  fs.readdirSync(dir)
+    // TODO remove once all models have been converted to new format
+    .filter(file => valid.includes(file))
     // Get fully qualified path
-    .map((file) => {
-      return path.join(dir, file);
-    })
+    .map(file => path.join(dir, file))
     // Ignore directories
-    .filter((file) => {
-      return fs.statSync(file).isFile();
-    });
-}));
+    .filter(file => fs.statSync(file).isFile()
+  )));
 
 const fileExports = files.map(file => require(file));
 
@@ -54,7 +50,7 @@ function executeQuery(query) {
 }
 
 function sync() {
-  console.log('Creating database models.');
+  console.log('Creating database tables.');
   fileExports.forEach((model) => {
     if (model.query) {
       model.query.forEach((query) => {

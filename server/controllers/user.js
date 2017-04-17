@@ -328,7 +328,7 @@ exports.postDeleteAccount = (req, res, next) => {
   userDao.erase(user).tap(result =>
     result.cata(
       err => res.status(401).json(err),
-      wasDeleted => res.status(200).json(wasDeleted)
+      rowsChanged => res.status(200).json(rowsChanged)
     )
   );
 };
