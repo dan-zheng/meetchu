@@ -234,32 +234,19 @@ exports.getProfile = (req, res) => {
 };
 
 /**
- * POST /account/profile
- * Update profile information.
+ * POST /account/update
+ * Update account information.
  */
-exports.postUpdateProfile = (req, res) => {
-  req.assert('firstName', 'First name is empty.').notEmpty();
-  req.assert('lastName', 'Last name is empty.').notEmpty();
-  req.assert('email', 'Email is not valid.').isEmail();
-  req.sanitize('email').normalizeEmail({ remove_dots: false });
+exports.postUpdateAccount = (req, res) => {
+  const updatedUser = req.body.updatedUser;
+  const fields = req.body.fields;
 
-  const errors = req.validationErrors();
-  if (errors) {
-    req.flash('error', errors);
-    return res.redirect(`/meetings/${id}`);
-  }
-
-  req.user.firstName = req.body.firstName || req.user.firstName;
-  req.user.lastName = req.body.lastName || req.user.firstName;
-  req.user.email = req.body.email || req.user.email;
-  req.user.major = req.body.major || req.user.email;
-  req.user.privacyShowEmail = req.body.privacyShowEmail === 'on';
-  req.user.privacyShowMajor = req.body.privacyShowMajor === 'on';
-  req.user.privacyShowProfilePicture = req.body.privacyShowProfilePicture === 'on';
-  req.user.save().then(() => {
-    req.flash('success', 'Your profile information has been updated.');
-    return res.redirect('/account');
-  });
+  userDao.update(updatedUser, fields).tap(result =>
+    result.cata(
+      err => res.status(401).json(err),
+      wasUpdated => res.status(200).json(updatedUser)
+    )
+  );
 };
 
 /**
@@ -324,27 +311,6 @@ exports.postPublicProfileCreateChat = (req, res) => {
         return res.redirect(`/chats/${group.id}`);
       });
     });
-  });
-};
-
-/**
- * POST /account/password
- * Update password.
- */
-exports.postUpdatePassword = (req, res) => {
-  req.assert('password', 'Password must be at least 4 characters long.').len(4);
-  req.assert('confirmPassword', 'Passwords do not match.').equals(req.body.password);
-
-  const errors = req.validationErrors();
-  if (errors) {
-    req.flash('error', errors);
-    return res.redirect('/account');
-  }
-
-  req.user.set('password', req.body.password);
-  req.user.save().then(() => {
-    req.flash('success', 'Your password has been updated.');
-    return res.redirect('/account');
   });
 };
 

@@ -131,6 +131,7 @@ if (process.env.NODE_ENV === 'production') {
 /*
  * App routes.
  */
+// TODO: Rewrite authentication
 app.get('/', homeController.index);
 app.get('/signup', userController.getSignup);
 app.post('/signup', userController.postSignup);
@@ -138,8 +139,7 @@ app.get('/login', userController.getLogin);
 app.post('/login', userController.postLogin);
 app.get('/logout', userController.getLogout);
 app.get('/account', passportConfig.isAuthenticated, userController.getProfile);
-app.post('/account/profile', passportConfig.isAuthenticated, userController.postUpdateProfile);
-app.post('/account/password', passportConfig.isAuthenticated, userController.postUpdatePassword);
+app.post('/account/update', userController.postUpdateAccount);
 app.post('/account/delete', passportConfig.isAuthenticated, userController.postDeleteAccount);
 app.get('/profile/:id', passportConfig.isAuthenticated, userController.getPublicProfile);
 app.post('/profile/:id/chat', passportConfig.isAuthenticated, userController.postPublicProfileCreateChat);

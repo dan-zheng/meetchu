@@ -118,9 +118,8 @@ module.exports = models => ({
       const values = keys.map(key => user[key]);
       const updates = keys.map(key => `${key} = ?`).join(', ');
       const query = `UPDATE users \nSET ${updates}\nWHERE id = ?`;
-      return models.pool.query(query, [...values, 'id'])
-        .then(result => Either.Right(result.affectedRows > 0))
-        .catch(err => Either.Left(err));
+      return models.pool.query(query, [...values, user.id])
+        .then(result => Either.Right(result.affectedRows > 0));
     }
     return Promise.resolve(Either.Left('Cannot execute update query without a user id.'));
   },

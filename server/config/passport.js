@@ -98,7 +98,7 @@ passport.use('login', new LocalStrategy({
     result.cata(
       err => done(err, null),
       user => done(null, user)
-    )
+    );
   });
 }));
 

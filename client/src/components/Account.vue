@@ -13,17 +13,17 @@
           .col-md-9
             .row
               validate.col-md-6.required-field(auto-label, :class='fieldClassName(formstate.profile.firstName)')
-                input.form-control(type='text', name='firstName', placeholder='First', required, v-model.lazy='model.profile.firstName')
+                input.form-control(type='text', name='firstName', placeholder='First', required, v-model.lazy='userModel.first_name')
                 field-messages.form-control-feedback(auto-label, name='firstName', show='$touched || $submitted')
                   div(slot='required') First name is required.
               validate.col-md-6.required-field(auto-label, :class='fieldClassName(formstate.profile.lastName)')
-                input.form-control(type='text', name='lastName', placeholder='Last', required, v-model.lazy='model.profile.lastName')
+                input.form-control(type='text', name='lastName', placeholder='Last', required, v-model.lazy='userModel.last_name')
                 field-messages.form-control-feedback(auto-label, name='lastName', show='$touched || $submitted')
                   div(slot='required') Last name is required.
         validate.form-group.row.required-field(auto-label, :class='fieldClassName(formstate.profile.email)')
           label.col-md-3.col-form-label Email
           .col-md-9
-            input.form-control(type='email', name='email', placeholder='Email', required, v-model.lazy='model.profile.email')
+            input.form-control(type='email', name='email', placeholder='Email', required, v-model.lazy='userModel.email')
             field-messages.form-control-feedback(auto-label, name='email', show='$touched || $submitted')
               div(slot='required') Email is required.
               div(slot='email') Email is invalid.
@@ -39,14 +39,14 @@
         validate.form-group.row.required-field(auto-label, :class='fieldClassName(formstate.password.password)')
           label.col-md-3.col-form-label Password
           .col-md-9
-            input.form-control(type='password', name='password', placeholder='Password', required, minlength='4', v-model.lazy='model.password.password')
+            input.form-control(type='password', name='password', placeholder='Password', required, minlength='4', v-model.lazy='userModel.password')
             field-messages.form-control-feedback(name='password', show='$touched || $submitted')
               div(slot='required') Password is required.
               div(slot='minlength') Password must be at least 4 characters long.
         validate.form-group.row.required-field(auto-label, :class='fieldClassName(formstate.password.confirmPassword)')
           label.col-md-3.col-form-label Confirm Password
           .col-md-9
-            input.form-control(type='password', name='confirmPassword', placeholder='Confirm Password', required, minlength='4', :pattern='model.password.password', v-model.lazy='model.password.confirmPassword')
+            input.form-control(type='password', name='confirmPassword', placeholder='Confirm Password', required, minlength='4', :pattern='userModel.password', v-model.lazy='userModel.confirmPassword')
             field-messages.form-control-feedback(name='confirmPassword', show='$touched || $submitted')
               div(slot='pattern') Passwords do not match.
         .py-2.text-center
@@ -70,6 +70,13 @@
 import { mapGetters } from 'vuex';
 import { default as swal } from 'sweetalert2';
 
+const fields = {
+  profile: ['id', 'first_name', 'last_name', 'email'],
+  password: ['id', 'password']
+};
+
+const hiddenFields = ['password', 'confirmPassword'];
+
 export default {
   name: 'account',
   metaInfo: {
@@ -81,18 +88,22 @@ export default {
         profile: {},
         password: {}
       },
-      model: {
-        profile: {
-          firstName: '',
-          lastName: '',
-          email: '',
-        },
-        password: {
-          password: '',
-          confirmPassword: ''
-        }
+      userModel: {
+        first_name: '',
+        last_name: '',
+        email: '',
+        password: '',
+        confirmPassword: ''
       }
     }
+  },
+  created () {
+    const temp = this.$store.getters.user;
+    Object.keys(temp)
+      .filter(key => !hiddenFields.includes(key))
+      .forEach(key => {
+        this.userModel[key] = temp[key];
+      });
   },
   computed: {
     ...mapGetters({
@@ -118,15 +129,16 @@ export default {
       if (!this.formstate[type].$valid) {
         return;
       }
-      this.$store.dispatch('updateAccount', type, this.model[type]).then(() => {
+      this.$store.dispatch('updateAccount', {
+        updatedUser: this.userModel,
+        fields: fields[type]
+      }).then(() => {
         console.log(`Update ${type} success.`);
-        // Redirect page
-        this.$router.push('/');
         // Alert message
         swal({
           type: 'success',
           title: 'Yay!',
-          text: 'Your ${type} has been updated.',
+          text: `Your ${type} has been updated.`,
         })
         .catch(swal.noop);
       }).catch((e) => {
@@ -138,7 +150,7 @@ export default {
           text: e.response.data
         })
         .catch(swal.noop);
-      })
+      });
     },
     deleteAccount() {
       this.$store.dispatch('deleteAccount').then(() => {
