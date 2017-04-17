@@ -1,6 +1,6 @@
 module.exports = {
   query: [
-    `CREATE TABLE IF NOT EXISTS courses (
+    `CREATE TABLE IF NOT EXISTS course (
       uuid CHAR(36) NOT NULL,
       title VARCHAR(255) NOT NULL,
       subject VARCHAR(255) NOT NULL,

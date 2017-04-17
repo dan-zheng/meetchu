@@ -16,7 +16,7 @@ User.prototype.verifyPassword = function(password) {
 module.exports = {
   object: User,
   query: [
-    `CREATE TABLE IF NOT EXISTS users (
+    `CREATE TABLE IF NOT EXISTS user (
       id INT NOT NULL AUTO_INCREMENT,
       google_id INT,
       facebook_id INT,

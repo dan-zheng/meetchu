@@ -1,13 +1,13 @@
 module.exports = {
   query: [
-    `CREATE TABLE IF NOT EXISTS invitations (
-      uuid CHAR(36) NOT NULL,
-      PRIMARY KEY (uuid),
+    `CREATE TABLE IF NOT EXISTS invitation (
+      id INT NOT NULL,
+      PRIMARY KEY (id),
       FOREIGN KEY (chat_id)
-        REFERENCES chats(id)
+        REFERENCES chat(id)
         ON DELETE CASCADE,
       FOREIGN KEY (sender_id)
-        REFERENCES users(id)
+        REFERENCES user(id)
         ON DELETE CASCADE
     )`
   ]
