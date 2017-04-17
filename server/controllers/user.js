@@ -253,7 +253,12 @@ exports.postUpdateProfile = (req, res) => {
   const updatedUser = req.body.updatedUser;
   const fields = req.body.fields;
 
-  userDao.update(updatedUser, fields).tap(user => res.status(200).json(user));
+  userDao.update(updatedUser, fields).tap(result =>
+    result.cata(
+      err => res.status(401).json(err),
+      user => res.status(200).json(user)
+    )
+  );
 };
 
 /**

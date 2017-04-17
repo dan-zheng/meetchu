@@ -104,9 +104,15 @@ module.exports = models => ({
       const query = `UPDATE users \nSET ${updates}\nWHERE id = ?`;
       return models.pool.query(query, [...values, 'id'])
         .then(result => Either.Right(result.affectedRows > 0));
-    } else {
-      return Promise.resolve(Either.Left('Cannot execute query without a user id.'));
     }
+    return Promise.resolve(Either.Left('Cannot execute update query without a user id.'));
+  },
+  erase(user) {
+    if (user.id) {
+      return models.pool.query(`DELETE FROM users WHERE id = ?`, [user.id])
+        .then(result => Either.Right(result.affectedRows > 0));
+    }
+    return Promise.resolve(Either.Left('Cannot execute erase query without a user id.'));
   },
   updateLastLogin(id) {
     return models.pool.query(
