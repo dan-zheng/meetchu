@@ -75,9 +75,12 @@ const actions = {
       throw err;
     });
   },
-  updateAccount({ commit }, type, values) {
+  updateAccount({ commit }, updatedUser, fields) {
     // TODO: back-end controller for updating account profile/password
-    return Vue.axios.post(`/account/${type}`, values)
+    return Vue.axios.post('/account/update', {
+      updatedUser,
+      fields
+    })
     .then((res) => {
       // Assume that response returns new user
       commit(types.SET_USER, res.data);

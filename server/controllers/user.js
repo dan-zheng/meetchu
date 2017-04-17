@@ -234,32 +234,26 @@ exports.getProfile = (req, res) => {
 };
 
 /**
- * POST /account/profile
- * Update profile information.
+ * POST /account/update
+ * Update account information.
  */
 exports.postUpdateProfile = (req, res) => {
-  req.assert('firstName', 'First name is empty.').notEmpty();
-  req.assert('lastName', 'Last name is empty.').notEmpty();
+  /*
+  req.assert('first_name', 'First name is required.').notEmpty();
+  req.assert('last_name', 'Last name is empty.').notEmpty();
   req.assert('email', 'Email is not valid.').isEmail();
   req.sanitize('email').normalizeEmail({ remove_dots: false });
 
   const errors = req.validationErrors();
   if (errors) {
-    req.flash('error', errors);
-    return res.redirect(`/meetings/${id}`);
+    return res.status(401).json(errors);
   }
+  */
 
-  req.user.firstName = req.body.firstName || req.user.firstName;
-  req.user.lastName = req.body.lastName || req.user.firstName;
-  req.user.email = req.body.email || req.user.email;
-  req.user.major = req.body.major || req.user.email;
-  req.user.privacyShowEmail = req.body.privacyShowEmail === 'on';
-  req.user.privacyShowMajor = req.body.privacyShowMajor === 'on';
-  req.user.privacyShowProfilePicture = req.body.privacyShowProfilePicture === 'on';
-  req.user.save().then(() => {
-    req.flash('success', 'Your profile information has been updated.');
-    return res.redirect('/account');
-  });
+  const updatedUser = req.body.updatedUser;
+  const fields = req.body.fields;
+
+  userDao.update(updatedUser, fields).tap(user => res.status(200).json(user));
 };
 
 /**

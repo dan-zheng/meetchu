@@ -105,7 +105,7 @@ module.exports = models => ({
       return models.pool.query(query, [...values, 'id'])
         .then(result => Either.Right(result.affectedRows > 0));
     } else {
-      return Promise.resolve(Either.Left('Cannot execute query without a user id.'))
+      return Promise.resolve(Either.Left('Cannot execute query without a user id.'));
     }
   },
   updateLastLogin(id) {
