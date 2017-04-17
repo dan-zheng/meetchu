@@ -9,8 +9,12 @@ User.prototype.genPasswordHash = (password) => {
   return bcrypt.hashSync(password, salt);
 };
 
-User.prototype.verifyPassword = function(password) {
+User.prototype.verifyPassword = function (password) {
   return bcrypt.compareSync(password, this.password);
+};
+
+User.prototype.updatePassword = function (password) {
+  this.password = this.genPasswordHash(this.password);
 };
 
 module.exports = {

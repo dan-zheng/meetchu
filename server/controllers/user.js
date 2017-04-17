@@ -238,8 +238,10 @@ exports.getProfile = (req, res) => {
  * Update account information.
  */
 exports.postUpdateAccount = (req, res) => {
-  const updatedUser = req.body.updatedUser;
+  const updatedUser = new models.User(req.body.updatedUser);
   const fields = req.body.fields;
+
+  updatedUser.updatePassword(updatedUser.password);
 
   userDao.update(updatedUser, fields).tap(result =>
     result.cata(
