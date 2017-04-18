@@ -44,11 +44,20 @@ import { default as swal } from 'sweetalert2';
 import { userIndex } from '../services/algolia';
 
 const chat = {
-  name: 'Test',
-  description: 'A test chat.',
+  name: 'CS 307 Team',
+  description: 'Team chat for CS 307',
   lastSender: 'Eric Aguilera',
   lastMsg: 'Functional programming is so nice! I love monads.',
   lastSent: moment().subtract('1', 'days'),
+  users: []
+};
+
+const chat2 = {
+  name: 'CS 252 Squad',
+  description: 'CS 252 Study Buddies',
+  lastSender: 'Carson Harmon',
+  lastMsg: 'I just finished part 3 using anonymous functions. Couldn\'t have done it without functional programming!',
+  lastSent: moment().subtract('3', 'days'),
   users: []
 };
 
@@ -57,7 +66,7 @@ const message = {
   text: 'Hello World.'
 };
 
-const chats = Array(1).fill(chat);
+const chats = [chat, chat2];
 const messages = Array(20).fill(message);
 
 export default {
@@ -94,7 +103,12 @@ export default {
         const u1 = a.first_name + ' ' + a.last_name;
         const u2 = b.first_name + ' ' + b.last_name;
         return u1.localeCompare(u2);
-      });;
+      });
+    },
+    sortedChats() {
+      return chats.sort((a, b) => {
+        return a.lastSent.isAfter(b.lastSent);
+      });
     }
   },
   methods: {
