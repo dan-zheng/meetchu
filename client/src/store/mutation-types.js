@@ -1,3 +1,14 @@
+// User/authentication related mutations
 export const GET_USER = 'GET_USER';
 export const SET_USER = 'SET_USER';
 export const UNSET_USER = 'UNSET_USER';
+
+// Chat related mutations
+export const SET_CHATS = 'SET_CHATS';
+export const ADD_CHAT = 'ADD_CHAT';
+export const REMOVE_CHAT = 'REMOVE_CHAT';
+
+// Course related mutations
+export const SET_COURSES = 'SET_COURSES';
+export const ADD_COURSE = 'ADD_COURSE';
+export const REMOVE_COURSE = 'REMOVE_COURSE';

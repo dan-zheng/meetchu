@@ -82,7 +82,7 @@ exports.postSignup = (req, res, next) => {
     }
     return res.status(200).json(user);
   })(req, res, next);
-}
+};
 
 /**
  * GET /login
@@ -220,7 +220,7 @@ exports.postPasswordReset = (req, res) => {
         return res.redirect('/login');
       });
     });
-  }).catch((err) => res.redirect('/'));
+  }).catch(err => res.redirect('/'));
 };
 
 /**
@@ -265,9 +265,7 @@ exports.getPublicProfile = (req, res) => {
       model: models.Course
     }]
   }).then((user) => {
-    const courses = user.Courses.map((course) => {
-      return course.dataValues;
-    });
+    const courses = user.Courses.map(course => course.dataValues);
     user = user.dataValues;
     user.Courses = courses;
     return res.render('account/profile', {

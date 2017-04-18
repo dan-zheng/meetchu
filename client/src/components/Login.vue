@@ -95,7 +95,7 @@ export default {
       })
     },
     loginAuth(provider) {
-      this.$store.dispatch('loginAuth', {
+      this.$store.dispatch('loginOauth', {
         provider
       }).then(() => {
         console.log(`${provider} login success.`);

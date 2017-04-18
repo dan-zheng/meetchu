@@ -23,14 +23,14 @@ const actions = {
   loggedIn() {
     return !!state.user;
   },
-  loginAuth({ commit }, { provider }) {
+  loginOauth({ commit }, { provider }) {
     // TODO: Needs to be rewritten
     // window.location.href = `http://localhost:3000/auth/${provider}`
     return Vue.axios.get(`/auth/${provider}`)
-    .then(res => commit(types.SET_USER, res.data))
-    .catch((err) => {
-      throw err;
-    });
+      .then(res => commit(types.SET_USER, res.data))
+      .catch((err) => {
+        throw err;
+      });
   },
   signup({ commit }, { firstName, lastName, email, password, confirmPassword }) {
     return Vue.axios.post('/signup', {
@@ -46,41 +46,33 @@ const actions = {
     });
   },
   login({ commit }, { email, password }) {
-    return Vue.axios.post('/login', {
-      email,
-      password
-    })
-    .then(res => commit(types.SET_USER, res.data))
-    .catch((err) => {
-      throw err;
-    });
+    return Vue.axios.post('/login', { email, password })
+      .then(res => commit(types.SET_USER, res.data))
+      .catch((err) => {
+        throw err;
+      });
   },
   logout({ commit }) {
     return Vue.axios.get('/logout')
-    .then(res => commit(types.UNSET_USER))
-    .catch((err) => {
-      throw err;
-    });
+      .then(res => commit(types.UNSET_USER))
+      .catch((err) => {
+        throw err;
+      });
   },
   updateAccount({ commit }, { user, fields }) {
-    return Vue.axios.post('/account/update', {
-      user,
-      fields
-    })
-    .then(res => commit(types.SET_USER, res.data))
-    .catch((err) => {
-      throw err;
-    });
+    return Vue.axios.post('/account/update', { user, fields })
+      .then(res => commit(types.SET_USER, res.data))
+      .catch((err) => {
+        throw err;
+      });
   },
   deleteAccount({ commit }, { user }) {
     // TODO: back-end controller for deleting account
-    return Vue.axios.post('/account/delete', {
-      user
-    })
-    .then(res => commit(types.UNSET_USER))
-    .catch((err) => {
-      throw err;
-    });
+    return Vue.axios.post('/account/delete', { user })
+      .then(res => commit(types.UNSET_USER))
+      .catch((err) => {
+        throw err;
+      });
   }
 };
 
