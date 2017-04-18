@@ -158,7 +158,7 @@ app.get('/courses', courseController.getCourses);
 app.get('/courses/:id', courseController.getCourse);
 app.post('/courses/add', courseController.postAddCourse);
 app.post('/courses/remove/:id', courseController.postRemoveCourse);
-app.post('/courses/auth', courseController.postAuthCourses);
+app.post('/courses/sync', courseController.postSyncCourses);
 app.get('/meetings', meetingController.getMeetings);
 app.get('/meetings/:id', meetingController.getMeeting);
 app.post('/meetings/create', meetingController.postCreateMeeting);
@@ -183,6 +183,10 @@ app.get('/auth/facebook/callback', authController.getAuthFacebookCallback);
  * Socket.io configuration.
  */
 io.on('connection', (socket) => {
+  socket.on('send_message', (req) => {
+    console.log(`Message received: '${req.text}'`);
+  });
+  /*
   socket.on('send message', (rec) => {
     models.Message.create({
       senderId: rec.senderId,
@@ -191,6 +195,7 @@ io.on('connection', (socket) => {
     });
     io.emit(`receive message ${rec.groupId}`, rec.message);
   });
+  */
 });
 
 /**

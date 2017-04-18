@@ -21,10 +21,10 @@
       h2.text-center.my-2 {{ currentChat.name }}
     #messages-list
       b-list-group
-        b-list-group-item.message.rounded-0.border(v-for='msg in messages', :key='msg.id')
+        b-list-group-item.message.rounded-0.border(v-for='msg in currentChat.messages', :key='msg.id')
           | {{ msg }}
     #message-box
-      input.px-3(v-model='currentMsg', placeholder='Type message...')
+      input.px-3(v-model='currentMsg', placeholder='Type message...', @keyup.enter='sendMessage(currentChat)')
   b-modal#new-chat-modal(title='Create a chat', @shown='clear(["userHits", "userQuery"])', @ok='createChat(model.newChat)')
     vue-form(:state='formstate.newChat', v-model='formstate.newChat', @submit.prevent='createChat')
     b-form-input.mb-1(type='text', placeholder='Chat name', v-model='model.newChat.title')
@@ -43,13 +43,20 @@ import * as moment from 'moment';
 import { default as swal } from 'sweetalert2';
 import { userIndex } from '../services/algolia';
 
+const message = {
+  senderId: 1,
+  text: 'Hello World.',
+  timeSent: moment().subtract('5', 'hours')
+};
+
 const chat = {
   name: 'CS 307 Team',
   description: 'Team chat for CS 307',
   lastSender: 'Eric Aguilera',
   lastMsg: 'Functional programming is so nice! I love monads.',
   lastSent: moment().subtract('1', 'days'),
-  users: []
+  users: [],
+  messages: Array(3).fill(message)
 };
 
 const chat2 = {
@@ -58,16 +65,11 @@ const chat2 = {
   lastSender: 'Carson Harmon',
   lastMsg: 'I just finished part 3 using anonymous functions. Couldn\'t have done it without functional programming!',
   lastSent: moment().subtract('3', 'days'),
-  users: []
-};
-
-const message = {
-  sender: 'Dan Zheng',
-  text: 'Hello World.'
+  users: [],
+  messages: []
 };
 
 const chats = [chat, chat2];
-const messages = Array(20).fill(message);
 
 export default {
   name: 'chats',
@@ -77,7 +79,6 @@ export default {
   data () {
     return {
       chats,
-      messages,
       currentChat: chats.length > 0 ? chats[0] : null,
       formstate: {
         newChat: {}
@@ -122,6 +123,28 @@ export default {
     addChat(chat, user) {
       this.chat.users.push(user);
     },
+    setCurrentChat(chat) {
+      this.currentChat = chat;
+    },
+    sendMessage(chat) {
+      const request = {
+        chatId: chat.id,
+        senderId: this.$store.getters.user.id,
+        text: this.currentMsg
+      };
+      // Emit message
+      this.$socket.emit('send_message', request);
+      // TODO: Add store dispatch
+      // In the meantime, the local chats object is updated.
+      const now = moment();
+      chat.messages.push({
+        senderId: this.$store.getters.user.id,
+        text: this.currentMsg,
+        timeSent: now
+      });
+      chat.lastSent = now;
+      this.currentMsg = '';
+    },
     search(hits, query) {
       if (!query) {
         this[hits] = [];
@@ -142,9 +165,6 @@ export default {
           this[v] = '';
         }
       });
-    },
-    setCurrentChat(chat) {
-      this.currentChat = chat;
     },
     formatDate(date) {
       const now = moment();

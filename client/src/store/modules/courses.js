@@ -18,7 +18,7 @@ const actions = {
       });
   },
   addCourse({ commit, rootState }, { course }) {
-    return Vue.axios.post('/courses/create', { course, userId: rootState.user.id })
+    return Vue.axios.post('/courses/add', { course, userId: rootState.user.id })
       .then(res => commit(types.ADD_COURSE, res.data))
       .catch((err) => {
         throw err;
@@ -30,6 +30,18 @@ const actions = {
       .catch((err) => {
         throw err;
       });
+  },
+  syncCourses({ commit, rootState }, { username, password }) {
+    return Vue.axios.post(`/courses/sync`, {
+      userId: rootState.user.id,
+      username,
+      password
+    })
+    // Assume that controller will return all courses
+    .then(res => commit(types.SET_COURSES, res.data))
+    .catch((err) => {
+      throw err;
+    });
   },
 };
 

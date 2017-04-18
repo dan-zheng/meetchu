@@ -37,7 +37,7 @@ const actions = {
       .catch((err) => {
         throw err;
       });
-  },
+  }
 };
 
 const mutations = {
@@ -50,6 +50,10 @@ const mutations = {
   [types.REMOVE_CHAT](state, chat) {
     const index = state.chats.findIndex(c => c.id === chat.id);
     state.chats.splice(index, 1);
+  },
+  [types.SEND_MESSAGE](state, chat, message) {
+    const index = state.chats.findIndex(c => c.id === chat.id);
+    state.chats[index].messages.push(message);
   },
   [types.UNSET_USER](state) {
     state.chats = [];

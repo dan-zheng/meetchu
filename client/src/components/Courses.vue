@@ -154,7 +154,10 @@ export default {
       if (!this.formstate.purdue.$valid) {
         return;
       }
-      this.$store.dispatch('addCourses').then(() => {
+      this.$store.dispatch('syncCourses', {
+        username: purdueUsername,
+        password: purduePassword
+      }).then(() => {
         console.log(`Sync courses success.`);
         // Alert message
         swal({

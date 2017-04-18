@@ -97,10 +97,10 @@ exports.postRemoveCourse = (req, res) => {
 };
 
 /**
- * POST /courses/auth
+ * POST /courses/sync
  * Authenticate with Purdue and add courses.
  */
-exports.postAuthCourses = (req, res, next) => {
+exports.postSyncCourses = (req, res, next) => {
   req.assert('username', 'Purdue username is empty.').notEmpty();
   req.assert('password', 'Purdue password is empty.').notEmpty();
 

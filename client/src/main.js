@@ -8,9 +8,11 @@ import VueAxios from 'vue-axios';
 import VueMeta from 'vue-meta';
 import VueForm from 'vue-form';
 import BootstrapVue from 'bootstrap-vue';
+import VueSocketIO from 'vue-socket.io';
 
-import router from './router';
 import store from './store';
+import router from './router';
+import sockets from './sockets';
 import * as types from './store/mutation-types';
 import App from './App';
 
@@ -18,11 +20,9 @@ Vue.use(VueAxios, axios);
 Vue.use(VueMeta);
 Vue.use(VueForm);
 Vue.use(BootstrapVue);
+Vue.use(VueSocketIO, process.env.SOCKET_URL, store);
 
 sync(store, router);
-
-import jQuery from 'jquery';
-window.$ = jQuery;
 
 // TODO: Fix baseURL for production/development server
 // May require splitting client/server into separate repos
@@ -38,6 +38,7 @@ const vue = new Vue({
   el: '#app',
   store,
   router,
+  sockets,
   template: '<App/>',
   components: { App }
 });
