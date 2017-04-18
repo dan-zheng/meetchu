@@ -27,9 +27,7 @@ const actions = {
     // TODO: Needs to be rewritten
     // window.location.href = `http://localhost:3000/auth/${provider}`
     return Vue.axios.get(`/auth/${provider}`)
-    .then((res) => {
-      commit(types.SET_USER, res.data);
-    })
+    .then(res => commit(types.SET_USER, res.data))
     .catch((err) => {
       throw err;
     });
@@ -42,12 +40,8 @@ const actions = {
       password,
       confirmPassword
     })
-    .then((res) => {
-      commit(types.SET_USER, res.data);
-      // console.log(state.user);
-    })
+    .then(res => commit(types.SET_USER, res.data))
     .catch((err) => {
-      // console.log(JSON.stringify(err, null, 2));
       throw err;
     });
   },
@@ -56,22 +50,15 @@ const actions = {
       email,
       password
     })
-    .then((res) => {
-      commit(types.SET_USER, res.data);
-      // console.log(state.user);
-    })
+    .then(res => commit(types.SET_USER, res.data))
     .catch((err) => {
-      // console.log(JSON.stringify(err, null, 2));
       throw err;
     });
   },
   logout({ commit }) {
     return Vue.axios.get('/logout')
-    .then(() => {
-      commit(types.UNSET_USER, null);
-    })
+    .then(res => commit(types.UNSET_USER))
     .catch((err) => {
-      // console.log(JSON.stringify(err, null, 2));
       throw err;
     });
   },
@@ -80,12 +67,8 @@ const actions = {
       user,
       fields
     })
-    .then((res) => {
-      // Assume that response returns updated user
-      commit(types.SET_USER, res.data);
-    })
+    .then(res => commit(types.SET_USER, res.data))
     .catch((err) => {
-      // console.log(JSON.stringify(err, null, 2));
       throw err;
     });
   },
@@ -94,11 +77,8 @@ const actions = {
     return Vue.axios.post('/account/delete', {
       user
     })
-    .then((res) => {
-      commit(types.UNSET_USER);
-    })
+    .then(res => commit(types.UNSET_USER))
     .catch((err) => {
-      // console.log(JSON.stringify(err, null, 2));
       throw err;
     });
   }
@@ -115,7 +95,7 @@ const mutations = {
     state.user = user;
     localStorage.setItem('user', JSON.stringify(user));
   },
-  [types.UNSET_USER](state, user) {
+  [types.UNSET_USER](state) {
     state.user = null;
     localStorage.removeItem('user');
   }
