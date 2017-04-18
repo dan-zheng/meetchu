@@ -4,12 +4,10 @@
     .d-flex.text-center.px-4.align-items-stretch
       h2.my-2 Courses
       span.d-flex.px-0.ml-auto.align-items-center
-        a.text-primary(@click="$root.$emit('show::modal','add-course-modal')")
+        a.text-primary.d-flex.align-items-center(@click="$root.$emit('show::modal','add-course-modal')")
           i.fa.fa-lg.fa-plus-square
-        // input(type='text', v-model='courseQuery', @keyup='search')
-        // img(src='static/img/icon-course.svg', style='height: 45px')
-        a.text-primary(@click="$root.$emit('show::modal','sync-course-modal')")
-          i.fa.fa-lg.fa-cloud-download
+        a.text-primary.d-flex.align-items-center(@click="$root.$emit('show::modal','sync-course-modal')")
+          img(src='static/img/icon-purdue.svg', style='height: 18px')
     #courses-list
       .list-group
         .list-group-item.list-group-item-action.course.rounded-0.border(v-for='course in sortedCourses', :key='course.uuid', v-bind:class='{ active: currentCourse == course }', @click='setCurrentCourse(course)')
@@ -24,6 +22,8 @@
       b-list-group
         b-list-group-item.user.rounded-0.border(v-for='user in sortedUsers', :key='user.email')
           | {{ user }}
+
+  //- Modals
   b-modal#add-course-modal(title='Add a course', @shown='clear(["courseHits", "courseQuery"])', hide-footer)
     b-form-input.mb-1(type='text', placeholder='Search for a course...', v-model='courseQuery', @keyup='search("courseHits", courseQuery)')
     .list-group
