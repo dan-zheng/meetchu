@@ -108,13 +108,14 @@ export default {
   },
   methods: {
     fieldClassName(field) {
-      if(!field) {
+      if (!field) {
         return '';
       }
-      if((field.$touched || field.$submitted) && field.$valid) {
-        return 'has-success';
+      if ((field.$touched || field.$submitted) && field.$valid) {
+        return '';
+        // return 'has-success';
       }
-      if((field.$touched || field.$submitted) && field.$invalid) {
+      if ((field.$touched || field.$submitted) && field.$invalid) {
         return 'has-danger';
       }
     },

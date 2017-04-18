@@ -12,7 +12,7 @@
         .list-group-item.list-group-item-action.chat.rounded-0.border(v-for='chat in chats', :key='chat.name', v-bind:class='{ active: currentChat == chat }', @click='setCurrentChat(chat)')
           .d-flex.w-100.justify-content-between
             h5.mb-1 {{ chat.name }}
-            small {{ chat.lastSent }}
+            small {{ formatDate(chat.lastSent) }}
           p.mb-1
             strong {{ chat.lastSender }}:
             |  {{ chat.lastMsg }}
@@ -25,7 +25,7 @@
           | {{ msg }}
     #message-box
       input.px-3(v-model='currentMsg', placeholder='Type message...')
-  b-modal#new-chat-modal(title='Create a chat', @shown='clear("userHits", "userQuery")', @ok='createChat(model.newChat)')
+  b-modal#new-chat-modal(title='Create a chat', @shown='clear(["userHits", "userQuery"])', @ok='createChat(model.newChat)')
     vue-form(:state='formstate.newChat', v-model='formstate.newChat', @submit.prevent='createChat')
     b-form-input.mb-1(type='text', placeholder='Chat name', v-model='model.newChat.title')
     b-form-input.mb-1(type='text', placeholder='Description', v-model='model.newChat.description')
@@ -39,6 +39,7 @@
 
 <script>
 import { mapGetters } from 'vuex';
+import * as moment from 'moment';
 import { default as swal } from 'sweetalert2';
 import { userIndex } from '../services/algolia';
 
@@ -47,7 +48,7 @@ const chat = {
   description: 'A test chat.',
   lastSender: 'Eric Aguilera',
   lastMsg: 'Functional programming is so nice! I love monads.',
-  lastSent: '2:09 PM',
+  lastSent: moment().subtract('1', 'days'),
   users: []
 };
 
@@ -130,6 +131,22 @@ export default {
     },
     setCurrentChat(chat) {
       this.currentChat = chat;
+    },
+    formatDate(date) {
+      const now = moment();
+      const dayDiff = now.diff(date, 'days');
+      const isSameYear = now.isSame(date, 'years');
+      if (dayDiff === 0) {
+        return date.format('LT');
+      } else if (dayDiff === 1) {
+        return 'Yesterday, ' + date.format('LT');
+      } else if (dayDiff < 7) {
+        return date.format('ddd, LT');
+      } else if (isSameYear) {
+        return date.format('MMM D');
+      } else {
+        return date.format('LL');
+      }
     }
   }
 }
