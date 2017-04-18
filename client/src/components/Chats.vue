@@ -9,11 +9,11 @@
         // img(src='static/img/icon-chat.svg', style='height: 45px')
     #chats-list
       .list-group
-        .list-group-item.list-group-item-action.chat.rounded-0.border(v-for='chat in chats', :key='chat.name', v-bind:class='{ active: currentChat == chat }', @click='setCurrentChat(chat)')
+        .list-group-item.list-group-item-action.chat.rounded-0.border(v-for='chat in sortedChats', :key='chat.name', v-bind:class='{ active: currentChat == chat }', @click='setCurrentChat(chat)')
           .d-flex.w-100.justify-content-between
             h5.mb-1 {{ chat.name }}
-            small {{ formatDate(chat.lastSent) }}
-          p.mb-1
+            small(v-if='!!chat.lastSent') {{ formatDate(chat.lastSent) }}
+          p.mb-1(v-if='!!chat.lastSender && !!chat.lastMsg')
             strong {{ chat.lastSender }}:
             |  {{ chat.lastMsg }}
   #current-chat.d-flex.flex-column.col-sm-8.px-0(v-model='currentChat')
@@ -27,14 +27,14 @@
       input.px-3(v-model='currentMsg', placeholder='Type message...', @keyup.enter='sendMessage(currentChat)')
   b-modal#new-chat-modal(title='Create a chat', @shown='clear(["userHits", "userQuery"])', @ok='createChat(model.newChat)')
     vue-form(:state='formstate.newChat', v-model='formstate.newChat', @submit.prevent='createChat')
-    b-form-input.mb-1(type='text', placeholder='Chat name', v-model='model.newChat.title')
-    b-form-input.mb-1(type='text', placeholder='Description', v-model='model.newChat.description')
-    b-form-input.mb-1(type='text', placeholder='Search for a user...', v-model='userQuery', @keyup='search("userHits", userQuery)')
-    .list-group
-      .list-group-item.list-group-item-action.rounded-0.border(v-for='user in userHits', :key='user.objectId', @click='addUser(model.newChat, user)')
-        .d-flex.w-100.mx-1.justify-content-between.align-items-center
-          h5.m-0 {{ user.firstName + ' ' + user.lastName }}
-          small.text-right(style='min-width: 80px;') {{ user.email }}
+      b-form-input.mb-1(type='text', placeholder='Chat name', v-model='model.newChat.name')
+      b-form-input.mb-1(type='text', placeholder='Description', v-model='model.newChat.description')
+      b-form-input.mb-1(type='text', placeholder='Search for a user...', v-model='userQuery', @keyup='search("userHits", userQuery)')
+      .list-group
+        .list-group-item.list-group-item-action.rounded-0.border(v-for='user in userHits', :key='user.objectId', @click='addUser(model.newChat, user)')
+          .d-flex.w-100.mx-1.justify-content-between.align-items-center
+            h5.m-0 {{ user.firstName + ' ' + user.lastName }}
+            small.text-right(style='min-width: 80px;') {{ user.email }}
 </template>
 
 <script>
@@ -44,12 +44,14 @@ import { default as swal } from 'sweetalert2';
 import { userIndex } from '../services/algolia';
 
 const message = {
+  chatId: 2,
   senderId: 1,
   text: 'Hello World.',
   timeSent: moment().subtract('5', 'hours')
 };
 
 const chat = {
+  id: 2,
   name: 'CS 307 Team',
   description: 'Team chat for CS 307',
   lastSender: 'Eric Aguilera',
@@ -60,6 +62,7 @@ const chat = {
 };
 
 const chat2 = {
+  id: 3,
   name: 'CS 252 Squad',
   description: 'CS 252 Study Buddies',
   lastSender: 'Carson Harmon',
@@ -85,9 +88,13 @@ export default {
       },
       model: {
         newChat: {
-          title: '',
+          name: '',
           description: '',
-          users: []
+          lastSender: '',
+          lastMsg: '',
+          lastSent: '',
+          users: [],
+          messages: []
         }
       },
       currentMsg: '',
@@ -107,26 +114,41 @@ export default {
       });
     },
     sortedChats() {
-      return chats.sort((a, b) => {
-        return a.lastSent.isAfter(b.lastSent);
+      return this.chats.sort((a, b) => {
+        if (!a.lastSent) {
+          return 1;
+        } else if (!b.lastSent) {
+          return -1;
+        }
+        return b.lastSent.isAfter(a.lastSent);
       });
     }
   },
   methods: {
     createChat() {
-      if (!this.formstate.$valid) {
+      if (!this.formstate.newChat.$valid) {
         return;
       }
-      this.chats.push(newChat);
+      this.chats.push(this.model.newChat);
+      this.model.newChat = {
+        name: '',
+        description: '',
+        lastSender: '',
+        lastMsg: '',
+        lastSent: '',
+        users: [],
+        messages: []
+      };
       this.$root.$emit('hide::modal','new-chat-modal');
     },
-    addChat(chat, user) {
+    addUserToChat(chat, user) {
       this.chat.users.push(user);
     },
     setCurrentChat(chat) {
       this.currentChat = chat;
     },
     sendMessage(chat) {
+      const now = moment();
       const request = {
         chatId: chat.id,
         senderId: this.$store.getters.user.id,
@@ -136,13 +158,16 @@ export default {
       this.$socket.emit('send_message', request);
       // TODO: Add store dispatch
       // In the meantime, the local chats object is updated.
-      const now = moment();
       chat.messages.push({
+        chatId: chat.id,
         senderId: this.$store.getters.user.id,
         text: this.currentMsg,
         timeSent: now
       });
-      chat.lastSent = now;
+      const fullName = this.$store.getters.user.first_name + ' ' + this.$store.getters.user.last_name;
+      this.$set(chat, 'lastSent', now);
+      this.$set(chat, 'lastSender', fullName);
+      this.$set(chat, 'lastMsg',this.currentMsg);
       this.currentMsg = '';
     },
     search(hits, query) {
@@ -167,6 +192,9 @@ export default {
       });
     },
     formatDate(date) {
+      if (!date) {
+        return '';
+      }
       const now = moment();
       const dayDiff = now.diff(date, 'days');
       const isSameYear = now.isSame(date, 'years');

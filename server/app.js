@@ -184,7 +184,7 @@ app.get('/auth/facebook/callback', authController.getAuthFacebookCallback);
  */
 io.on('connection', (socket) => {
   socket.on('send_message', (req) => {
-    console.log(`Message received: '${req.text}'`);
+    console.log(`Message received from user id ${req.senderId}: '${req.text}'`);
   });
   /*
   socket.on('send message', (rec) => {
