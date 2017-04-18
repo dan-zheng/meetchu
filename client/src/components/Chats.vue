@@ -25,15 +25,15 @@
           | {{ msg }}
     #message-box
       input.px-3(v-model='currentMsg', placeholder='Type message...')
-  b-modal#new-chat-modal(title='Create a chat', @shown='clearQuery("userHits", userQuery)', @ok='createChat(model.newChat)')
+  b-modal#new-chat-modal(title='Create a chat', @shown='clear("userHits", "userQuery")', @ok='createChat(model.newChat)')
     vue-form(:state='formstate.newChat', v-model='formstate.newChat', @submit.prevent='createChat')
     b-form-input.mb-1(type='text', placeholder='Chat name', v-model='model.newChat.title')
     b-form-input.mb-1(type='text', placeholder='Description', v-model='model.newChat.description')
     b-form-input.mb-1(type='text', placeholder='Search for a user...', v-model='userQuery', @keyup='search("userHits", userQuery)')
     .list-group
       .list-group-item.list-group-item-action.rounded-0.border(v-for='user in userHits', :key='user.objectId', @click='addUser(model.newChat, user)')
-        .d-flex.w-100.justify-content-between.mx-3
-          h5 {{ user.firstName + ' ' + user.lastName }}
+        .d-flex.w-100.mx-1.justify-content-between.align-items-center
+          h5.m-0 {{ user.firstName + ' ' + user.lastName }}
           small.text-right(style='min-width: 80px;') {{ user.email }}
 </template>
 
@@ -87,7 +87,14 @@ export default {
   computed: {
     ...mapGetters({
       user: 'user'
-    })
+    }),
+    sortedUsers(chat) {
+      return chat.users.sort((a, b) => {
+        const u1 = a.first_name + ' ' + a.last_name;
+        const u2 = b.first_name + ' ' + b.last_name;
+        return u1.localeCompare(u2);
+      });;
+    }
   },
   methods: {
     createChat() {
@@ -111,9 +118,15 @@ export default {
         this[hits] = results.hits;
       });
     },
-    clearQuery(hits, query) {
-      this[hits] = [];
-      query = '';
+    clear(values) {
+      values.forEach((v) => {
+        const temp = this[v];
+        if (Array.isArray(temp)) {
+          this[v] = [];
+        } else if (typeof temp === 'string' || temp instanceof String) {
+          this[v] = '';
+        }
+      });
     },
     setCurrentChat(chat) {
       this.currentChat = chat;

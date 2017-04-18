@@ -7,7 +7,7 @@
   .btn-group(role='group')
     router-link.btn.btn-primary(to='/account', role='button')
       i.fa.fa-id-card-o
-      | Profile
+      | Account
     button.btn.btn-primary(@click='logout')
       i.fa.fa-sign-out
       | Log out

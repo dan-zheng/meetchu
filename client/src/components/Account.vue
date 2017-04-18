@@ -1,7 +1,7 @@
 <template lang='pug'>
 #content.ml-2
   .page-header
-    h1 Profile
+    h1 Account
 
   .offset-md-1.col-md-10
     .page-header

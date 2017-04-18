@@ -57,7 +57,7 @@ const router = new Router({
     },
     */
     {
-      path: '/Courses',
+      path: '/courses',
       component: Courses,
       meta: { auth: true }
     },

@@ -1,13 +1,13 @@
 <template lang='pug'>
 #sidebar
   router-link(to='/dashboard')
-    img(src='static/img/icon-avatar.svg')
+    img(src='/static/img/icon-avatar.svg')
   router-link(to='/chats')
-    img(src='static/img/icon-chat.svg')
+    img(src='/static/img/icon-chat.svg')
   router-link(to='/meetings')
-    img(src='static/img/icon-cal.svg')
+    img(src='/static/img/icon-cal.svg')
   router-link(to='/courses')
-    img(src='static/img/icon-pencil.svg')
+    img(src='/static/img/icon-pencil.svg')
 </template>
 
 <script>

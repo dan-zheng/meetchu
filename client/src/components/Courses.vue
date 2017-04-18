@@ -4,13 +4,15 @@
     .d-flex.text-center.px-4.align-items-stretch
       h2.my-2 Courses
       span.d-flex.px-0.ml-auto.align-items-center
-        a.text-primary(@click="$root.$emit('show::modal','course-modal')")
+        a.text-primary(@click="$root.$emit('show::modal','add-course-modal')")
           i.fa.fa-lg.fa-plus-square
         // input(type='text', v-model='courseQuery', @keyup='search')
         // img(src='static/img/icon-course.svg', style='height: 45px')
+        a.text-primary(@click="$root.$emit('show::modal','sync-course-modal')")
+          i.fa.fa-lg.fa-cloud-download
     #courses-list
       .list-group
-        .list-group-item.list-group-item-action.course.rounded-0.border(v-for='course in courses', :key='course.uuid', v-bind:class='{ active: currentCourse == course }', @click='setCurrentCourse(course)')
+        .list-group-item.list-group-item-action.course.rounded-0.border(v-for='course in sortedCourses', :key='course.uuid', v-bind:class='{ active: currentCourse == course }', @click='setCurrentCourse(course)')
           .d-flex.w-100.justify-content-between
             h5.mb-1 {{ course.subject + ' ' + course.number }}
           p.mb-1
@@ -20,15 +22,33 @@
       h2.text-center.my-2 {{ currentCourse.subject + ' ' + currentCourse.number }}
     #users-list
       b-list-group
-        b-list-group-item.user.rounded-0.border(v-for='user in users', :key='user.email')
+        b-list-group-item.user.rounded-0.border(v-for='user in sortedUsers', :key='user.email')
           | {{ user }}
-  b-modal#course-modal(title='Add a course', @shown='clearQuery("courseHits", courseQuery)', hide-footer)
+  b-modal#add-course-modal(title='Add a course', @shown='clear(["courseHits", "courseQuery"])', hide-footer)
     b-form-input.mb-1(type='text', placeholder='Search for a course...', v-model='courseQuery', @keyup='search("courseHits", courseQuery)')
     .list-group
       .list-group-item.list-group-item-action.rounded-0.border(v-for='course in courseHits', :key='course.objectId', @click='addCourse(course)')
-        .d-flex.w-100.justify-content-between.mx-3
-          h5 {{ course.title }}
+        .d-flex.w-100.mx-1.justify-content-between.align-items-center
+          h5.m-0 {{ course.title }}
           small.text-right(style='min-width: 80px;') {{ course.subject + ' ' + course.number }}
+  b-modal#sync-course-modal(title='Sync Purdue courses', @shown='clear(["purdueUsername", "purduePassword"])', @ok='syncCourses', hide-footer)
+    p You can enter your Purdue credentials to synchronize your classes.
+    vue-form(:state='formstate.purdue', v-model='formstate.purdue', @submit.prevent='onSubmit("purdue")')
+      validate.form-group.container(auto-label, :class='fieldClassName(formstate.purdue.purdueUsername)')
+        label.col-form-label Username
+        input.form-control(type='text', name='purdueUsername', placeholder='Username', v-model.lazy='purdueUsername', required)
+        field-messages.form-control-feedback(name='purdueUsername', show='$touched || $submitted')
+          div(slot='required') Username is required.
+      validate.form-group.container(auto-label, :class='fieldClassName(formstate.purdue.purduePassword)')
+        label.col-form-label Password
+        input.form-control(type='password', name='purduePassword', placeholder='Password', v-model.lazy='purduePassword', required)
+        field-messages.form-control-feedback(name='purduePassword', show='$touched || $submitted')
+          div(slot='required') Password is required.
+      .py-2.text-center
+        button.btn.btn-primary(v-on:click='syncCourses')
+          i.fa.fa-user
+          | Login
+    small Note: Meetchu does not store your Purdue information.
 </template>
 
 <script>
@@ -39,6 +59,7 @@ import { courseIndex } from '../services/algolia';
 const course = {
   uuid: '8dd62248-6424-4e33-a745-852fdd31c78a',
   title: 'Software Engineering I',
+  courseID: 'CS 30700',
   subject: 'CS',
   number: '30700',
   creditHours: 3
@@ -64,15 +85,42 @@ export default {
       users,
       courseQuery: '',
       courseHits: [],
-      currentCourse: courses.length > 0 ? courses[0] : null
+      currentCourse: courses.length > 0 ? courses[0] : null,
+      purdueUsername: '',
+      purduePassword: '',
+      formstate: {
+        purdue: {}
+      }
     }
   },
   computed: {
     ...mapGetters({
       user: 'user'
-    })
+    }),
+    sortedCourses() {
+      return this.courses.sort((a, b) => {
+        return a.courseID.localeCompare(b.courseID);
+      });
+    },
+    sortedUsers() {
+      return this.users;
+    }
   },
   methods: {
+    fieldClassName(field) {
+      if(!field) {
+        return '';
+      }
+      if((field.$touched || field.$submitted) && field.$valid) {
+        return 'has-success';
+      }
+      if((field.$touched || field.$submitted) && field.$invalid) {
+        return 'has-danger';
+      }
+    },
+    onSubmit(type) {
+      console.log(this.formstate.purdue.$valid);
+    },
     search(hits, query) {
       if (!query) {
         this[hits] = [];
@@ -84,16 +132,46 @@ export default {
         this[hits] = results.hits;
       });
     },
-    clearQuery(hits, query) {
-      this[hits] = [];
-      query = '';
+    clear(values) {
+      values.forEach((v) => {
+        const temp = this[v];
+        if (Array.isArray(temp)) {
+          this[v] = [];
+        } else if (typeof temp === 'string' || temp instanceof String) {
+          this[v] = '';
+        }
+      });
     },
     addCourse(course) {
       this.courses.push(course);
-      this.$root.$emit('hide::modal','course-modal');
+      this.$root.$emit('hide::modal','add-course-modal');
     },
     setCurrentCourse(course) {
       this.currentCourse = course;
+    },
+    syncCourses() {
+      if (!this.formstate.purdue.$valid) {
+        return;
+      }
+      this.$store.dispatch('addCourses').then(() => {
+        console.log(`Sync courses success.`);
+        // Alert message
+        swal({
+          type: 'success',
+          title: 'Woo!',
+          text: `Your Purdue courses have been added.`,
+        })
+        .catch(swal.noop);
+      }).catch((e) => {
+        console.log(`Sync courses fail.`);
+        // Alert message
+        swal({
+          type: 'error',
+          title: 'Oops.',
+          text: e.response.data
+        })
+        .catch(swal.noop);
+      });
     }
   }
 }

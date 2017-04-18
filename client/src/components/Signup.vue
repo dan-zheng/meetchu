@@ -37,7 +37,7 @@
           field-messages.form-control-feedback(name='confirmPassword', show='$touched || $submitted')
             div(slot='pattern') Passwords do not match.
       .py-2.text-center
-        button.btn.btn-primary(v-on:click='signup()') Submit
+        button.btn.btn-primary(@click='signup()') Submit
   //- pre.
     {{ formstate }}
 </template>
