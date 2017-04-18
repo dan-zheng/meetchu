@@ -1,18 +1,8 @@
 const monet = require('monet');
-require('../../lib/monet-pimp.js')(monet);
+const Promise = require('bluebird');
+require('../../lib/database-helper.js')(Promise, monet);
 const Maybe = monet.Maybe;
 const Either = monet.Either;
-const Promise = require('bluebird');
-
-Promise.prototype.flatMap = function (mapper, options) {
-  return this.then(val => Promise.map(mapper, options)
-   .reduce((prev, curr) => prev.concat(curr), []));
-};
-
-const recoverDatabaseError = (err) => {
-  console.log(err);
-  return Either.Left('A database error occured.');
-};
 
 const verifyLoginAsync = (user, password) =>
   user.verifyPassword(password)
@@ -95,7 +85,7 @@ module.exports = models => ({
       [identity.email, identity.first_name, identity.last_name,
         identity.facebook_id, identity.google_id])
       .then(result => this.findById(result.insertId))
-      .catch(err => recoverDatabaseError(err));
+      .errorToLeft();
   },
   /**
    * Updates the user's last_login field.
@@ -106,8 +96,9 @@ module.exports = models => ({
     return this.findByEmail(login.email)
       .then(maybeUser => maybeUser.toEither('Email not found.'))
       .then(result => result.flatMap(user => verifyLoginSync(user, login.password)))
-      .then(result => result.flatMap(user => this.updateLastLogin(user)))
-      .catch(err => recoverDatabaseError(err));
+      .then(result => result.flatMap(user => this.updateLastLogin(user)
+        .then(() => Either.Right(user))))
+      .errorToLeft();
   },
   update(user, fields) {
     const keys = fields || Object.keys(user);
@@ -116,18 +107,18 @@ module.exports = models => ({
     const query = ['UPDATE users', `SET ${updates}`, 'WHERE id = ?'].join('\n\t');
     return models.pool.query(query, [...values, user.id])
       .then(result => Either.Right(result.affectedRows))
-      .catch(err => recoverDatabaseError(err));
+      .errorToLeft();
   },
   erase(user) {
     return models.pool.query(`DELETE FROM users WHERE id = ?`, [user.id])
       .then(result => Either.Right(result.affectedRows))
-      .catch(err => recoverDatabaseError(err));
+      .errorToLeft();
   },
   updateLastLogin(user) {
     return models.pool.query(`UPDATE users
       SET last_login = CURRENT_TIMESTAMP
       WHERE id = ?`, [user.id])
     .then(result => Either.Right(result.affectedRows))
-    .catch(err => recoverDatabaseError(err));
+    .errorToLeft();
   }
 });
