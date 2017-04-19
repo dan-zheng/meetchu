@@ -12,8 +12,9 @@ module.exports = models => ({
     return models.pool.query(
       `SELECT * FROM course
         JOIN person_course
-        ON person_id = id
-        WHERE person_id = ?`, [user.id])
+        ON course_id = id
+        WHERE person_id = ?
+        ORDER BY \`subject\` DESC, number DESC`, [user.id])
       .then(result => Either.Right(result.list()))
       .errorToLeft();
   },
