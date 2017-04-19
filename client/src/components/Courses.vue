@@ -6,7 +6,7 @@
       span.d-flex.px-0.ml-auto.align-items-center
         a.text-primary.d-flex.align-items-center(@click="$root.$emit('show::modal','add-course-modal')")
           i.fa.fa-lg.fa-plus-square
-        a.text-primary.d-flex.align-items-center(@click="$root.$emit('show::modal','sync-course-modal')")
+        a.text-primary(@click='clear(["purdueUsername", "purduePassword"]); showModal("#sync-course-modal");')
           img(src='static/img/icon-purdue.svg', style='height: 18px')
     #courses-list
       .list-group
@@ -31,24 +31,31 @@
         .d-flex.w-100.mx-1.justify-content-between.align-items-center
           h5.m-0 {{ course.title }}
           small.text-right(style='min-width: 80px;') {{ course.subject + ' ' + course.number }}
-  b-modal#sync-course-modal(title='Sync Purdue courses', @shown='clear(["purdueUsername", "purduePassword"])', hide-footer)
-    p You can enter your Purdue credentials to synchronize your classes.
-    vue-form(:state='formstate.purdue', v-model='formstate.purdue', @submit.prevent='onSubmit("purdue")')
-      validate.form-group.container(auto-label, :class='validationStyle(formstate.purdue.purdueUsername, false)')
-        label.col-form-label Username
-        input.form-control(type='text', name='purdueUsername', placeholder='Username', v-model.lazy='purdueUsername', required)
-        field-messages.form-control-feedback(name='purdueUsername', show='$touched || $submitted')
-          div(slot='required') Username is required.
-      validate.form-group.container(auto-label, :class='validationStyle(formstate.purdue.purduePassword, false)')
-        label.col-form-label Password
-        input.form-control(type='password', name='purduePassword', placeholder='Password', v-model.lazy='purduePassword', required)
-        field-messages.form-control-feedback(name='purduePassword', show='$touched || $submitted')
-          div(slot='required') Password is required.
-      .py-2.text-center
-        button.btn.btn-primary(@click='syncCourses')
-          i.fa.fa-user
-          | Login
-    small Note: Meetchu does not store your Purdue information.
+  .modal.fade#sync-course-modal(tabindex='-1', role='dialog', aria-labelledby='syncCoursesModalLabel', aria-hidden='true')
+    .modal-dialog.modal-md
+      .modal-content
+        .modal-header
+          h5.modal-title Create a chat
+          button.close(type='button', data-dismiss='modal', aria-label='Close')
+            span(aria-hidden='true') ×
+        .modal-body
+          p You can enter your Purdue credentials to synchronize your classes.
+          vue-form(:state='formstate.purdue', v-model='formstate.purdue', @submit.prevent='onSubmit("purdue")')
+            validate.form-group.container(auto-label, :class='validationStyle(formstate.purdue.purdueUsername, false)')
+              label.col-form-label Username
+              input.form-control(type='text', name='purdueUsername', placeholder='Username', v-model.lazy='purdueUsername', required)
+              field-messages.form-control-feedback(name='purdueUsername', show='$touched || $submitted')
+                div(slot='required') Username is required.
+            validate.form-group.container(auto-label, :class='validationStyle(formstate.purdue.purduePassword, false)')
+              label.col-form-label Password
+              input.form-control(type='password', name='purduePassword', placeholder='Password', v-model.lazy='purduePassword', required)
+              field-messages.form-control-feedback(name='purduePassword', show='$touched || $submitted')
+                div(slot='required') Password is required.
+            .py-2.text-center
+              button.btn.btn-primary(@click='syncCourses(); hideModal("#sync-course-modal")')
+                i.fa.fa-user
+                | Login
+          small Note: Meetchu does not store your Purdue information.
 </template>
 
 <script>
@@ -177,6 +184,12 @@ export default {
     },
     onSubmit() {
       console.log(this.formstate.purdue.$valid);
+    },
+    showModal(modalId) {
+      $(modalId).modal('show');
+    },
+    hideModal(modalId) {
+      $(modalId).modal('hide');
     },
     validationStyle
   }

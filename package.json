@@ -58,6 +58,7 @@
     "readline-sync": "^1.4.6",
     "sequelize": "^3.30.2",
     "socket.io": "^1.7.3",
+    "style-loader": "^0.16.1",
     "superagent": "^3.4.4",
     "sweetalert2": "^6.6.0",
     "vue-form": "^4.0.0",

@@ -10,6 +10,13 @@ import VueForm from 'vue-form';
 import BootstrapVue from 'bootstrap-vue';
 import VueSocketIO from 'vue-socket.io';
 
+import jQuery from 'jquery';
+import Tether from 'tether';
+window.$ = jQuery;
+window.jQuery = jQuery;
+window.Tether = Tether;
+const Bootstrap = require('bootstrap');
+
 import store from './store';
 import router from './router';
 import sockets from './sockets';
