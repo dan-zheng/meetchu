@@ -20,7 +20,7 @@ User.prototype.updatePassword = function (password) {
 module.exports = {
   object: User,
   query: [
-    `CREATE TABLE IF NOT EXISTS users (
+    `CREATE TABLE IF NOT EXISTS person (
       id INT NOT NULL AUTO_INCREMENT,
       google_id INT,
       facebook_id INT,
@@ -41,24 +41,40 @@ module.exports = {
       UNIQUE (google_id),
       UNIQUE (facebook_id),
       UNIQUE (reset_password_token)
+    )`,
+    `CREATE TABLE IF NOT EXISTS person_course (
+      person_id INT NOT NULL,
+      course_id INT NOT NULL,
+      PRIMARY KEY (person_id, course_id),
+      FOREIGN KEY (person_id)
+        REFERENCES person(id)
+        ON DELETE CASCADE,
+      FOREIGN KEY (course_id)
+        REFERENCES course(id)
+        ON DELETE CASCADE
     )`
-    /*
-    , `CREATE TABLE IF NOT EXISTS user_chat (
-      created_at DATETIME,
+    /*,
+    `CREATE TABLE IF NOT EXISTS person_chat (
+      chat_id INT NOT NULL,
+      person_id INT NOT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      PRIMARY KEY (chat_id, user_id),
       FOREIGN KEY (chat_id)
         REFERENCES chat(id)
         ON DELETE CASCADE,
-      FOREIGN KEY (user_id)
-        REFERENCES user(id)
+      FOREIGN KEY (person_id)
+        REFERENCES person(id)
         ON DELETE CASCADE
     )`,
-    `CREATE TABLE IF NOT EXISTS user_notification (
-      created_at DATETIME,
+    `CREATE TABLE IF NOT EXISTS person_notification (
+      notification_id INT NOT NULL,
+      person_id INT NOT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (notification_id)
         REFERENCES notification(id)
         ON DELETE CASCADE,
-      FOREIGN KEY (user_id)
-        REFERENCES user(id)
+      FOREIGN KEY (person_id)
+        REFERENCES person(id)
         ON DELETE CASCADE
     )`*/
   ]
