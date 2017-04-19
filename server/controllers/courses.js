@@ -1,163 +1,59 @@
 const async = require('async');
 const request = require('superagent');
+
 const models = require('../models');
+const courseDao = require('../dao/course')(models);
 
 /**
- * GET /courses
- * Courses page.
+ * POST /courses
+ * Get a user's courses.
  */
-exports.getCourses = (req, res) => {
-  models.Course.findAll({
-    include: [{
-      model: models.User,
-      where: {
-        id: req.user.dataValues.id
-      }
-    }]
-  }).then((courses) => {
-    courses = courses.map((course) => {
-      return course.dataValues;
-    });
-    return res.render('courses/index', {
-      title: 'Courses',
-      courses
-    });
-  });
+exports.postCourses = (req, res) => {
+  const person = new models.Person(req.body.user);
+  courseDao.findByPerson(person).tap(result =>
+    result.cata(
+      err => res.status(401).json(err),
+      courses => res.status(200).json(courses)
+    )
+  );
 };
 
 /**
- * GET /course/:id
- * Course info page.
+ * POST /course/add
+ * Add a user to a course.
  */
-exports.getCourse = (req, res) => {
-  const courseId = req.params.id;
-  models.Course.findOne({
-    where: {
-      id: courseId
-    },
-    include: [{
-      model: models.User
-    }]
-  }).then((course) => {
-    if (!course) {
-      req.flash('error', 'No course with the specificied id exists.');
-      return res.redirect('/courses');
-    }
-    course = course.dataValues;
-    course.Users = course.Users.map((user) => {
-      return user.dataValues;
-    });
-    return res.render('courses/course', {
-      title: course.Title,
-      course
-    });
-  });
+exports.postCourseAddUser = (req, res) => {
+  const course = req.body.course;
+  const person = new models.Person(req.body.user);
+  courseDao.addPerson(person).tap(result =>
+    result.cata(
+      err => res.status(401).json(err),
+      () => res.status(200).json(true)
+    )
+  );
 };
 
 /**
- * POST /courses/
- * Add a course.
+ * POST /course/remove
+ * Remove a user from a course.
  */
-exports.postAddCourse = (req, res) => {
-  req.assert('courseId', 'Course field is empty.').notEmpty();
-
-  const errors = req.validationErrors();
-  if (errors) {
-    req.flash('error', errors);
-    return res.redirect('/courses');
-  }
-
-  const courseId = req.body.courseId;
-  models.Course.findOne({
-    where: {
-      id: courseId
-    }
-  }).then((course) => {
-    req.user.addCourse(course);
-    req.flash('success', 'Your course has been added.');
-    return res.redirect('/courses');
-  });
+exports.postCourseRemoveUser = (req, res) => {
+  const course = req.body.course;
+  const person = new models.Person(req.body.user);
+  courseDao.removePerson(person).tap(result =>
+    result.cata(
+      err => res.status(401).json(err),
+      () => res.status(200).json(true)
+    )
+  );
 };
 
 /**
- * POST /courses/remove/:course
- * Remove a course.
+ * POST /course/sync
+ * Sync a user's courses using their Purdue credentials.
  */
-exports.postRemoveCourse = (req, res) => {
-  const courseId = req.params.id;
-  models.Course.findById(courseId).then((course) => {
-    if (!course) {
-      req.flash('error', 'Database error: course does not exist.');
-      return res.redirect('/courses');
-    }
-    req.user.removeCourse(course);
-    req.flash('success', 'Your course has been removed.');
-    return res.redirect('/courses');
-  });
-};
-
-/**
- * POST /courses/sync
- * Authenticate with Purdue and add courses.
- */
-exports.postSyncCourses = (req, res, next) => {
-  req.assert('username', 'Purdue username is empty.').notEmpty();
-  req.assert('password', 'Purdue password is empty.').notEmpty();
-
-  const errors = req.validationErrors();
-  if (errors) {
-    req.flash('error', errors);
-    return res.redirect('/chats');
-  }
-
-  const username = req.body.username.replace('@purdue.edu', '');
+exports.postCourseSyncUser = (req, res) => {
+  const course = req.body.course;
+  const username = req.body.username;
   const password = req.body.password;
-  const encodedString = Buffer.from(`${username}:${password}`).toString('base64');
-
-  request
-  .get('https://api-dev.purdue.io/Student/Schedule')
-  .auth(username, password)
-  .then((res2) => {
-    const term = 'spring 2017';
-    const courses = res2.body[term];
-    async.each(courses, ((courseID, callback2) => {
-      request
-      .get('https://api.purdue.io/odata/Sections')
-      .query({
-        $filter: `SectionId eq ${courseID}`,
-        $expand: 'Class($expand=Course)'
-      })
-      .then((res3) => {
-        const section = res3.body.value[0];
-        const _class = section.Class;
-        const course = _class.Course;
-        models.Course.findOne({
-          where: {
-            id: course.CourseId
-          }
-        }).then((_course) => {
-          req.user.addCourse(_course);
-          callback2(null);
-        }).catch((err) => {
-          callback2(err);
-        });
-      })
-      .catch((err) => {
-        callback2(err);
-      });
-    }), ((err) => {
-      // If error
-      if (err) {
-        req.flash('error', 'A database error occured. Please try again.');
-        return res.redirect('/courses');
-      }
-      // If success
-      req.flash('success', 'Your Purdue courses have been added successfully.');
-      return res.redirect('/courses');
-    }));
-  })
-  .catch((err) => {
-    req.flash('error', 'Your Purdue credentials are invalid. Please try again.');
-    return res.redirect('/courses');
-  });
 };

@@ -11,21 +11,21 @@ const getters = {
 
 const actions = {
   initCourses({ commit, rootState }) {
-    return Vue.axios.post('/courses', { userId: rootState.user.id })
+    return Vue.axios.post('/courses', { user: rootState.user })
       .then(res => commit(types.SET_COURSES, res.data))
       .catch((err) => {
         throw err;
       });
   },
   addCourse({ commit, rootState }, { course }) {
-    return Vue.axios.post('/courses/add', { course, userId: rootState.user.id })
+    return Vue.axios.post('/courses/add', { course, user: rootState.user })
       .then(res => commit(types.ADD_COURSE, res.data))
       .catch((err) => {
         throw err;
       });
   },
   removeCourse({ commit, rootState }, { course }) {
-    return Vue.axios.post(`/courses/${course.id}/remove`, { userId: rootState.user.id })
+    return Vue.axios.post(`/courses/remove`, { course, user: rootState.user })
       .then(res => commit(types.REMOVE_COURSE, course))
       .catch((err) => {
         throw err;
@@ -33,7 +33,7 @@ const actions = {
   },
   syncCourses({ commit, rootState }, { username, password }) {
     return Vue.axios.post(`/courses/sync`, {
-      userId: rootState.user.id,
+      user: rootState.user,
       username,
       password
     })
