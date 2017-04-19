@@ -8,7 +8,6 @@ module.exports = {
       FOREIGN KEY (sender_id)
         REFERENCES person(id)
         ON DELETE CASCADE
-
     )`
   ]
 };

@@ -8,13 +8,13 @@ module.exports = models => ({
   /**
    * @return Promise[Either[String, List[Course]]]
    */
-  findByPerson(user) {
+  findByPerson(person) {
     return models.pool.query(
-      `SELECT * FROM course
+      `SELECT course.* FROM course
         JOIN person_course
         ON course_id = id
         WHERE person_id = ?
-        ORDER BY \`subject\` DESC, number DESC`, [user.id])
+        ORDER BY \`subject\` DESC, number DESC`, [person.id])
       .then(result => Either.Right(result.list()))
       .errorToLeft();
   },
