@@ -41,10 +41,12 @@ module.exports = {
       UNIQUE (google_id),
       UNIQUE (facebook_id),
       UNIQUE (reset_password_token)
-    )`
-    /*
-    , `CREATE TABLE IF NOT EXISTS user_chat (
+    )`,
+    `CREATE TABLE IF NOT EXISTS user_chat (
       created_at DATETIME,
+      chat_id INT NOT NULL,
+      user_id INT NOT NULL,
+      PRIMARY KEY (chat_id, user_id),
       FOREIGN KEY (chat_id)
         REFERENCES chat(id)
         ON DELETE CASCADE,
@@ -60,6 +62,6 @@ module.exports = {
       FOREIGN KEY (user_id)
         REFERENCES user(id)
         ON DELETE CASCADE
-    )`*/
+    )`
   ]
 };
