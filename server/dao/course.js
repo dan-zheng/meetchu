@@ -29,12 +29,7 @@ module.exports = models => ({
       .then(result => Either.Right(result.affectedRows))
       .errorToLeft();
   },
-  findByCourseId(id) {
-    return models.pool.query('SELECT * FROM course WHERE id = ?', [id])
-      .then(result => Either.Right(result.affectedRows))
-      .errorToLeft();
-  },
-  findByCourseIds(ids) {
-    return Promise.all(ids.map(id => this.findByCourseId(id)));
+  findPeople(course) {
+    return null;
   }
 });
