@@ -139,15 +139,11 @@ exports.postUpdateAccount = (req, res) => {
  * Get user public profile.
  */
 exports.getProfile = (req, res) => {
-  const user = new models.User(req.body.user);
-  const fields = req.body.fields;
-
-  user.updatePassword(user.password);
-
-  userDao.update(user, fields).tap(result =>
+  const id = req.body.id;
+  userDao.findById(id).tap(result =>
     result.cata(
       err => res.status(401).json(err),
-      wasUpdated => res.status(200).json(user)
+      user => res.status(200).json(user)
     )
   );
 };
