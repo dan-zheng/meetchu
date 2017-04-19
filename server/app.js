@@ -51,7 +51,7 @@ const sessionStore = new MySQLStore({
   password: process.env.DB_PASS,
   database: process.env.DB_NAME,
   schema: {
-    tableName: 'Sessions'
+    tableName: 'sessions'
   }
 });
 
@@ -203,8 +203,17 @@ io.on('connection', (socket) => {
  */
 models.sync();
 const userDao = require('./dao/user')(models);
+const courseDao = require('./dao/course')(models);
 
 /*
+userDao.findByEmail('era878@gmail.com').then((maybeUser) => {
+  maybeUser.map((user) => {
+    return courseDao.findByPerson(user).then((courses) => {
+      console.log(courses);
+    });
+  });
+});
+
 userDao.signup({ email: 'era878@gmail.com', first_name: 'Eric', last_name: 'Aguilera', password: 'asdf' })
 .then((result) => {
   console.log(result);
