@@ -10,7 +10,7 @@
           img(src='static/img/icon-purdue.svg', style='height: 18px')
     #courses-list
       .list-group
-        .list-group-item.list-group-item-action.course.rounded-0.border(v-for='course in sortedCourses', :key='course.uuid', v-bind:class='{ active: currentCourse == course }', @click='setCurrentCourse(course)')
+        .list-group-item.list-group-item-action.course.rounded-0.border(v-for='course in sortedCourses', :key='course.id', v-bind:class='{ active: currentCourse == course }', @click='setCurrentCourse(course)')
           .d-flex.w-100.justify-content-between
             h5.mb-1 {{ course.subject + ' ' + course.number }}
           p.mb-1

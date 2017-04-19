@@ -85,19 +85,6 @@ exports.postSignup = (req, res, next) => {
 };
 
 /**
- * GET /login
- * Login page.
- */
-exports.getLogin = (req, res) => {
-  if (req.user) {
-    return res.redirect('/');
-  }
-  return res.render('account/login', {
-    title: 'Login'
-  });
-};
-
-/**
  * POST /login
  * User login.
  */

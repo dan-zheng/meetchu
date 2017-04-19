@@ -15,6 +15,10 @@ exports.loginCallback = ((strategy, req, res, next) => {
       req.flash('error', err);
       return res.status(401).json(err);
     }
+    const hiddenFields = ['password', 'confirmPassword'];
+    hiddenFields.forEach((field) => {
+      delete user[field];
+    });
     return res.status(200).json(user);
   })(req, res, next);
 });
