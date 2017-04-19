@@ -16,12 +16,16 @@
           p.mb-1
             strong {{ course.title }}
   #current-course.d-flex.flex-column.col-sm-8.px-0(v-model='currentCourse')
-    .page-header
-      h2.text-center.my-2(style='height: 35px')
-        span(v-if='!!currentCourse.subject') {{ currentCourse.subject + ' ' + currentCourse.number }}
+    h2.text-center.my-2(style='min-height: 35px')
+      span(v-if='!!currentCourse.subject') {{ currentCourse.subject + ' ' + currentCourse.number }}
     #users-list
+      h4.subtitle.text-center.py-2.my-0 Students
       b-list-group
-        b-list-group-item.user.rounded-0.border(v-for='user in currentCourse.users', :key='user.email') {{ user }}
+        // p(v-if='!currentCourse || !currentCourse.users || currentCourse.users.length === 0') There are no users.
+        b-list-group-item.user.rounded-0.border(v-for='user in currentCourse.users', :key='user.email')
+          .d-flex.w-100.mx-1.justify-content-between.align-items-center
+            h5.mb-0 {{ user.first_name + ' ' + user.last_name }}
+            small.text-right {{ user.email }}
 
   //- Modals
   b-modal#add-course-modal(title='Add a course', @shown='clear(["courseHits", "courseQuery"])', hide-footer)
@@ -96,7 +100,7 @@ export default {
   },
   methods: {
     addCourse(course) {
-      if (courses.findIndex(c => c.id === course.id) !== -1) {
+      if (this.courses.findIndex(c => c.id === course.id) !== -1) {
         console.log(`Course ${c.id} has already been added`);
         return false;
       }
@@ -210,6 +214,10 @@ export default {
   border-top: 1px solid $grid-border-color;
   border-radius: 0;
   overflow-y: scroll;
+}
+
+.subtitle {
+  border-bottom: 1px solid $grid-border-color;
 }
 
 #courses-list,

@@ -203,13 +203,19 @@ const courseDao = require('./dao/course')(models);
 const chatDao = require('./dao/chat')(models);
 
 /*
-courseDao.findPeopleByCourseId('a456072d-13db-4946-a74a-3fbb74a00683')
+const course = {
+  id: '001aac29-ed19-4f3f-855c-1c751c4c79c2'
+};
+courseDao.findPeopleByCourse(course)
 .tap((result) => {
   result.cata(
     err => console.log(err),
-    personList => console.log(personList)
-  )
+    personList => console.log(personList.toArray())
+  );
 });
+*/
+
+/*
 
 personDao.findByEmail('era878@gmail.com').tap((maybePerson) => {
   maybePerson.map((person) => {
