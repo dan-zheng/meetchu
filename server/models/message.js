@@ -4,14 +4,14 @@ module.exports = {
     `CREATE TABLE IF NOT EXISTS message(
       id INT AUTO_INCREMENT,
       sender_id INT NOT NULL,
-      group_id INT NOT NULL,
+      chat_id INT NOT NULL,
       message VARCHAR(255) NOT NULL,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       PRIMARY KEY (id),
       FOREIGN KEY (sender_id)
-        REFERENCES user(id)
-      FOREIGN KEY (group_id)
-        REFERENCES group(id)
+        REFERENCES person(id),
+      FOREIGN KEY (chat_id)
+        REFERENCES chat(id)
     )`
   ]
 };

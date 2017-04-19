@@ -28,7 +28,7 @@ if (debugging) {
 }
 
 const dirs = [__dirname];
-const valid = ['user.js', 'course.js', 'invitation.js'];//, 'message.js', 'chat.js', 'notification.js'];
+const valid = ['user.js', 'course.js', 'invitation.js', 'message.js', 'chat.js', 'notification.js'];
 // Flatten and filter directory files
 const files = [].concat.apply([], dirs.map(dir =>
   fs.readdirSync(dir)

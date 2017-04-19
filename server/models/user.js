@@ -57,7 +57,7 @@ module.exports = {
       created_at DATETIME,
       chat_id INT NOT NULL,
       person_id INT NOT NULL,
-      PRIMARY KEY (chat_id, user_id),
+      PRIMARY KEY (chat_id, person_id),
       FOREIGN KEY (chat_id)
         REFERENCES chat(id)
         ON DELETE CASCADE,

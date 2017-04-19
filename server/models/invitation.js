@@ -9,7 +9,7 @@ module.exports = {
         REFERENCES chat(id)
         ON DELETE CASCADE,
       FOREIGN KEY (sender_id)
-        REFERENCES users(id)
+        REFERENCES person(id)
         ON DELETE CASCADE
     )`
   ]
