@@ -135,7 +135,6 @@ if (process.env.NODE_ENV === 'production') {
 app.get('/', homeController.index);
 app.get('/signup', userController.getSignup);
 app.post('/signup', userController.postSignup);
-app.get('/login', userController.getLogin);
 app.post('/login', userController.postLogin);
 app.get('/logout', userController.getLogout);
 app.post('/account/update', userController.postUpdateAccount);

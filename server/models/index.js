@@ -28,8 +28,8 @@ if (debugging) {
 }
 
 const dirs = [__dirname];
-const valid = ['user.js', 'course.js', 'invitation.js', 'message.js', 'chat.js', 'notification.js'];
-//TODO: invitation.js requires new foriegn key for when chats are made
+const valid = ['person.js', 'course.js', 'invitation.js', 'message.js', 'chat.js', 'notification.js'];
+// TODO: invitation.js requires new foriegn key for when chats are made
 
 // Flatten and filter directory files
 const files = [].concat.apply([], dirs.map(dir =>

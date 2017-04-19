@@ -11,7 +11,7 @@
             img(src='static/img/icon-purdue.svg', style='height: 18px')
       #meetings-list
         .list-group
-          .list-group-item.list-group-item-action.meeting.rounded-0.border(v-for='meeting in sortedMeetings', :key='meeting.uuid', v-bind:class='{ active: currentMeeting == meeting }', @click='setCurrentMeeting(meeting)')
+          .list-group-item.list-group-item-action.meeting.rounded-0.border(v-for='meeting in sortedMeetings', :key='meeting.id', v-bind:class='{ active: currentMeeting == meeting }', @click='setCurrentMeeting(meeting)')
             .d-flex.w-100.justify-content-between
               h5.mb-1 {{ meeting.subject + ' ' + meeting.number }}
             p.mb-1

@@ -10,7 +10,7 @@
           img(src='static/img/icon-purdue.svg', style='height: 18px')
     #courses-list
       .list-group
-        .list-group-item.list-group-item-action.course.rounded-0.border(v-for='course in sortedCourses', :key='course.uuid', v-bind:class='{ active: currentCourse == course }', @click='setCurrentCourse(course)')
+        .list-group-item.list-group-item-action.course.rounded-0.border(v-for='course in sortedCourses', :key='course.id', v-bind:class='{ active: currentCourse == course }', @click='setCurrentCourse(course)')
           .d-flex.w-100.justify-content-between
             h5.mb-1 {{ course.subject + ' ' + course.number }}
           p.mb-1
@@ -65,7 +65,7 @@ import { courseIndex } from '../services/algolia';
 import { validationStyle } from '../services/form';
 
 const course = {
-  uuid: '8dd62248-6424-4e33-a745-852fdd31c78a',
+  id: '8dd62248-6424-4e33-a745-852fdd31c78a',
   title: 'Software Engineering I',
   courseID: 'CS 30700',
   subject: 'CS',
@@ -116,7 +116,7 @@ export default {
   },
   methods: {
     addCourse(course) {
-      if (courses.findIndex(c => c.uuid === course.uuid) !== -1) {
+      if (courses.findIndex(c => c.id === course.id) !== -1) {
         console.log(`Course ${c.courseID} has already been added`);
         return false;
       }
@@ -163,9 +163,9 @@ export default {
       courseIndex.search(query, {
         hitsPerPage: 5
       }, (error, results) => {
-        const filteredHits = results.hits.filter(el => this.courses.findIndex(c => c.uuid === el.objectID) === -1);
+        const filteredHits = results.hits.filter(el => this.courses.findIndex(c => c.id === el.objectID) === -1);
         filteredHits.forEach((el) => {
-          el.uuid = el.objectID;
+          el.id = el.objectID;
           delete el.objectID;
           delete el._highlightResult;
           return el;

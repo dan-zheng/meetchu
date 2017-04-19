@@ -23,6 +23,8 @@ exports.postCourses = (req, res) => {
  * Add a user to a course.
  */
 exports.postCourseAddUser = (req, res) => {
+  console.log(req.body.course);
+  console.log(req.body.user);
   const course = req.body.course;
   const person = new models.Person(req.body.user);
   courseDao.addPerson(person).tap(result =>
