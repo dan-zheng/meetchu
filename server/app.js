@@ -198,33 +198,26 @@ io.on('connection', (socket) => {
  * Create any missing database tables and start Express server.
  */
 models.sync();
+
+/* Testing Playground */
 const personDao = require('./dao/person')(models);
 const courseDao = require('./dao/course')(models);
 const chatDao = require('./dao/chat')(models);
 
 /*
-const course = {
-  id: '001aac29-ed19-4f3f-855c-1c751c4c79c2'
-};
-courseDao.findPeopleByCourse(course)
+// Bulk Course Insertions
+personDao.findByEmail('era878@gmail.com')
 .tap((result) => {
-  result.cata(
-    err => console.log(err),
-    personList => console.log(personList.toArray())
-  );
-});
-*/
-
-/*
-
-personDao.findByEmail('era878@gmail.com').tap((maybePerson) => {
-  maybePerson.map((person) => {
-    chatDao.getChatList(person).then((result) => {
-      result.cata(
-        err => console.log(err),
-        chatList => console.log(chatList.toArray())
-      )
-    });
+  result.map((person) => {
+    const courses = [
+      { id: '0005ee03-21c1-4662-bc83-c7e9ccdadbff' },
+      { id: '001aac29-ed19-4f3f-855c-1c751c4c79c2' },
+      { id: '0020ac32-74c1-47d5-ad32-af801e14be46' }
+    ];
+    courseDao.addPersonBulk(courses, person)
+    .tap((result) => {
+      console.log(result);
+    })
   });
 });
 */

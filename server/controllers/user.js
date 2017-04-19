@@ -108,10 +108,11 @@ exports.getLogout = (req, res) => {
  * Update account information.
  */
 exports.postUpdateAccount = (req, res) => {
-  const person = new models.Person(req.body.user);
   const fields = req.body.fields;
-
-  person.updatePassword(person.password);
+  const password = req.body.user.password;
+  const person = password ?
+    new models.Person(req.body.user).withPassword(password) :
+    new models.Person(req.body.user);
 
   personDao.update(person, fields).tap(result =>
     result.cata(
@@ -128,11 +129,11 @@ exports.postUpdateAccount = (req, res) => {
 exports.getProfile = (req, res) => {
   const person = new models.Person(req.body.user);
   const fields = req.body.fields;
-  
+
   personDao.findById(person, fields).tap(result =>
     result.cata(
       err => res.status(401).json(err),
-      wasUpdated => res.status(200).json(person)
+      foundPerson => res.status(200).json(foundPerson)
     )
   );
 };

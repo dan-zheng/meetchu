@@ -19,18 +19,17 @@ module.exports = models => ({
       .errorToLeft();
   },
   /**
-   * @return Promise[Either[String, List[Integer]]]
+   * @return Promise[Either[String, Integer]]
    */
-  addPerson(course, person) {
+  addPersonBulk(courses, person) {
+    const values = courses.map(course => [person.id, course.id]);
     return models.pool.query(
-      `INSERT INTO person_course
-        (person_id, course_id)
-        VALUES (?, ?)`, [person.id, course.id])
+      'INSERT INTO person_course (person_id, course_id) VALUES ?', [values])
       .then(result => Either.Right(result.affectedRows))
       .errorToLeft();
   },
   /**
-   * @return Promise[Either[String, List[Integer]]]
+   * @return Promise[Either[String, Integer]]
    */
   removePerson(course, person) {
     return models.pool.query(
