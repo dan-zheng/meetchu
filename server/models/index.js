@@ -64,9 +64,13 @@ function sync() {
   console.log('Creating database tables.');
   fileExports.forEach((model) => {
     if (model.query) {
-      model.query.forEach((query) => {
-        executeQuery(query);
-      });
+      model.query.forEach(query => executeQuery(query));
+    }
+  });
+  console.log('Creating junction tables.');
+  fileExports.forEach((model) => {
+    if (model.joins) {
+      model.joins.forEach(query => executeQuery(query));
     }
   });
 }

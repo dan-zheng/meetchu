@@ -49,5 +49,5 @@ module.exports = models => ({
         WHERE course_id = ?`, [id])
       .then(rows => Either.Right(rows.list().map(person => new models.Person(person))))
       .errorToLeft();
-    }
+  }
 });

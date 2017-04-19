@@ -41,7 +41,9 @@ module.exports = {
       UNIQUE (google_id),
       UNIQUE (facebook_id),
       UNIQUE (reset_password_token)
-    )`,
+    )`
+  ],
+  join: [
     `CREATE TABLE IF NOT EXISTS person_course (
       person_id INT NOT NULL,
       course_id CHAR(36) NOT NULL,

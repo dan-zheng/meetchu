@@ -5,7 +5,7 @@ module.exports = {
       title VARCHAR(255) NOT NULL,
       subject VARCHAR(255) NOT NULL,
       number VARCHAR(255) NOT NULL,
-      description VARCHAR(255) NOT NULL,
+      description TEXT NOT NULL,
       credit_hours TINYINT(2) NOT NULL,
       PRIMARY KEY (id)
     )`
