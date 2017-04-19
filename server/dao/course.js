@@ -21,6 +21,12 @@ module.exports = models => ({
   /**
    * @return Promise[Either[String, Integer]]
    */
+  addPerson(course, person) {
+    return this.addPersonBulk([course], person);
+  },
+  /**
+   * @return Promise[Either[String, Integer]]
+   */
   addPersonBulk(courses, person) {
     const values = courses.map(course => [person.id, course.id]);
     return models.pool.query(

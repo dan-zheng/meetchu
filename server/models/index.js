@@ -45,12 +45,10 @@ const files = [].concat.apply([], dirs.map(dir =>
 const fileExports = files.map(file => require(file));
 
 function withModels(models) {
-  fileExports.forEach((model) => {
-    if (model.object) {
-      models[model.object.name] = model.object;
-    }
-  });
-  return models;
+  const src = fileExports
+    .filter(model => model.object)
+    .map(model => ({ [model.object.name]: model.object }));
+  return Object.assign(models, src);
 }
 
 function executeQuery(query) {
@@ -62,17 +60,11 @@ function executeQuery(query) {
 
 function sync() {
   console.log('Creating database tables.');
-  fileExports.forEach((model) => {
-    if (model.query) {
-      model.query.forEach(query => executeQuery(query));
-    }
-  });
+  fileExports.filter(model => model.query)
+    .forEach(model => model.query.forEach(query => executeQuery(query)));
   console.log('Creating junction tables.');
-  fileExports.forEach((model) => {
-    if (model.join) {
-      model.join.forEach(query => executeQuery(query));
-    }
-  });
+  fileExports.filter(model => model.join)
+    .forEach(model => model.join.forEach(query => executeQuery(query)));
 }
 
 module.exports = withModels({ pool, sync });
