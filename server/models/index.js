@@ -47,7 +47,8 @@ const fileExports = files.map(file => require(file));
 function withModels(models) {
   const src = fileExports
     .filter(model => model.object)
-    .map(model => ({ [model.object.name]: model.object }));
+    .map(model => ({ [model.object.name]: model.object }))
+    .reduce((prev, curr) => Object.assign(prev, curr), {});
   return Object.assign(models, src);
 }
 
