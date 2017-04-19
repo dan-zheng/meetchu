@@ -67,6 +67,8 @@ module.exports = {
     )`,
     `CREATE TABLE IF NOT EXISTS person_notification (
       created_at DATETIME,
+      notification_id INT NOT NULL,
+      person_id INT NOT NULL,
       FOREIGN KEY (notification_id)
         REFERENCES notification(id)
         ON DELETE CASCADE,
