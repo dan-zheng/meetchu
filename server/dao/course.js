@@ -30,7 +30,7 @@ module.exports = models => ({
   addPersonBulk(courses, person) {
     const values = courses.map(course => [person.id, course.id]);
     return models.pool.query(
-      'INSERT INTO person_course (person_id, course_id) VALUES ?', [values])
+      'INSERT IGNORE INTO person_course (person_id, course_id) VALUES ?', [values])
       .then(result => Either.Right(result.affectedRows))
       .errorToLeft();
   },

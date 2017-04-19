@@ -153,7 +153,7 @@ app.post('/courses', courseController.postCourses);
 app.post('/course/users', courseController.postCourseUsers);
 app.post('/course/add', courseController.postCourseAddUser);
 app.post('/course/remove/', courseController.postCourseRemoveUser);
-app.post('/courses/sync', courseController.postCourseSyncUser);
+app.post('/courses/sync', courseController.postCoursesSyncUser);
 
 app.get('/meetings', meetingController.getMeetings);
 app.get('/meetings/:id', meetingController.getMeeting);
@@ -206,20 +206,20 @@ const chatDao = require('./dao/chat')(models);
 
 /*
 // Bulk Course Insertions
-personDao.findByEmail('era878@gmail.com')
-.tap((result) => {
-  result.map((person) => {
-    const courses = [
-      { id: '0005ee03-21c1-4662-bc83-c7e9ccdadbff' },
-      { id: '001aac29-ed19-4f3f-855c-1c751c4c79c2' },
-      { id: '0020ac32-74c1-47d5-ad32-af801e14be46' }
-    ];
-    courseDao.addPersonBulk(courses, person)
-    .tap((result) => {
-      console.log(result);
-    })
+personDao.findByEmail('a@a.com')
+  .tap((result) => {
+    result.map((person) => {
+      const courses = [
+        { id: '0005ee03-21c1-4662-bc83-c7e9ccdadbff' },
+        { id: '001aac29-ed19-4f3f-855c-1c751c4c79c2' },
+        { id: '0020ac32-74c1-47d5-ad32-af801e14be46' }
+      ];
+      courseDao.addPersonBulk(courses, person)
+        .tap((result) => {
+          console.log(result);
+        });
+    });
   });
-});
 */
 
 http.listen(app.get('port'), () => {

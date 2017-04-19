@@ -17,10 +17,10 @@
             strong {{ course.title }}
   #current-course.d-flex.flex-column.col-sm-8.px-0(v-model='currentCourse')
     h2.text-center.my-2(style='min-height: 35px')
-      span(v-if='!!currentCourse.subject') {{ currentCourse.subject + ' ' + currentCourse.number }}
+      span(v-if='typeof currentCourse !== "undefined"') {{ currentCourse.subject + ' ' + currentCourse.number }}
     #users-list
       h4.subtitle.text-center.py-2.my-0 Students
-      b-list-group
+      b-list-group(v-if='typeof currentCourse !== "undefined"')
         // p(v-if='!currentCourse || !currentCourse.users || currentCourse.users.length === 0') There are no users.
         b-list-group-item.user.rounded-0.border(v-for='user in currentCourse.users', :key='user.email')
           .d-flex.w-100.mx-1.justify-content-between.align-items-center
@@ -96,6 +96,8 @@ export default {
     this.$store.dispatch('getCourses')
       .then(() => {
         this.currentCourse = this.courses[0];
+        console.log(this.courses);
+        console.log(!!this.currentCourse);
       });
   },
   methods: {
@@ -134,6 +136,7 @@ export default {
         })
         .catch(swal.noop);
       }).catch((e) => {
+        console.log(e);
         console.log(`Sync courses fail.`);
         // Alert message
         swal({

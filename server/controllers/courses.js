@@ -63,58 +63,57 @@ exports.postCourseRemoveUser = (req, res) => {
 };
 
 /**
- * POST /course/sync
+ * POST /courses/sync
  * Sync a user's courses using their Purdue credentials.
  */
-exports.postCourseSyncUser = (req, res) => {
-  const user = req.body.user;
+exports.postCoursesSyncUser = (req, res) => {
+  const person = new models.Person(req.body.user);
   const username = req.body.username.replace('@purdue.edu', '');
   const password = req.body.password;
   const encodedString = Buffer.from(`${username}:${password}`).toString('base64');
 
   request
-    .get('https://api-dev.purdue.io/Student/Schedule')
-    .auth(username, password)
-    .then((res1) => {
-      const term = 'spring 2017';
-      const courses = res1.body[term];
-      async.each(courses, ((courseID, callback) => {
-        request
-        .get('https://api.purdue.io/odata/Sections')
-        .query({
-          $filter: `SectionId eq ${courseID}`,
-          $expand: 'Class($expand=Course)'
-        })
-        .then((res2) => {
-          const section = res2.body.value[0];
-          const _class = section.Class;
-          const course = _class.Course;
-          models.Course.findOne({
-            where: {
-              id: course.CourseId
-            }
-          }).then((_course) => {
-            req.user.addCourse(_course);
-            callback(null);
-          }).catch((err) => {
-            callback(err);
-          });
-        })
-        .catch((err) => {
-          callback(err);
-        });
-      }), ((err) => {
-        // If error
-        if (err) {
-          req.flash('error', 'A database error occured. Please try again.');
-          return res.status(401).json('A database error occured. Please try again.');
-        }
-        // If success
-        req.flash('success', 'Your Purdue courses have been added successfully.');
-        return res.status(200).json(true);
-      }));
-    })
-    .catch((err) => {
-      return res.status(401).json('Your Purdue credentials are invalid. Please try again.');
-    });
+  .get('https://api-dev.purdue.io/Student/Schedule')
+  .auth(username, password)
+  .then((res1) => {
+    const term = 'spring 2017';
+    const courses = res1.body[term];
+    async.each(courses, ((sectionId, callback) => {
+      request
+      .get('https://api.purdue.io/odata/Sections')
+      .query({
+        $filter: `SectionId eq ${sectionId}`,
+        $expand: 'Class($expand=Course)'
+      })
+      .then((res2) => {
+        const course = {
+          id: res2.body.value[0].Class.Course.CourseId
+        };
+        courseDao.addPerson(course, person).tap(result =>
+          result.cata(
+            err => callback(err),
+            () => callback(null)
+          )
+        );
+      })
+      .catch((err) => {
+        callback(err);
+      });
+    }), ((err) => {
+      // If error
+      if (err) {
+        req.flash('error', 'A database error occured. Please try again.');
+        return res.status(401).json('A database error occured. Please try again.');
+      }
+      // If success
+      req.flash('success', 'Your Purdue courses have been added successfully.');
+      courseDao.findByPerson(person).tap(result =>
+        result.cata(
+          err1 => res.status(401).json(err1),
+          courses1 => res.status(200).json(courses1.toArray())
+        )
+      );
+    }));
+  })
+  .catch(err => res.status(401).json('Your Purdue credentials are invalid. Please try again.'));
 };
