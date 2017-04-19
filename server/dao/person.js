@@ -66,7 +66,8 @@ module.exports = models => ({
         }
         const personWithId = Object.assign(personWithHash, { id: result.insertId });
         return Either.Right(personWithId);
-      });
+      })
+      .errorToLeft();
   },
   /**
    * Inserts or updates the person's first_name, last_name, last_login
