@@ -69,8 +69,8 @@ function sync() {
   });
   console.log('Creating junction tables.');
   fileExports.forEach((model) => {
-    if (model.joins) {
-      model.joins.forEach(query => executeQuery(query));
+    if (model.join) {
+      model.join.forEach(query => executeQuery(query));
     }
   });
 }
