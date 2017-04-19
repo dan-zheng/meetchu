@@ -77,7 +77,7 @@ passport.use('signup', new LocalStrategy({
   usernameField: 'email',
   passReqToCallback: true
 }, (req, email, password, done) => {
-  userDao.signup({
+  personDao.signup({
     email: req.body.email,
     first_name: req.body.firstName,
     last_name: req.body.lastName,
@@ -93,7 +93,7 @@ passport.use('signup', new LocalStrategy({
 passport.use('login', new LocalStrategy({
   usernameField: 'email',
 }, (email, password, done) => {
-  userDao.loginWithEmail({ email, password })
+  personDao.loginWithEmail({ email, password })
   .tap((result) => {
     result.cata(
       err => done(err, null),
