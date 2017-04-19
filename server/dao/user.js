@@ -28,7 +28,7 @@ module.exports = models => ({
    * @return {Promise} Maybe[User]
    */
   findById(id) {
-    return models.pool.query('SELECT * FROM users WHERE id = ? LIMIT 1', [id])
+    return models.pool.query('SELECT * FROM person WHERE id = ? LIMIT 1', [id])
       .then(rows => rows.list().headMaybe().map(user => new models.User(user)));
   },
   /**
@@ -37,7 +37,7 @@ module.exports = models => ({
    * @return {Maybe} Maybe[User]
    */
   findByEmail(email) {
-    return models.pool.query('SELECT * FROM users WHERE email = ? LIMIT 1', [email])
+    return models.pool.query('SELECT * FROM person WHERE email = ? LIMIT 1', [email])
       .then(rows => rows.list().headMaybe().map(user => new models.User(user)));
   },
   /**
@@ -52,7 +52,7 @@ module.exports = models => ({
     const hash = user.genPasswordHash(identity.password);
     const userWithHash = Object.assign(user, { password: hash });
     return models.pool.query(
-      `INSERT IGNORE INTO users
+      `INSERT IGNORE INTO person
         (email, first_name, last_name, password)
         VALUES(?, ?, ?, ?)`,
       [identity.email, identity.first_name, identity.last_name, hash])
@@ -73,7 +73,7 @@ module.exports = models => ({
    * @return {Promise} Maybe[Left]
    */
   externalLogin(identity) {
-    return models.pool.query(`INSERT INTO users
+    return models.pool.query(`INSERT INTO person
       (email, first_name, last_name, google_id, facebook_id)
       VALUES (?, ?, ?, ?, ?)
       ON DUPLICATE KEY UPDATE
@@ -104,18 +104,18 @@ module.exports = models => ({
     const keys = fields || Object.keys(user);
     const values = keys.map(key => user[key]);
     const updates = keys.map(key => `${key} = ?`).join(', ');
-    const query = ['UPDATE users', `SET ${updates}`, 'WHERE id = ?'].join('\n\t');
+    const query = ['UPDATE person', `SET ${updates}`, 'WHERE id = ?'].join('\n\t');
     return models.pool.query(query, [...values, user.id])
       .then(result => Either.Right(result.affectedRows))
       .errorToLeft();
   },
   erase(user) {
-    return models.pool.query(`DELETE FROM users WHERE id = ?`, [user.id])
+    return models.pool.query(`DELETE FROM person WHERE id = ?`, [user.id])
       .then(result => Either.Right(result.affectedRows))
       .errorToLeft();
   },
   updateLastLogin(user) {
-    return models.pool.query(`UPDATE users
+    return models.pool.query(`UPDATE person
       SET last_login = CURRENT_TIMESTAMP
       WHERE id = ?`, [user.id])
     .then(result => Either.Right(result.affectedRows))

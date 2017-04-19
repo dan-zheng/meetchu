@@ -20,7 +20,7 @@ User.prototype.updatePassword = function (password) {
 module.exports = {
   object: User,
   query: [
-    `CREATE TABLE IF NOT EXISTS users (
+    `CREATE TABLE IF NOT EXISTS person (
       id INT NOT NULL AUTO_INCREMENT,
       google_id INT,
       facebook_id INT,
@@ -42,7 +42,16 @@ module.exports = {
       UNIQUE (facebook_id),
       UNIQUE (reset_password_token)
     )`,
-    `CREATE TABLE IF NOT EXISTS user_chat (
+    `CREATE TABLE IF NOT EXISTS person_course (
+      user_id INT NOT NULL,
+      course_id INT NOT NULL,
+      PRIMARY KEY (user_id, course_id),
+      FOREIGN KEY (user_id)
+        REFERENCES person(id),
+      FOREIGN KEY (course_id)
+        REFERENCES course(id)
+    )`,
+    `CREATE TABLE IF NOT EXISTS person_chat (
       created_at DATETIME,
       chat_id INT NOT NULL,
       user_id INT NOT NULL,
@@ -54,7 +63,7 @@ module.exports = {
         REFERENCES user(id)
         ON DELETE CASCADE
     )`,
-    `CREATE TABLE IF NOT EXISTS user_notification (
+    `CREATE TABLE IF NOT EXISTS person_notification (
       created_at DATETIME,
       FOREIGN KEY (notification_id)
         REFERENCES notification(id)
