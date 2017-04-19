@@ -25,8 +25,21 @@ module.exports = models => ({
     .then(result => Either.Right(result.list()))
     .errorToLeft();
   },
-  findChat(chat) {
-
+  findChatMessages(chat, max) {
+    return models.pool.query(`
+      SELECT * FROM (
+        SELECT chat.name, person.first_name, person.last_name, message.message, message.time_sent
+        FROM chat
+        JOIN message
+        ON chat.id = message.chat_id
+        JOIN person
+        ON message.sender_id = person.id
+        WHERE chat.id = ?
+        ORDER BY message.time_sent DESC
+        LIMIT ?) messages
+      ORDER BY messages.time_sent ASC`, [chat.id, max])
+    .then(result => Either.Right(result.list()))
+    .errorToLeft();
   },
   findByPerson(person) {
     return models.pool.query(
