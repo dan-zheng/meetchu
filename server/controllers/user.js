@@ -128,9 +128,7 @@ exports.postUpdateAccount = (req, res) => {
 exports.getProfile = (req, res) => {
   const person = new models.Person(req.body.user);
   const fields = req.body.fields;
-
-  person.updatePassword(person.password);
-
+  
   personDao.findById(person, fields).tap(result =>
     result.cata(
       err => res.status(401).json(err),

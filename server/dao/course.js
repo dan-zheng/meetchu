@@ -42,12 +42,12 @@ module.exports = models => ({
   /**
    * @return Promise[Either[String, List[Person]]]
    */
-  findPeopleByCourse(course) {
+  findPeopleByCourseId(id) {
     return models.pool.query(
-      `SELECT * FROM person
+      `SELECT person.* FROM person
         JOIN person_course
         ON person_id = person.id
-        WHERE course_id = ?`, [course.id])
+        WHERE course_id = ?`, [id])
       .then(rows => Either.Right(rows.list().map(person => new models.Person(person))))
       .errorToLeft();
   }

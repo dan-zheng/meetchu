@@ -5,7 +5,7 @@ const Maybe = monet.Maybe;
 const Either = monet.Either;
 
 module.exports = models => ({
-  findChatList(person) {
+  getChatList(person) {
     return models.pool.query(`
       SELECT chat.id, chat.name, chat.description, person.first_name, person.last_name, message.message
       FROM person_chat
@@ -25,18 +25,18 @@ module.exports = models => ({
     .then(result => Either.Right(result.list()))
     .errorToLeft();
   },
-  findChatMessages(chat, max) {
+  getChatMessages(chat, max) {
     return models.pool.query(`
       SELECT * FROM (
         SELECT chat.name, person.first_name, person.last_name, message.message, message.time_sent
-        FROM chat
-        JOIN message
-        ON chat.id = message.chat_id
-        JOIN person
-        ON message.sender_id = person.id
-        WHERE chat.id = ?
-        ORDER BY message.time_sent DESC
-        LIMIT ?) messages
+          FROM chat
+          JOIN message
+          ON chat.id = message.chat_id
+          JOIN person
+          ON message.sender_id = person.id
+          WHERE chat.id = ?
+          ORDER BY message.time_sent DESC
+          LIMIT ?) messages
       ORDER BY messages.time_sent ASC`, [chat.id, max])
     .then(result => Either.Right(result.list()))
     .errorToLeft();

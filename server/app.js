@@ -144,10 +144,10 @@ app.get('/profile/:id', userController.getProfile);
 
 app.get('/chats', chatController.getChats);
 app.get('/chats/:id', chatController.getChat);
-app.post('/chats/create', chatController.postCreateChatGroup);
-app.post('/chats/:id/invite', chatController.postInviteChatGroup);
-app.post('/chats/:id/leave', chatController.postLeaveChatGroup);
-app.post('/chats/:id/delete', chatController.postDeleteChatGroup);
+app.post('/chats/create', chatController.postCreateChat);
+app.post('/chats/:id/invite', chatController.postInviteToChat);
+app.post('/chats/:id/leave', chatController.postLeaveChat);
+app.post('/chats/:id/delete', chatController.postDeleteChat);
 
 app.post('/courses', courseController.postCourses);
 app.post('/course/users', courseController.postCourseUsers);
@@ -200,25 +200,26 @@ io.on('connection', (socket) => {
 models.sync();
 const personDao = require('./dao/person')(models);
 const courseDao = require('./dao/course')(models);
+const chatDao = require('./dao/chat')(models);
 
 /*
-userDao.findByEmail('era878@gmail.com').then((maybeUser) => {
-  maybeUser.map((user) => {
-    return courseDao.findByPerson(user).then((courses) => {
-      console.log(courses);
+courseDao.findPeopleByCourseId('a456072d-13db-4946-a74a-3fbb74a00683')
+.tap((result) => {
+  result.cata(
+    err => console.log(err),
+    personList => console.log(personList)
+  )
+});
+
+personDao.findByEmail('era878@gmail.com').tap((maybePerson) => {
+  maybePerson.map((person) => {
+    chatDao.getChatList(person).then((result) => {
+      result.cata(
+        err => console.log(err),
+        chatList => console.log(chatList.toArray())
+      )
     });
   });
-});
-
-userDao.signup({ email: 'era878@gmail.com', first_name: 'Eric', last_name: 'Aguilera', password: 'asdf' })
-.then((result) => {
-  console.log(result);
-});
-
-userDao.findByEmail('era878@gmail.com').then((maybeUser) => {
-  maybeUser.map(user => userDao.erase(user).then((result) => {
-    console.log(result);
-  }));
 });
 */
 
