@@ -17,11 +17,11 @@
             strong {{ course.title }}
   #current-course.d-flex.flex-column.col-sm-8.px-0(v-model='currentCourse')
     .page-header
-      h2.text-center.my-2 {{ currentCourse.subject + ' ' + currentCourse.number }}
+      h2.text-center.my-2(style='height: 35px')
+        span(v-if='!!currentCourse.subject') {{ currentCourse.subject + ' ' + currentCourse.number }}
     #users-list
       b-list-group
-        b-list-group-item.user.rounded-0.border(v-for='user in sortedUsers', :key='user.email')
-          | {{ user }}
+        b-list-group-item.user.rounded-0.border(v-for='user in currentCourse.users', :key='user.email') {{ user }}
 
   //- Modals
   b-modal#add-course-modal(title='Add a course', @shown='clear(["courseHits", "courseQuery"])', hide-footer)
@@ -64,24 +64,6 @@ import { default as swal } from 'sweetalert2';
 import { courseIndex } from '../services/algolia';
 import { validationStyle } from '../services/form';
 
-const course = {
-  id: '8dd62248-6424-4e33-a745-852fdd31c78a',
-  title: 'Software Engineering I',
-  courseID: 'CS 30700',
-  subject: 'CS',
-  number: '30700',
-  creditHours: 3
-};
-
-const user = {
-  firstName: 'Jeff',
-  lastName: 'Turkstra',
-  email: 'test@test.com'
-}
-
-const courses = Array(1).fill(course);
-const users = Array(5).fill(user);
-
 export default {
   name: 'courses',
   metaInfo: {
@@ -89,11 +71,9 @@ export default {
   },
   data() {
     return {
-      // courses,
-      users,
       courseQuery: '',
       courseHits: [],
-      currentCourse: courses.length > 0 ? courses[0] : null,
+      currentCourse: {},
       purdueUsername: '',
       purduePassword: '',
       formstate: {
@@ -104,38 +84,30 @@ export default {
   computed: {
     ...mapGetters({
       user: 'user',
-      courses: 'courses'
-    }),
-    sortedCourses() {
-      // return this.$store.getters.sortedCourses;
-    },
-    sortedUsers() {
-      return this.users;
-    }
+      courses: 'courses',
+      sortedCourses: 'sortedCourses'
+    })
   },
   created() {
-    console.log('before');
-    console.log(this.$store.getters.courses);
-    this.$store.dispatch('getCourses', { course })
+    this.$store.dispatch('getCourses')
       .then(() => {
-        console.log(this.$store.getters.courses);
+        this.currentCourse = this.courses[0];
       });
   },
   methods: {
     addCourse(course) {
       if (courses.findIndex(c => c.id === course.id) !== -1) {
-        console.log(`Course ${c.courseID} has already been added`);
+        console.log(`Course ${c.id} has already been added`);
         return false;
       }
       this.$store.dispatch('addCourse', { course });
-      // this.courses.push(course);
       this.$root.$emit('hide::modal','add-course-modal');
     },
     setCurrentCourse(course) {
       this.currentCourse = course;
       this.$store.dispatch('getCourseUsers', { course })
-        .then((updatedCourse) => {
-          this.currentCourse = updatedCourse;
+        .then(() => {
+          this.currentCourse = this.sortedCourses.find(c => c.id === course.id);
         }).catch((e) => {
           console.log('Get course users failed.');
         });
@@ -176,7 +148,7 @@ export default {
       courseIndex.search(query, {
         hitsPerPage: 5
       }, (error, results) => {
-        const filteredHits = results.hits.filter(el => this.courses.findIndex(c => c.id === el.objectID) === -1);
+        const filteredHits = results.hits.filter(el => this.sortedCourses.findIndex(c => c.id === el.objectID) === -1);
         filteredHits.forEach((el) => {
           el.id = el.objectID;
           delete el.objectID;

@@ -1,6 +1,12 @@
 @import '_fonts';
 @import '_variables';
 
+// General
+
+[v-cloak] {
+  display: none;
+}
+
 // Scaffolding
 
 html, body, #app {

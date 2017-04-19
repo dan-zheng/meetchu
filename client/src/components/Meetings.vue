@@ -36,7 +36,7 @@ const meeting = {
   createdAt: moment().subtract('2', 'days'),
 };
 
-console.log(JSON.stringify(meeting, null, 2));
+// console.log(JSON.stringify(meeting, null, 2));
 
 const meetings = Array(1).fill(meeting);
 

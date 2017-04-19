@@ -8,8 +8,11 @@ const state = {
 const getters = {
   courses: state => state.courses,
   sortedCourses: state => {
-    return state.courses.sort((a, b) => {
-      return a.courseID.localeCompare(b.courseID);
+    const temp = state.courses.slice(0);
+    return temp.sort((a, b) => {
+      const _a = a.subject + ' ' + a.number;
+      const _b = b.subject + ' ' + b.number;
+      return _a.localeCompare(_b);
     });
   }
 };
@@ -17,27 +20,31 @@ const getters = {
 const actions = {
   getCourses({ commit, rootState }) {
     return Vue.axios.post('/courses', { user: rootState.user.user })
-      .then(res => commit(types.SET_COURSES, res.data))
+      .then(res => {
+        commit(types.SET_COURSES, res.data);
+      })
       .catch((err) => {
         throw err;
       });
   },
   getCourseUsers({ commit }, { course }) {
-    return Vue.axios.post('/courses/users', { course })
-      .then(res => commit(types.SET_COURSE_USERS, course, res.data))
+    return Vue.axios.post('/course/users', { course })
+      .then(res => {
+        commit(types.SET_COURSE_USERS, course, res.data);
+      })
       .catch((err) => {
         throw err;
       });
   },
   addCourse({ commit, rootState }, { course }) {
-    return Vue.axios.post('/courses/add', { course, user: rootState.user.user })
+    return Vue.axios.post('/course/add', { course, user: rootState.user.user })
       .then(res => commit(types.ADD_COURSE, res.data))
       .catch((err) => {
         throw err;
       });
   },
   removeCourse({ commit, rootState }, { course }) {
-    return Vue.axios.post(`/courses/remove`, { course, user: rootState.user.user })
+    return Vue.axios.post(`/course/remove`, { course, user: rootState.user.user })
       .then(res => commit(types.REMOVE_COURSE, course))
       .catch((err) => {
         throw err;
@@ -62,14 +69,11 @@ const mutations = {
     state.courses = courses;
   },
   [types.SET_COURSE_USERS](state, course, users) {
-    let index = -1;
     state.courses.forEach((c, i) => {
       if (c.id === course.id) {
-        index = i;
-        state.courses[i] = users;
+        state.courses[i].users = users;
       }
     });
-    return state.courses[index];
   },
   [types.ADD_COURSE](state, course) {
     state.courses.push(course);
