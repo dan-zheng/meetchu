@@ -150,6 +150,7 @@ app.post('/chats/:id/leave', chatController.postLeaveChatGroup);
 app.post('/chats/:id/delete', chatController.postDeleteChatGroup);
 
 app.post('/courses', courseController.postCourses);
+app.post('/courses/users', courseController.postCourseUsers);
 app.post('/courses/add', courseController.postCourseAddUser);
 app.post('/courses/remove/', courseController.postCourseRemoveUser);
 app.post('/courses/sync', courseController.postCourseSyncUser);

@@ -13,7 +13,21 @@ exports.postCourses = (req, res) => {
   courseDao.findByPerson(person).tap(result =>
     result.cata(
       err => res.status(401).json(err),
-      courses => res.status(200).json(courses)
+      courses => res.status(200).json(courses.toArray())
+    )
+  );
+};
+
+/**
+ * POST /course/users
+ * Get a course's users.
+ */
+exports.postCourseUsers = (req, res) => {
+  const course = req.body.course;
+  courseDao.findPeopleByCourse(course).tap(result =>
+    result.cata(
+      err => res.status(401).json(err),
+      people => res.status(200).json(people.toArray())
     )
   );
 };

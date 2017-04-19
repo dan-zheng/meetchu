@@ -89,7 +89,7 @@ export default {
   },
   data() {
     return {
-      courses,
+      // courses,
       users,
       courseQuery: '',
       courseHits: [],
@@ -103,16 +103,23 @@ export default {
   },
   computed: {
     ...mapGetters({
-      user: 'user'
+      user: 'user',
+      courses: 'courses'
     }),
     sortedCourses() {
-      return this.courses.sort((a, b) => {
-        return a.courseID.localeCompare(b.courseID);
-      });
+      // return this.$store.getters.sortedCourses;
     },
     sortedUsers() {
       return this.users;
     }
+  },
+  created() {
+    console.log('before');
+    console.log(this.$store.getters.courses);
+    this.$store.dispatch('getCourses', { course })
+      .then(() => {
+        console.log(this.$store.getters.courses);
+      });
   },
   methods: {
     addCourse(course) {
@@ -121,11 +128,17 @@ export default {
         return false;
       }
       this.$store.dispatch('addCourse', { course });
-      this.courses.push(course);
+      // this.courses.push(course);
       this.$root.$emit('hide::modal','add-course-modal');
     },
     setCurrentCourse(course) {
       this.currentCourse = course;
+      this.$store.dispatch('getCourseUsers', { course })
+        .then((updatedCourse) => {
+          this.currentCourse = updatedCourse;
+        }).catch((e) => {
+          console.log('Get course users failed.');
+        });
     },
     syncCourses() {
       if (!this.formstate.purdue.$valid) {

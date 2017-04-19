@@ -6,13 +6,25 @@ const state = {
 };
 
 const getters = {
-  courses: state => state.courses
+  courses: state => state.courses,
+  sortedCourses: state => {
+    return state.courses.sort((a, b) => {
+      return a.courseID.localeCompare(b.courseID);
+    });
+  }
 };
 
 const actions = {
-  initCourses({ commit, rootState }) {
+  getCourses({ commit, rootState }) {
     return Vue.axios.post('/courses', { user: rootState.user.user })
       .then(res => commit(types.SET_COURSES, res.data))
+      .catch((err) => {
+        throw err;
+      });
+  },
+  getCourseUsers({ commit }, { course }) {
+    return Vue.axios.post('/courses/users', { course })
+      .then(res => commit(types.SET_COURSE_USERS, course, res.data))
       .catch((err) => {
         throw err;
       });
@@ -48,6 +60,16 @@ const actions = {
 const mutations = {
   [types.SET_COURSES](state, courses) {
     state.courses = courses;
+  },
+  [types.SET_COURSE_USERS](state, course, users) {
+    let index = -1;
+    state.courses.forEach((c, i) => {
+      if (c.id === course.id) {
+        index = i;
+        state.courses[i] = users;
+      }
+    });
+    return state.courses[index];
   },
   [types.ADD_COURSE](state, course) {
     state.courses.push(course);

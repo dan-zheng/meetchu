@@ -11,5 +11,6 @@ export const SEND_MESSAGE = 'SEND_MESSAGE';
 
 // Course related mutations
 export const SET_COURSES = 'SET_COURSES';
+export const SET_COURSE_USERS = 'SET_COURSE_USERS';
 export const ADD_COURSE = 'ADD_COURSE';
 export const REMOVE_COURSE = 'REMOVE_COURSE';
