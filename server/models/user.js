@@ -52,11 +52,12 @@ module.exports = {
       FOREIGN KEY (course_id)
         REFERENCES course(id)
         ON DELETE CASCADE
-    )`,
+    )`
+    /*,
     `CREATE TABLE IF NOT EXISTS person_chat (
-      created_at DATETIME,
       chat_id INT NOT NULL,
       person_id INT NOT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       PRIMARY KEY (chat_id, user_id),
       FOREIGN KEY (chat_id)
         REFERENCES chat(id)
@@ -66,15 +67,15 @@ module.exports = {
         ON DELETE CASCADE
     )`,
     `CREATE TABLE IF NOT EXISTS person_notification (
-      created_at DATETIME,
       notification_id INT NOT NULL,
       person_id INT NOT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (notification_id)
         REFERENCES notification(id)
         ON DELETE CASCADE,
       FOREIGN KEY (person_id)
         REFERENCES person(id)
         ON DELETE CASCADE
-    )`
+    )`*/
   ]
 };
