@@ -12,15 +12,15 @@
           label.col-md-3.col-form-label Name
           .col-md-9
             .row
-              validate.col-md-6.required-field(auto-label, :class='fieldClassName(formstate.profile.firstName)')
+              validate.col-md-6.required-field(auto-label, :class='validationStyle(formstate.profile.firstName)')
                 input.form-control(type='text', name='firstName', placeholder='First', required, v-model.lazy='userModel.first_name')
                 field-messages.form-control-feedback(auto-label, name='firstName', show='$touched || $submitted')
                   div(slot='required') First name is required.
-              validate.col-md-6.required-field(auto-label, :class='fieldClassName(formstate.profile.lastName)')
+              validate.col-md-6.required-field(auto-label, :class='validationStyle(formstate.profile.lastName)')
                 input.form-control(type='text', name='lastName', placeholder='Last', required, v-model.lazy='userModel.last_name')
                 field-messages.form-control-feedback(auto-label, name='lastName', show='$touched || $submitted')
                   div(slot='required') Last name is required.
-        validate.form-group.row.required-field(auto-label, :class='fieldClassName(formstate.profile.email)')
+        validate.form-group.row.required-field(auto-label, :class='validationStyle(formstate.profile.email)')
           label.col-md-3.col-form-label Email
           .col-md-9
             input.form-control(type='email', name='email', placeholder='Email', required, v-model.lazy='userModel.email')
@@ -36,14 +36,14 @@
       h3 Update Password
     .offset-md-1.col-md-10
       vue-form(:state='formstate.password', v-model='formstate.password', @submit.prevent='onSubmit("password")')
-        validate.form-group.row.required-field(auto-label, :class='fieldClassName(formstate.password.password)')
+        validate.form-group.row.required-field(auto-label, :class='validationStyle(formstate.password.password)')
           label.col-md-3.col-form-label Password
           .col-md-9
             input.form-control(type='password', name='password', placeholder='Password', required, minlength='4', v-model.lazy='userModel.password')
             field-messages.form-control-feedback(name='password', show='$touched || $submitted')
               div(slot='required') Password is required.
               div(slot='minlength') Password must be at least 4 characters long.
-        validate.form-group.row.required-field(auto-label, :class='fieldClassName(formstate.password.confirmPassword)')
+        validate.form-group.row.required-field(auto-label, :class='validationStyle(formstate.password.confirmPassword)')
           label.col-md-3.col-form-label Confirm Password
           .col-md-9
             input.form-control(type='password', name='confirmPassword', placeholder='Confirm Password', required, minlength='4', :pattern='userModel.password', v-model.lazy='userModel.confirmPassword')
@@ -69,6 +69,7 @@
 <script>
 import { mapGetters } from 'vuex';
 import { default as swal } from 'sweetalert2';
+import { validationStyle } from '../services/form';
 
 const fields = {
   profile: ['first_name', 'last_name', 'email'],
@@ -82,7 +83,7 @@ export default {
   metaInfo: {
     title: 'Account'
   },
-  data () {
+  data() {
     return {
       formstate: {
         profile: {},
@@ -97,7 +98,7 @@ export default {
       }
     }
   },
-  created () {
+  created() {
     const temp = this.$store.getters.user;
     Object.keys(temp)
       .filter(key => !hiddenFields.includes(key))
@@ -111,20 +112,6 @@ export default {
     })
   },
   methods: {
-    fieldClassName(field) {
-      if (!field) {
-        return '';
-      }
-      if ((field.$touched || field.$submitted) && field.$valid) {
-        return 'has-success';
-      }
-      if ((field.$touched || field.$submitted) && field.$invalid) {
-        return 'has-danger';
-      }
-    },
-    onSubmit(type) {
-      console.log(this.formstate[type].$valid);
-    },
     updateAccount(type) {
       if (!this.formstate[type].$valid) {
         return;
@@ -176,7 +163,11 @@ export default {
         })
         .catch(swal.noop);
       })
-    }
+    },
+    onSubmit(type) {
+      console.log(this.formstate[type].$valid);
+    },
+    validationStyle
   }
 }
 </script>

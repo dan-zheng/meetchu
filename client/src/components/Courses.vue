@@ -34,12 +34,12 @@
   b-modal#sync-course-modal(title='Sync Purdue courses', @shown='clear(["purdueUsername", "purduePassword"])', hide-footer)
     p You can enter your Purdue credentials to synchronize your classes.
     vue-form(:state='formstate.purdue', v-model='formstate.purdue', @submit.prevent='onSubmit("purdue")')
-      validate.form-group.container(auto-label, :class='fieldClassName(formstate.purdue.purdueUsername)')
+      validate.form-group.container(auto-label, :class='validationStyle(formstate.purdue.purdueUsername, false)')
         label.col-form-label Username
         input.form-control(type='text', name='purdueUsername', placeholder='Username', v-model.lazy='purdueUsername', required)
         field-messages.form-control-feedback(name='purdueUsername', show='$touched || $submitted')
           div(slot='required') Username is required.
-      validate.form-group.container(auto-label, :class='fieldClassName(formstate.purdue.purduePassword)')
+      validate.form-group.container(auto-label, :class='validationStyle(formstate.purdue.purduePassword, false)')
         label.col-form-label Password
         input.form-control(type='password', name='purduePassword', placeholder='Password', v-model.lazy='purduePassword', required)
         field-messages.form-control-feedback(name='purduePassword', show='$touched || $submitted')
@@ -55,6 +55,7 @@
 import { mapGetters } from 'vuex';
 import { default as swal } from 'sweetalert2';
 import { courseIndex } from '../services/algolia';
+import { validationStyle } from '../services/form';
 
 const course = {
   uuid: '8dd62248-6424-4e33-a745-852fdd31c78a',
@@ -79,7 +80,7 @@ export default {
   metaInfo: {
     title: 'Courses'
   },
-  data () {
+  data() {
     return {
       courses,
       users,
@@ -174,21 +175,10 @@ export default {
         }
       });
     },
-    fieldClassName(field) {
-      if (!field) {
-        return '';
-      }
-      if ((field.$touched || field.$submitted) && field.$valid) {
-        return '';
-        // return 'has-success';
-      }
-      if ((field.$touched || field.$submitted) && field.$invalid) {
-        return 'has-danger';
-      }
-    },
-    onSubmit(type) {
+    onSubmit() {
       console.log(this.formstate.purdue.$valid);
-    }
+    },
+    validationStyle
   }
 }
 </script>

@@ -29,6 +29,10 @@ body {
         background: #dbd9fa;
       }
 
+      &.router-link-active {
+        background: #c5c2f9;
+      }
+
       &:active,
       &:focus {
         text-decoration: none;

@@ -4,16 +4,15 @@
     h3 Sign in
   .offset-md-1.col-md-10
     vue-form(:state='formstate', v-model='formstate', @submit.prevent='onSubmit')
-      validate.form-group.row.required-field(auto-label, :class='fieldClassName(formstate.email)')
+      validate.form-group.row.required-field(auto-label, :class='validationStyle(formstate.email, false)')
         label.col-md-2.col-form-label Email
         .col-md-10
           input.form-control(type='email', name='email', required, v-model.lazy='model.email')
           field-messages.form-control-feedback(auto-label, name='email', show='$touched || $submitted')
             div(slot='required') Please enter your email.
-      validate.form-group.row.required-field(auto-label, :class='fieldClassName(formstate.password)')
+      validate.form-group.row.required-field(auto-label, :class='validationStyle(formstate.password, false)')
         label.col-md-2.col-form-label Password
         .col-md-10
-          // input.form-control(type='password', name='password', required, minlength='4', v-model.lazy='model.password')
           input.form-control(type='password', name='password', required, v-model.lazy='model.password')
           field-messages.form-control-feedback(name='password', show='$touched || $submitted')
             div(slot='required') Please enter your password.
@@ -32,6 +31,7 @@
 
 <script>
 import { default as swal } from 'sweetalert2';
+import { validationStyle } from '../services/form';
 
 export default {
   name: 'login',
@@ -49,21 +49,6 @@ export default {
     }
   },
   methods: {
-    fieldClassName(field) {
-      if (!field) {
-        return '';
-      }
-      if ((field.$touched || field.$submitted) && field.$valid) {
-        return '';
-        // return 'has-success';
-      }
-      if ((field.$touched || field.$submitted) && field.$invalid) {
-        return 'has-danger';
-      }
-    },
-    onSubmit() {
-      console.log(this.formstate.$valid);
-    },
     login() {
       if (!this.formstate.$valid) {
         return;
@@ -104,7 +89,8 @@ export default {
         console.log(`${provider} login fail.`);
         console.log(e);
       })
-    }
+    },
+    validationStyle
   }
 }
 </script>

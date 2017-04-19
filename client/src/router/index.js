@@ -37,17 +37,17 @@ const router = new Router({
     {
       path: '/dashboard',
       component: Dashboard,
-      meta: { auth: true }
+      meta: { auth: true, sidebar: '/dashboard' }
     },
     {
       path: '/account',
       component: Account,
-      meta: { auth: true }
+      meta: { auth: true, sidebar: '/dashboard' }
     },
     {
       path: '/chats',
       component: Chats,
-      meta: { auth: true }
+      meta: { auth: true, sidebar: '/chats' }
     },
     /*
     {
@@ -59,7 +59,7 @@ const router = new Router({
     {
       path: '/courses',
       component: Courses,
-      meta: { auth: true }
+      meta: { auth: true, sidebar: '/courses' }
     },
     {
       path: '/test',

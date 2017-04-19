@@ -27,7 +27,7 @@
       input.px-3(v-model='currentMsg', placeholder='Type message...', @keyup.enter='sendMessage(currentChat)')
   b-modal#new-chat-modal(title='Create a chat', @shown='clear(["userHits", "userQuery"])', @close='clear(["userHits", "userQuery"])', hide-footer)
     vue-form(:state='formstate.newChat', v-model='formstate.newChat', @submit.prevent='onSubmit')
-      validate.form-group.container(auto-label, :class='fieldClassName(formstate.newChat.chatName)')
+      validate.form-group.container(auto-label, :class='validationStyle(formstate.newChat.chatName)')
         label.col-form-label Chat name
         input.form-control(type='text', name='chatName', placeholder='Chat name', v-model.lazy='model.newChat.name', required)
         field-messages.form-control-feedback(name='chatName', show='$touched || $submitted')
@@ -39,6 +39,7 @@
         label.col-form-label Add users
         input.form-control(type='text', placeholder='Search for a user...', v-model='userQuery', @keyup='search("userHits", userQuery)')
       small.text-info(v-if='userHits.length > 0') Matches
+      small.text-warning(v-else-if='userQuery.length > 0 && model.newChat.users.length === 0') No matches.
       .list-group
         .list-group-item.list-group-item-action.rounded-0.border(v-for='(user, index) in sortedHitUsers', :key='user.objectId', @click='addUserToChat(model.newChat, user, index)')
           .d-flex.w-100.mx-1.justify-content-between.align-items-center
@@ -61,6 +62,7 @@ import { mapGetters } from 'vuex';
 import * as moment from 'moment';
 import { default as swal } from 'sweetalert2';
 import { userIndex } from '../services/algolia';
+import { validationStyle } from '../services/form';
 
 const message = {
   chatId: 2,
@@ -98,7 +100,7 @@ export default {
   metaInfo: {
     title: 'Chats'
   },
-  data () {
+  data() {
     return {
       chats,
       currentChat: chats.length > 0 ? chats[0] : null,
@@ -168,7 +170,7 @@ export default {
     },
     removeUserFromChat(chat, user, index) {
       chat.users.splice(index, 1);
-      this.userHits.push(user);
+      this.search("userHits", this.userQuery);
     },
     setCurrentChat(chat) {
       this.currentChat = chat;
@@ -252,20 +254,10 @@ export default {
         return date.format('LL');
       }
     },
-    fieldClassName(field) {
-      if (!field) {
-        return '';
-      }
-      if ((field.$touched || field.$submitted) && field.$valid) {
-        return 'has-success';
-      }
-      if ((field.$touched || field.$submitted) && field.$invalid) {
-        return 'has-danger';
-      }
-    },
     onSubmit(type) {
       console.log(this.formstate.newChat.$valid);
-    }
+    },
+    validationStyle
   }
 }
 </script>
