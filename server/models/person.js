@@ -1,24 +1,24 @@
 const bcrypt = require('bcrypt-nodejs');
 
-function User(data) {
+function Person(data) {
   Object.assign(this, data);
 }
 
-User.prototype.genPasswordHash = (password) => {
+Person.prototype.genPasswordHash = (password) => {
   const salt = bcrypt.genSaltSync(10);
   return bcrypt.hashSync(password, salt);
 };
 
-User.prototype.verifyPassword = function (password) {
+Person.prototype.verifyPassword = function (password) {
   return bcrypt.compareSync(password, this.password);
 };
 
-User.prototype.updatePassword = function (password) {
+Person.prototype.updatePassword = function (password) {
   this.password = this.genPasswordHash(this.password);
 };
 
 module.exports = {
-  object: User,
+  object: Person,
   query: [
     `CREATE TABLE IF NOT EXISTS person (
       id INT NOT NULL AUTO_INCREMENT,

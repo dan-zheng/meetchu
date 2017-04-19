@@ -10,7 +10,7 @@ const algoliasearch = require('algoliasearch');
 const Promise = require('bluebird');
 
 const models = require('../models');
-const userDao = require('../dao/user')(models);
+const personDao = require('../dao/person')(models);
 
 /**
  * Load environment variables from .env file
@@ -26,8 +26,8 @@ const userIndex = client.initIndex('users');
 passport.serializeUser = ((user, done) => done(null, user.id));
 
 passport.deserializeUser = ((id, done) => {
-  userDao.findById(id)
-  .tap(maybeUser => maybeUser.cata(
+  personDao.findById(id)
+  .tap(maybePerson => maybePerson.cata(
     () => done('User not found', null),
     user => done(null, user)))
 });
@@ -56,7 +56,7 @@ const oauthLogin = (oauthId, profile, done) => {
     last_name: profile.name.familyName
   }, oauth);
 
-  userDao.externalLogin(identity)
+  personDao.externalLogin(identity)
   .then((user) => {
     // if (userWasCreated) {
     //   return addUserToAlgolia(user, done);

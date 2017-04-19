@@ -22,23 +22,27 @@ const verifyLoginSync = (user, password) => {
 
 module.exports = models => ({
   /**
-   * Retrieves a user by email.
-   * @param {Object} email - the user's email.
+   * Retrieves a person by email.
+   * @param {Object} email - the person's email.
    *  and an associated OAuth id (e.g. facebook_id, google_id)
-   * @return {Promise} Maybe[User]
+   * @return {Promise} Either[String, Person]
    */
   findById(id) {
     return models.pool.query('SELECT * FROM person WHERE id = ? LIMIT 1', [id])
-      .then(rows => rows.list().headMaybe().map(user => new models.User(user)));
+      .then(rows => rows.list().headMaybe().map(user => new models.Person(user)))
+      .then(maybePerson => maybeUser.toEither('Person not found.'))
+      .errorToLeft();
   },
   /**
-   * Retrieves a user by email.
-   * @param {Object} email - the user's email.
-   * @return {Maybe} Maybe[User]
+   * Retrieves a person by email.
+   * @param {Object} email - the person's email.
+   * @return {Maybe} Maybe[Person]
    */
   findByEmail(email) {
     return models.pool.query('SELECT * FROM person WHERE email = ? LIMIT 1', [email])
-      .then(rows => rows.list().headMaybe().map(user => new models.User(user)));
+      .then(rows => rows.list().headMaybe().map(user => new models.Person(user)))
+      .then(maybePerson => maybePerson.toEither('Email not found.'))
+      .errorToLeft();
   },
   /**
    * Inserts a new user if not already in database.
@@ -70,7 +74,7 @@ module.exports = models => ({
    * @param {Object} identity - an object containing
    *  the user's email, first_name, last_name
    *  and an associated OAuth id (e.g. facebook_id, google_id)
-   * @return {Promise} Maybe[Left]
+   * @return {Promise} Either[String, User]
    */
   externalLogin(identity) {
     return models.pool.query(`INSERT INTO person
@@ -94,7 +98,6 @@ module.exports = models => ({
    */
   loginWithEmail(login) {
     return this.findByEmail(login.email)
-      .then(maybeUser => maybeUser.toEither('Email not found.'))
       .then(result => result.flatMap(user => verifyLoginSync(user, login.password)))
       .then(result => result.flatMap(user => this.updateLastLogin(user)
         .then(() => Either.Right(user))))

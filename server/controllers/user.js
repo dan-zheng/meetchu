@@ -12,7 +12,7 @@ const Either = monet.Either;
 const Maybe = monet.Maybe;
 
 const models = require('../models');
-const userDao = require('../dao/user')(models);
+const personDao = require('../dao/person')(models);
 
 /**
  * Load environment variables from .env file
@@ -121,15 +121,15 @@ exports.getLogout = (req, res) => {
  * Update account information.
  */
 exports.postUpdateAccount = (req, res) => {
-  const user = new models.User(req.body.user);
+  const person = new models.Person(req.body.user);
   const fields = req.body.fields;
 
-  user.updatePassword(user.password);
+  person.updatePassword(person.password);
 
-  userDao.update(user, fields).tap(result =>
+  personDao.update(person, fields).tap(result =>
     result.cata(
       err => res.status(401).json(err),
-      wasUpdated => res.status(200).json(user)
+      wasUpdated => res.status(200).json(person)
     )
   );
 };
@@ -139,15 +139,15 @@ exports.postUpdateAccount = (req, res) => {
  * Get user public profile.
  */
 exports.getProfile = (req, res) => {
-  const user = new models.User(req.body.user);
+  const person = new models.Person(req.body.user);
   const fields = req.body.fields;
 
-  user.updatePassword(user.password);
+  person.updatePassword(person.password);
 
-  userDao.update(user, fields).tap(result =>
+  personDao.update(person, fields).tap(result =>
     result.cata(
       err => res.status(401).json(err),
-      wasUpdated => res.status(200).json(user)
+      wasUpdated => res.status(200).json(person)
     )
   );
 };
@@ -157,9 +157,9 @@ exports.getProfile = (req, res) => {
  * Delete user account.
  */
 exports.postDeleteAccount = (req, res, next) => {
-  const user = req.body.user;
+  const person = req.body.user;
 
-  userDao.erase(user).tap(result =>
+  personDao.erase(person).tap(result =>
     result.cata(
       err => res.status(401).json(err),
       rowsChanged => res.status(200).json(rowsChanged)

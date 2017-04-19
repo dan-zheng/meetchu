@@ -202,7 +202,7 @@ io.on('connection', (socket) => {
  * Create any missing database tables and start Express server.
  */
 models.sync();
-const userDao = require('./dao/user')(models);
+const personDao = require('./dao/person')(models);
 const courseDao = require('./dao/course')(models);
 
 /*
