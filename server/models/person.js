@@ -57,8 +57,12 @@ module.exports = {
     `CREATE TABLE IF NOT EXISTS person_chat (
       chat_id INT NOT NULL,
       person_id INT NOT NULL,
+<<<<<<< HEAD
+      PRIMARY KEY (chat_id, person_id),
+=======
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       PRIMARY KEY (chat_id, user_id),
+>>>>>>> test
       FOREIGN KEY (chat_id)
         REFERENCES chat(id)
         ON DELETE CASCADE,

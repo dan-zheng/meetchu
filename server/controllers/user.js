@@ -144,7 +144,7 @@ exports.getProfile = (req, res) => {
 
   person.updatePassword(person.password);
 
-  personDao.update(person, fields).tap(result =>
+  personDao.findById(person, fields).tap(result =>
     result.cata(
       err => res.status(401).json(err),
       wasUpdated => res.status(200).json(person)
