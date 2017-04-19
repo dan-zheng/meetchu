@@ -77,12 +77,12 @@ passport.use('signup', new LocalStrategy({
   usernameField: 'email',
   passReqToCallback: true
 }, (req, email, password, done) => {
-  personDao.signup({
+  const person = new models.Person({
     email: req.body.email,
     first_name: req.body.firstName,
-    last_name: req.body.lastName,
-    password: req.body.password
-  }).tap(result =>
+    last_name: req.body.lastName
+  }).withPassword(password);
+  personDao.signup(person).tap(result =>
     result.cata(
       err => done(err, null),
       user => done(null, user)

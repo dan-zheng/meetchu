@@ -51,22 +51,15 @@ module.exports = models => ({
    *  and an associated OAuth id (e.g. facebook_id, google_id)
    * @return {Promise} Either[String, person]
    */
-  signup(identity) {
-    const person = new models.Person(identity);
-    const hash = person.genPasswordHash(identity.password);
-    const personWithHash = Object.assign(person, { password: hash });
+  signup(person) {
     return models.pool.query(
       `INSERT IGNORE INTO person
         (email, first_name, last_name, password)
         VALUES(?, ?, ?, ?)`,
-      [identity.email, identity.first_name, identity.last_name, personWithHash.password])
-      .then((result) => {
-        if (result.affectedRows === 0) {
-          return Either.Left('An account with that email already exists.');
-        }
-        const personWithId = Object.assign(personWithHash, { id: result.insertId });
-        return Either.Right(personWithId);
-      })
+      [person.email, person.first_name, person.last_name, person.password])
+      .then(result => result.affectedRows === 0 ?
+        Either.Left('An account with that email already exists.') :
+        Either.Right(Object.assign(person, { id: result.insertId })))
       .errorToLeft();
   },
   /**

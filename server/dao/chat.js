@@ -52,10 +52,12 @@ module.exports = models => ({
   },
   addPerson(chat, person) {
     return models.pool.query(
-      `INSERT INTO person_chat
+      `INSERT INGORE INTO person_chat
         (person_id, chat_id)
         VALUES (?, ?)`, [person.id, chat.id])
-      .then(result => Either.Right(result.affectedRows))
+      .then(result => result.affectedRows === 0 ?
+        Either.Left('User was already added to chat.') :
+        Either.Right(result.insertId))
       .errorToLeft();
   },
   removePerson(chat, person) {

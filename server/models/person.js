@@ -4,17 +4,14 @@ function Person(data) {
   Object.assign(this, data);
 }
 
-Person.prototype.genPasswordHash = (password) => {
-  const salt = bcrypt.genSaltSync(10);
-  return bcrypt.hashSync(password, salt);
-};
-
 Person.prototype.verifyPassword = function (password) {
   return bcrypt.compareSync(password, this.password);
 };
 
-Person.prototype.updatePassword = function (password) {
-  this.password = this.genPasswordHash(this.password);
+Person.prototype.withPassword = function (password) {
+  const salt = bcrypt.genSaltSync(10);
+  const hash = bcrypt.hashSync(password, salt);
+  return Object.assign(this, { password: hash });
 };
 
 module.exports = {

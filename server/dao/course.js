@@ -19,7 +19,7 @@ module.exports = models => ({
       .errorToLeft();
   },
   /**
-   * @return Promise[Either[String, List[Integer]]]
+   * @return Promise[Either[String, Integer]]
    */
   addPerson(course, person) {
     return models.pool.query(
@@ -30,7 +30,7 @@ module.exports = models => ({
       .errorToLeft();
   },
   /**
-   * @return Promise[Either[String, List[Integer]]]
+   * @return Promise[Either[String, Integer]]
    */
   removePerson(course, person) {
     return models.pool.query(
