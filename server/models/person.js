@@ -44,7 +44,7 @@ module.exports = {
     )`,
     `CREATE TABLE IF NOT EXISTS person_course (
       person_id INT NOT NULL,
-      course_id INT NOT NULL,
+      course_id CHAR(36) NOT NULL,
       PRIMARY KEY (person_id, course_id),
       FOREIGN KEY (person_id)
         REFERENCES person(id)

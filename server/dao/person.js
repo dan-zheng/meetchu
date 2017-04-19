@@ -4,18 +4,18 @@ require('../../lib/database-helper.js')(Promise, monet);
 const Maybe = monet.Maybe;
 const Either = monet.Either;
 
-const verifyLoginAsync = (user, password) =>
-  user.verifyPassword(password)
+const verifyLoginAsync = (person, password) =>
+  person.verifyPassword(password)
   .then((passwordMatches) => {
     if (passwordMatches) {
-      return Either.Right(user);
+      return Either.Right(person);
     }
     Either.Left('Password does not match.');
   });
 
-const verifyLoginSync = (user, password) => {
-  if (user.verifyPassword(password)) {
-    return Either.Right(user);
+const verifyLoginSync = (person, password) => {
+  if (person.verifyPassword(password)) {
+    return Either.Right(person);
   }
   return Either.Left('Password does not match.');
 };
@@ -29,8 +29,8 @@ module.exports = models => ({
    */
   findById(id) {
     return models.pool.query('SELECT * FROM person WHERE id = ? LIMIT 1', [id])
-      .then(rows => rows.list().headMaybe().map(user => new models.Person(user)))
-      .then(maybePerson => maybeUser.toEither('Person not found.'))
+      .then(rows => rows.list().headMaybe().map(person => new models.Person(person)))
+      .then(maybePerson => maybeperson.toEither('Person not found.'))
       .errorToLeft();
   },
   /**
@@ -40,45 +40,45 @@ module.exports = models => ({
    */
   findByEmail(email) {
     return models.pool.query('SELECT * FROM person WHERE email = ? LIMIT 1', [email])
-      .then(rows => rows.list().headMaybe().map(user => new models.Person(user)))
+      .then(rows => rows.list().headMaybe().map(person => new models.Person(person)))
       .then(maybePerson => maybePerson.toEither('Email not found.'))
       .errorToLeft();
   },
   /**
-   * Inserts a new user if not already in database.
+   * Inserts a new person if not already in database.
    * @param {Object} identity - an object containing
-   *  the user's email, first_name, last_name
+   *  the person's email, first_name, last_name
    *  and an associated OAuth id (e.g. facebook_id, google_id)
-   * @return {Promise} Either[String, User]
+   * @return {Promise} Either[String, person]
    */
   signup(identity) {
-    const user = new models.User(identity);
-    const hash = user.genPasswordHash(identity.password);
-    const userWithHash = Object.assign(user, { password: hash });
+    const person = new models.Person(identity);
+    const hash = person.genPasswordHash(identity.password);
+    const personWithHash = Object.assign(person, { password: hash });
     return models.pool.query(
       `INSERT IGNORE INTO person
         (email, first_name, last_name, password)
         VALUES(?, ?, ?, ?)`,
-      [identity.email, identity.first_name, identity.last_name, hash])
+      [identity.email, identity.first_name, identity.last_name, personWithHash.password])
       .then((result) => {
         if (result.affectedRows === 0) {
           return Either.Left('An account with that email already exists.');
         }
-        const userWithId = Object.assign(userWithHash, { id: result.insertId });
-        return Either.Right(userWithId);
+        const personWithId = Object.assign(personWithHash, { id: result.insertId });
+        return Either.Right(personWithId);
       });
   },
   /**
-   * Inserts or updates the user's first_name, last_name, last_login
+   * Inserts or updates the person's first_name, last_name, last_login
    *  and associated OAuth id fields.
    * @param {Object} identity - an object containing
-   *  the user's email, first_name, last_name
+   *  the person's email, first_name, last_name
    *  and an associated OAuth id (e.g. facebook_id, google_id)
-   * @return {Promise} Either[String, User]
+   * @return {Promise} Either[String, person]
    */
   externalLogin(identity) {
     return models.pool.query(`INSERT INTO person
-      (email, first_name, last_name, google_id, facebook_id)
+      (email, first_name, last_ name, google_id, facebook_id)
       VALUES (?, ?, ?, ?, ?)
       ON DUPLICATE KEY UPDATE
         last_login = CURRENT_TIMESTAMP,
@@ -92,35 +92,35 @@ module.exports = models => ({
       .errorToLeft();
   },
   /**
-   * Updates the user's last_login field.
-   * @param {Object} login { email: the user's email, password: the user's hashed password }
+   * Updates the person's last_login field.
+   * @param {Object} login { email: the person's email, password: the person's hashed password }
    * @return {Promise}
    */
   loginWithEmail(login) {
     return this.findByEmail(login.email)
-      .then(result => result.flatMap(user => verifyLoginSync(user, login.password)))
-      .then(result => result.flatMap(user => this.updateLastLogin(user)
-        .then(() => Either.Right(user))))
+      .then(result => result.flatMap(person => verifyLoginSync(person, login.password)))
+      .then(result => result.flatMap(person => this.updateLastLogin(person)
+        .then(() => Either.Right(person))))
       .errorToLeft();
   },
-  update(user, fields) {
-    const keys = fields || Object.keys(user);
-    const values = keys.map(key => user[key]);
+  update(person, fields) {
+    const keys = fields || Object.keys(person);
+    const values = keys.map(key => person[key]);
     const updates = keys.map(key => `${key} = ?`).join(', ');
     const query = ['UPDATE person', `SET ${updates}`, 'WHERE id = ?'].join('\n\t');
-    return models.pool.query(query, [...values, user.id])
+    return models.pool.query(query, [...values, person.id])
       .then(result => Either.Right(result.affectedRows))
       .errorToLeft();
   },
-  erase(user) {
-    return models.pool.query(`DELETE FROM person WHERE id = ?`, [user.id])
+  erase(person) {
+    return models.pool.query(`DELETE FROM person WHERE id = ?`, [person.id])
       .then(result => Either.Right(result.affectedRows))
       .errorToLeft();
   },
-  updateLastLogin(user) {
+  updateLastLogin(person) {
     return models.pool.query(`UPDATE person
       SET last_login = CURRENT_TIMESTAMP
-      WHERE id = ?`, [user.id])
+      WHERE id = ?`, [person.id])
     .then(result => Either.Right(result.affectedRows))
     .errorToLeft();
   }
