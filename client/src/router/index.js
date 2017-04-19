@@ -9,7 +9,9 @@ import Login from '../components/Login';
 import Signup from '../components/Signup';
 import Dashboard from '../components/Dashboard';
 import Account from '../components/Account';
+import Profile from '../components/Profile';
 import Chats from '../components/Chats';
+import Meetings from '../components/Meetings';
 import Courses from '../components/Courses';
 // Test view
 import Test from '../components/Test';
@@ -45,17 +47,20 @@ const router = new Router({
       meta: { auth: true, sidebar: '/dashboard' }
     },
     {
+      path: '/profile/:id',
+      component: Profile,
+      meta: { auth: true }
+    },
+    {
       path: '/chats',
       component: Chats,
       meta: { auth: true, sidebar: '/chats' }
     },
-    /*
     {
       path: '/meetings',
       component: Meetings,
-      meta: { auth: true }
+      meta: { auth: true, sidebar: '/meetings' }
     },
-    */
     {
       path: '/courses',
       component: Courses,

@@ -1,11 +1,11 @@
 <template lang='pug'>
 #content.ml-2
   .page-header
-    h1 Account
+    h2 Account
 
   .offset-md-1.col-md-10
     .page-header
-      h3 Update Profile
+      h4 Update Profile
     .offset-md-1.col-md-10
       vue-form(:state='formstate.profile', v-model='formstate.profile', @submit.prevent='onSubmit("profile")')
         .form-group.row
@@ -33,7 +33,7 @@
             | Update
 
     .page-header
-      h3 Update Password
+      h4 Update Password
     .offset-md-1.col-md-10
       vue-form(:state='formstate.password', v-model='formstate.password', @submit.prevent='onSubmit("password")')
         validate.form-group.row.required-field(auto-label, :class='validationStyle(formstate.password.password)')
@@ -55,7 +55,7 @@
             | Change password
 
     .page-header
-      h3 Delete Account
+      h4 Delete Account
     .offset-md-1.col-md-10
       p You can delete your account, but keep in mind this action is irreversible.
       .py-2.text-center

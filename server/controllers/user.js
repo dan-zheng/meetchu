@@ -117,6 +117,57 @@ exports.getLogout = (req, res) => {
 };
 
 /**
+ * POST /account/update
+ * Update account information.
+ */
+exports.postUpdateAccount = (req, res) => {
+  const user = new models.User(req.body.user);
+  const fields = req.body.fields;
+
+  user.updatePassword(user.password);
+
+  userDao.update(user, fields).tap(result =>
+    result.cata(
+      err => res.status(401).json(err),
+      wasUpdated => res.status(200).json(user)
+    )
+  );
+};
+
+/**
+ * GET /profile/:id
+ * Get user public profile.
+ */
+exports.getProfile = (req, res) => {
+  const user = new models.User(req.body.user);
+  const fields = req.body.fields;
+
+  user.updatePassword(user.password);
+
+  userDao.update(user, fields).tap(result =>
+    result.cata(
+      err => res.status(401).json(err),
+      wasUpdated => res.status(200).json(user)
+    )
+  );
+};
+
+/**
+ * POST /account/delete
+ * Delete user account.
+ */
+exports.postDeleteAccount = (req, res, next) => {
+  const user = req.body.user;
+
+  userDao.erase(user).tap(result =>
+    result.cata(
+      err => res.status(401).json(err),
+      rowsChanged => res.status(200).json(rowsChanged)
+    )
+  );
+};
+
+/**
  * GET /forgot
  * Password recovery.
  */
@@ -227,54 +278,9 @@ exports.postPasswordReset = (req, res) => {
  * GET /account
  * Account page.
  */
-exports.getProfile = (req, res) => {
+exports.getAccount = (req, res) => {
   return res.render('account/account', {
     title: 'Update profile'
-  });
-};
-
-/**
- * POST /account/update
- * Update account information.
- */
-exports.postUpdateAccount = (req, res) => {
-  const user = new models.User(req.body.user);
-  const fields = req.body.fields;
-
-  user.updatePassword(user.password);
-
-  userDao.update(user, fields).tap(result =>
-    result.cata(
-      err => res.status(401).json(err),
-      wasUpdated => res.status(200).json(user)
-    )
-  );
-};
-
-/**
- * GET /profile/:id
- * Get user public profile.
- */
-exports.getPublicProfile = (req, res) => {
-  const userId = req.params.id;
-  models.User.findOne({
-    where: {
-      id: userId
-    },
-    include: [{
-      model: models.Course
-    }]
-  }).then((user) => {
-    const courses = user.Courses.map(course => course.dataValues);
-    user = user.dataValues;
-    user.Courses = courses;
-    return res.render('account/profile', {
-      title: 'Public Profile',
-      user
-    });
-  }).catch((err) => {
-    req.flash('info', 'User profile page does not exist.');
-    return res.redirect(req.session.returnTo);
   });
 };
 
@@ -282,7 +288,7 @@ exports.getPublicProfile = (req, res) => {
  * POST /profile/:id/chat
  * Create a chat with a user.
  */
-exports.postPublicProfileCreateChat = (req, res) => {
+exports.postProfileCreateChat = (req, res) => {
   const id = req.params.id;
 
   const errors = req.validationErrors();
@@ -312,21 +318,4 @@ exports.postPublicProfileCreateChat = (req, res) => {
       });
     });
   });
-};
-
-/**
- * POST /account/delete
- * Delete user account.
- */
-exports.postDeleteAccount = (req, res, next) => {
-  const user = req.body.user;
-
-  // TODO: handle Algolia
-
-  userDao.erase(user).tap(result =>
-    result.cata(
-      err => res.status(401).json(err),
-      rowsChanged => res.status(200).json(rowsChanged)
-    )
-  );
 };
