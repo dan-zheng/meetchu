@@ -8,10 +8,12 @@ module.exports = models => ({
   findChatList(person) {
     return models.pool.query(`
       SELECT chat.id, chat.name, chat.description, person.first_name, person.last_name, message.message
-      FROM chat
+      FROM person_chat
+      JOIN chat
+      ON chat_id = chat.id AND person_id = ?
       LEFT JOIN message
-        INNER JOIN
-        (SELECT id, chat_id, MAX(time_sent) most_recent
+        INNER JOIN (
+          SELECT id, chat_id, MAX(time_sent) most_recent
           FROM message
           GROUP BY chat_id
         ) sub_message ON message.chat_id = sub_message.chat_id AND message.time_sent = sub_message.most_recent
@@ -19,7 +21,7 @@ module.exports = models => ({
       LEFT JOIN person
       ON message.sender_id = person.id
       GROUP BY chat.id
-      ORDER BY message.time_sent DESC, chat.name DESC`)
+      ORDER BY message.time_sent DESC, chat.name DESC`, [person.id])
     .then(result => Either.Right(result.list()))
     .errorToLeft();
   },
