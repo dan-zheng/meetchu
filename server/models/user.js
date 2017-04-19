@@ -43,24 +43,26 @@ module.exports = {
       UNIQUE (reset_password_token)
     )`,
     `CREATE TABLE IF NOT EXISTS person_course (
-      user_id INT NOT NULL,
+      person_id INT NOT NULL,
       course_id INT NOT NULL,
-      PRIMARY KEY (user_id, course_id),
-      FOREIGN KEY (user_id)
-        REFERENCES person(id),
+      PRIMARY KEY (person_id, course_id),
+      FOREIGN KEY (person_id)
+        REFERENCES person(id)
+        ON DELETE CASCADE,
       FOREIGN KEY (course_id)
         REFERENCES course(id)
+        ON DELETE CASCADE
     )`,
     `CREATE TABLE IF NOT EXISTS person_chat (
       created_at DATETIME,
       chat_id INT NOT NULL,
-      user_id INT NOT NULL,
+      person_id INT NOT NULL,
       PRIMARY KEY (chat_id, user_id),
       FOREIGN KEY (chat_id)
         REFERENCES chat(id)
         ON DELETE CASCADE,
-      FOREIGN KEY (user_id)
-        REFERENCES user(id)
+      FOREIGN KEY (person_id)
+        REFERENCES person(id)
         ON DELETE CASCADE
     )`,
     `CREATE TABLE IF NOT EXISTS person_notification (
@@ -68,8 +70,8 @@ module.exports = {
       FOREIGN KEY (notification_id)
         REFERENCES notification(id)
         ON DELETE CASCADE,
-      FOREIGN KEY (user_id)
-        REFERENCES user(id)
+      FOREIGN KEY (person_id)
+        REFERENCES person(id)
         ON DELETE CASCADE
     )`
   ]
