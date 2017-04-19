@@ -25,16 +25,35 @@
           | {{ msg }}
     #message-box
       input.px-3(v-model='currentMsg', placeholder='Type message...', @keyup.enter='sendMessage(currentChat)')
-  b-modal#new-chat-modal(title='Create a chat', @shown='clear(["userHits", "userQuery"])', @ok='createChat(model.newChat)')
-    vue-form(:state='formstate.newChat', v-model='formstate.newChat', @submit.prevent='createChat')
-      b-form-input.mb-1(type='text', placeholder='Chat name', v-model='model.newChat.name')
-      b-form-input.mb-1(type='text', placeholder='Description', v-model='model.newChat.description')
-      b-form-input.mb-1(type='text', placeholder='Search for a user...', v-model='userQuery', @keyup='search("userHits", userQuery)')
+  b-modal#new-chat-modal(title='Create a chat', @shown='clear(["userHits", "userQuery"])', @close='clear(["userHits", "userQuery"])', hide-footer)
+    vue-form(:state='formstate.newChat', v-model='formstate.newChat', @submit.prevent='onSubmit')
+      validate.form-group.container(auto-label, :class='fieldClassName(formstate.newChat.chatName)')
+        label.col-form-label Chat name
+        input.form-control(type='text', name='chatName', placeholder='Chat name', v-model.lazy='model.newChat.name', required)
+        field-messages.form-control-feedback(name='chatName', show='$touched || $submitted')
+          div(slot='required') Chat name is required.
+      .form-group.container
+        label.col-form-label Description
+        input.form-control(type='text', name='description', placeholder='Description', v-model.lazy='model.newChat.description')
+      .form-group.container
+        label.col-form-label Add users
+        input.form-control(type='text', placeholder='Search for a user...', v-model='userQuery', @keyup='search("userHits", userQuery)')
+      small.text-info(v-if='userHits.length > 0') Matches
       .list-group
-        .list-group-item.list-group-item-action.rounded-0.border(v-for='user in userHits', :key='user.objectId', @click='addUser(model.newChat, user)')
+        .list-group-item.list-group-item-action.rounded-0.border(v-for='(user, index) in sortedHitUsers', :key='user.objectId', @click='addUserToChat(model.newChat, user, index)')
           .d-flex.w-100.mx-1.justify-content-between.align-items-center
-            h5.m-0 {{ user.firstName + ' ' + user.lastName }}
+            h5.m-0 {{ user.first_name + ' ' + user.last_name }}
             small.text-right(style='min-width: 80px;') {{ user.email }}
+      small.text-success(v-if='model.newChat.users.length > 0') Selected
+      .list-group
+        .list-group-item.list-group-item-action.rounded-0.border(v-for='(user, index) in sortedNewChatUsers', :key='user.id', @click='removeUserFromChat(model.newChat, user, index)')
+          .d-flex.w-100.mx-1.justify-content-between.align-items-center
+            h5.m-0 {{ user.first_name + ' ' + user.last_name }}
+            small.text-right(style='min-width: 80px;') {{ user.email }}
+      .py-2.text-center
+        button.btn.btn-primary(v-on:click='createChat(model.newChat)')
+          i.fa.fa-plus-circle
+          | Create chat
 </template>
 
 <script>
@@ -106,13 +125,6 @@ export default {
     ...mapGetters({
       user: 'user'
     }),
-    sortedUsers(chat) {
-      return chat.users.sort((a, b) => {
-        const u1 = a.first_name + ' ' + a.last_name;
-        const u2 = b.first_name + ' ' + b.last_name;
-        return u1.localeCompare(u2);
-      });
-    },
     sortedChats() {
       return this.chats.sort((a, b) => {
         if (!a.lastSent) {
@@ -122,6 +134,20 @@ export default {
         }
         return b.lastSent.isAfter(a.lastSent);
       });
+    },
+    sortedHitUsers() {
+      return this.userHits.sort((a, b) => {
+        const u1 = a.first_name + ' ' + a.last_name;
+        const u2 = b.first_name + ' ' + b.last_name;
+        return u1.localeCompare(u2);
+      });
+    },
+    sortedNewChatUsers() {
+      return this.model.newChat.users.sort((a, b) => {
+        const u1 = a.first_name + ' ' + a.last_name;
+        const u2 = b.first_name + ' ' + b.last_name;
+        return u1.localeCompare(u2);
+      });
     }
   },
   methods: {
@@ -130,19 +156,19 @@ export default {
         return;
       }
       this.chats.push(this.model.newChat);
-      this.model.newChat = {
-        name: '',
-        description: '',
-        lastSender: '',
-        lastMsg: '',
-        lastSent: '',
-        users: [],
-        messages: []
-      };
       this.$root.$emit('hide::modal','new-chat-modal');
     },
-    addUserToChat(chat, user) {
-      this.chat.users.push(user);
+    addUserToChat(chat, user, index) {
+      if (chat.users.findIndex(u => u.id === user.id) !== -1) {
+        console.log(`User ${user.id} is already in chat ${chat.id}`);
+        return false;
+      }
+      chat.users.push(user);
+      this.userHits.splice(index, 1);
+    },
+    removeUserFromChat(chat, user, index) {
+      chat.users.splice(index, 1);
+      this.userHits.push(user);
     },
     setCurrentChat(chat) {
       this.currentChat = chat;
@@ -178,7 +204,14 @@ export default {
       userIndex.search(query, {
         hitsPerPage: 5
       }, (error, results) => {
-        this[hits] = results.hits;
+        const filteredHits = results.hits.filter(el => this.model.newChat.users.findIndex(u => u.id === el.objectID) === -1);
+        filteredHits.forEach((el) => {
+          el.id = el.objectID;
+          delete el.objectID;
+          delete el._highlightResult;
+          return el;
+        });
+        this[hits] = filteredHits;
       });
     },
     clear(values) {
@@ -190,6 +223,15 @@ export default {
           this[v] = '';
         }
       });
+      this.model.newChat = {
+        name: '',
+        description: '',
+        lastSender: '',
+        lastMsg: '',
+        lastSent: '',
+        users: [],
+        messages: []
+      };
     },
     formatDate(date) {
       if (!date) {
@@ -209,6 +251,20 @@ export default {
       } else {
         return date.format('LL');
       }
+    },
+    fieldClassName(field) {
+      if (!field) {
+        return '';
+      }
+      if ((field.$touched || field.$submitted) && field.$valid) {
+        return 'has-success';
+      }
+      if ((field.$touched || field.$submitted) && field.$invalid) {
+        return 'has-danger';
+      }
+    },
+    onSubmit(type) {
+      console.log(this.formstate.newChat.$valid);
     }
   }
 }

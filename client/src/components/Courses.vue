@@ -31,7 +31,7 @@
         .d-flex.w-100.mx-1.justify-content-between.align-items-center
           h5.m-0 {{ course.title }}
           small.text-right(style='min-width: 80px;') {{ course.subject + ' ' + course.number }}
-  b-modal#sync-course-modal(title='Sync Purdue courses', @shown='clear(["purdueUsername", "purduePassword"])', @ok='syncCourses', hide-footer)
+  b-modal#sync-course-modal(title='Sync Purdue courses', @shown='clear(["purdueUsername", "purduePassword"])', hide-footer)
     p You can enter your Purdue credentials to synchronize your classes.
     vue-form(:state='formstate.purdue', v-model='formstate.purdue', @submit.prevent='onSubmit("purdue")')
       validate.form-group.container(auto-label, :class='fieldClassName(formstate.purdue.purdueUsername)')
@@ -45,7 +45,7 @@
         field-messages.form-control-feedback(name='purduePassword', show='$touched || $submitted')
           div(slot='required') Password is required.
       .py-2.text-center
-        button.btn.btn-primary(v-on:click='syncCourses')
+        button.btn.btn-primary(@click='syncCourses')
           i.fa.fa-user
           | Login
     small Note: Meetchu does not store your Purdue information.
@@ -107,43 +107,11 @@ export default {
     }
   },
   methods: {
-    fieldClassName(field) {
-      if (!field) {
-        return '';
-      }
-      if ((field.$touched || field.$submitted) && field.$valid) {
-        return '';
-        // return 'has-success';
-      }
-      if ((field.$touched || field.$submitted) && field.$invalid) {
-        return 'has-danger';
-      }
-    },
-    onSubmit(type) {
-      console.log(this.formstate.purdue.$valid);
-    },
-    search(hits, query) {
-      if (!query) {
-        this[hits] = [];
+    addCourse(course) {
+      if (courses.findIndex(c => c.uuid === course.uuid) !== -1) {
+        console.log(`Course ${c.courseID} has already been added`);
         return false;
       }
-      courseIndex.search(query, {
-        hitsPerPage: 5
-      }, (error, results) => {
-        this[hits] = results.hits;
-      });
-    },
-    clear(values) {
-      values.forEach((v) => {
-        const temp = this[v];
-        if (Array.isArray(temp)) {
-          this[v] = [];
-        } else if (typeof temp === 'string' || temp instanceof String) {
-          this[v] = '';
-        }
-      });
-    },
-    addCourse(course) {
       this.courses.push(course);
       this.$root.$emit('hide::modal','add-course-modal');
     },
@@ -154,9 +122,10 @@ export default {
       if (!this.formstate.purdue.$valid) {
         return;
       }
+      this.clear(["courseHits", "courseQuery"]);
       this.$store.dispatch('syncCourses', {
-        username: purdueUsername,
-        password: purduePassword
+        username: this.purdueUsername,
+        password: this.purduePassword
       }).then(() => {
         console.log(`Sync courses success.`);
         // Alert message
@@ -176,6 +145,49 @@ export default {
         })
         .catch(swal.noop);
       });
+    },
+    search(hits, query) {
+      if (!query) {
+        this[hits] = [];
+        return false;
+      }
+      courseIndex.search(query, {
+        hitsPerPage: 5
+      }, (error, results) => {
+        const filteredHits = results.hits.filter(el => this.courses.findIndex(c => c.uuid === el.objectID) === -1);
+        filteredHits.forEach((el) => {
+          el.uuid = el.objectID;
+          delete el.objectID;
+          delete el._highlightResult;
+          return el;
+        });
+        this[hits] = filteredHits;
+      });
+    },
+    clear(values) {
+      values.forEach((v) => {
+        const temp = this[v];
+        if (Array.isArray(temp)) {
+          this[v] = [];
+        } else if (typeof temp === 'string' || temp instanceof String) {
+          this[v] = '';
+        }
+      });
+    },
+    fieldClassName(field) {
+      if (!field) {
+        return '';
+      }
+      if ((field.$touched || field.$submitted) && field.$valid) {
+        return '';
+        // return 'has-success';
+      }
+      if ((field.$touched || field.$submitted) && field.$invalid) {
+        return 'has-danger';
+      }
+    },
+    onSubmit(type) {
+      console.log(this.formstate.purdue.$valid);
     }
   }
 }

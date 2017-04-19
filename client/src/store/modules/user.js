@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import * as types from '../mutation-types';
+import { userIndex, addObjects } from '../../services/algolia';
 
 const state = {
   user: null
@@ -40,7 +41,15 @@ const actions = {
       password,
       confirmPassword
     })
-    .then(res => commit(types.SET_USER, res.data))
+    .then((res) => {
+      commit(types.SET_USER, res.data);
+      addObjects(userIndex, [{
+        objectID: res.data.id,
+        first_name: firstName,
+        last_name: lastName,
+        email
+      }]);
+    })
     .catch((err) => {
       throw err;
     });
