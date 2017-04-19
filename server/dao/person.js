@@ -30,7 +30,7 @@ module.exports = models => ({
   findById(id) {
     return models.pool.query('SELECT * FROM person WHERE id = ? LIMIT 1', [id])
       .then(rows => rows.list().headMaybe().map(user => new models.Person(user)))
-      .then(maybePerson => maybeUser.toEither('Person not found.'))
+      .then(maybePerson => maybePerson.toEither('Person not found.'))
       .errorToLeft();
   },
   /**

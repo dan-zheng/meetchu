@@ -23,11 +23,9 @@ exports.postCourses = (req, res) => {
  * Add a user to a course.
  */
 exports.postCourseAddUser = (req, res) => {
-  console.log(req.body.course);
-  console.log(req.body.user);
   const course = req.body.course;
   const person = new models.Person(req.body.user);
-  courseDao.addPerson(person).tap(result =>
+  courseDao.addPerson(course, person).tap(result =>
     result.cata(
       err => res.status(401).json(err),
       () => res.status(200).json(true)
@@ -42,7 +40,7 @@ exports.postCourseAddUser = (req, res) => {
 exports.postCourseRemoveUser = (req, res) => {
   const course = req.body.course;
   const person = new models.Person(req.body.user);
-  courseDao.removePerson(person).tap(result =>
+  courseDao.removePerson(course, person).tap(result =>
     result.cata(
       err => res.status(401).json(err),
       () => res.status(200).json(true)
