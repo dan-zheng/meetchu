@@ -138,15 +138,11 @@ app.post('/signup', userController.postSignup);
 app.get('/login', userController.getLogin);
 app.post('/login', userController.postLogin);
 app.get('/logout', userController.getLogout);
-app.get('/account', userController.getAccount);
 app.post('/account/update', userController.postUpdateAccount);
 app.post('/account/delete', userController.postDeleteAccount);
+
 app.get('/profile/:id', userController.getProfile);
-app.post('/profile/:id/chat', userController.postProfileCreateChat);
-app.get('/forgot', userController.getForgot);
-app.post('/forgot', userController.postForgot);
-app.get('/reset/:token', userController.getPasswordReset);
-app.post('/reset/:token', userController.postPasswordReset);
+
 app.get('/chats', chatController.getChats);
 app.get('/chats/:id', chatController.getChat);
 app.post('/chats/create', chatController.postCreateChatGroup);
@@ -154,11 +150,11 @@ app.post('/chats/:id/invite', chatController.postInviteChatGroup);
 app.post('/chats/:id/leave', chatController.postLeaveChatGroup);
 app.post('/chats/:id/delete', chatController.postDeleteChatGroup);
 
-app.get('/courses', courseController.getCourses);
-app.get('/courses/:id', courseController.getCourse);
-app.post('/courses/add', courseController.postAddCourse);
-app.post('/courses/remove/:id', courseController.postRemoveCourse);
-app.post('/courses/sync', courseController.postSyncCourses);
+app.post('/courses', courseController.postCourses);
+app.post('/courses/add', courseController.postCourseAddUser);
+app.post('/courses/remove/', courseController.postCourseRemoveUser);
+app.post('/courses/sync', courseController.postCourseSyncUser);
+
 app.get('/meetings', meetingController.getMeetings);
 app.get('/meetings/:id', meetingController.getMeeting);
 app.post('/meetings/create', meetingController.postCreateMeeting);

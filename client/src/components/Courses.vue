@@ -120,6 +120,7 @@ export default {
         console.log(`Course ${c.courseID} has already been added`);
         return false;
       }
+      this.$store.dispatch('addCourse', { course });
       this.courses.push(course);
       this.$root.$emit('hide::modal','add-course-modal');
     },
