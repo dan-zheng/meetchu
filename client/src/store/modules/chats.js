@@ -10,7 +10,7 @@ const getters = {
 };
 
 const actions = {
-  initChats({ commit, rootState }) {
+  getChats({ commit, rootState }) {
     return Vue.axios.post('/chats', { userId: rootState.user.id })
       .then(res => commit(types.SET_CHATS, res.data))
       .catch((err) => {
@@ -18,22 +18,25 @@ const actions = {
       });
   },
   createChat({ commit, rootState }, { chat }) {
+    commit(types.ADD_CHAT, res.data);
     return Vue.axios.post('/chats/create', { chat, userId: rootState.user.id })
-      .then(res => commit(types.ADD_CHAT, res.data))
+      .then(res => true)
       .catch((err) => {
         throw err;
       });
   },
   removeChat({ commit, rootState }, { chat }) {
+    commit(types.REMOVE_CHAT, chat);
     return Vue.axios.post(`/chats/${chat.id}/remove`, { userId: rootState.user.id })
-      .then(res => commit(types.REMOVE_CHAT, chat))
+      .then(res => true)
       .catch((err) => {
         throw err;
       });
   },
   deleteChat({ commit, rootState }, { chat }) {
+    commit(types.REMOVE_CHAT, chat);
     return Vue.axios.post(`/chats/${chat.id}/delete`, { userId: rootState.user.id })
-      .then(res => commit(types.REMOVE_CHAT, chat))
+      .then(res => true)
       .catch((err) => {
         throw err;
       });

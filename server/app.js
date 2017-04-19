@@ -204,7 +204,8 @@ const personDao = require('./dao/person')(models);
 const courseDao = require('./dao/course')(models);
 const chatDao = require('./dao/chat')(models);
 
-/* Bulk Course Insertions
+/*
+// Bulk Course Insertions
 personDao.findByEmail('era878@gmail.com')
 .tap((result) => {
   result.map((person) => {
@@ -219,8 +220,7 @@ personDao.findByEmail('era878@gmail.com')
     })
   });
 });
-
-/*                    */
+*/
 
 http.listen(app.get('port'), () => {
   console.log('Express server listening on port %d in %s mode', app.get('port'), app.get('env'));

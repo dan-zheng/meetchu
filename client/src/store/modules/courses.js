@@ -29,23 +29,23 @@ const actions = {
   },
   getCourseUsers({ commit }, { course }) {
     return Vue.axios.post('/course/users', { course })
-      .then(res => {
-        commit(types.SET_COURSE_USERS, course, res.data);
-      })
+      .then(res => commit(types.SET_COURSE_USERS, { course, users: res.data }))
       .catch((err) => {
         throw err;
       });
   },
   addCourse({ commit, rootState }, { course }) {
+    commit(types.ADD_COURSE, course);
     return Vue.axios.post('/course/add', { course, user: rootState.user.user })
-      .then(res => commit(types.ADD_COURSE, res.data))
+      .then(res => true)
       .catch((err) => {
         throw err;
       });
   },
   removeCourse({ commit, rootState }, { course }) {
+    commit(types.REMOVE_COURSE, course);
     return Vue.axios.post(`/course/remove`, { course, user: rootState.user.user })
-      .then(res => commit(types.REMOVE_COURSE, course))
+      .then(res => true)
       .catch((err) => {
         throw err;
       });
@@ -68,7 +68,7 @@ const mutations = {
   [types.SET_COURSES](state, courses) {
     state.courses = courses;
   },
-  [types.SET_COURSE_USERS](state, course, users) {
+  [types.SET_COURSE_USERS](state, { course, users }) {
     state.courses.forEach((c, i) => {
       if (c.id === course.id) {
         state.courses[i].users = users;
