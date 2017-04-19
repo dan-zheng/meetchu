@@ -51,7 +51,7 @@ const sessionStore = new MySQLStore({
   password: process.env.DB_PASS,
   database: process.env.DB_NAME,
   schema: {
-    tableName: 'Sessions'
+    tableName: 'sessions'
   }
 });
 
@@ -138,11 +138,11 @@ app.post('/signup', userController.postSignup);
 app.get('/login', userController.getLogin);
 app.post('/login', userController.postLogin);
 app.get('/logout', userController.getLogout);
-app.get('/account', userController.getProfile);
+app.get('/account', userController.getAccount);
 app.post('/account/update', userController.postUpdateAccount);
 app.post('/account/delete', userController.postDeleteAccount);
-app.get('/profile/:id', userController.getPublicProfile);
-app.post('/profile/:id/chat', userController.postPublicProfileCreateChat);
+app.get('/profile/:id', userController.getProfile);
+app.post('/profile/:id/chat', userController.postProfileCreateChat);
 app.get('/forgot', userController.getForgot);
 app.post('/forgot', userController.postForgot);
 app.get('/reset/:token', userController.getPasswordReset);
@@ -203,8 +203,17 @@ io.on('connection', (socket) => {
  */
 models.sync();
 const userDao = require('./dao/user')(models);
+const courseDao = require('./dao/course')(models);
 
 /*
+userDao.findByEmail('era878@gmail.com').then((maybeUser) => {
+  maybeUser.map((user) => {
+    return courseDao.findByPerson(user).then((courses) => {
+      console.log(courses);
+    });
+  });
+});
+
 userDao.signup({ email: 'era878@gmail.com', first_name: 'Eric', last_name: 'Aguilera', password: 'asdf' })
 .then((result) => {
   console.log(result);

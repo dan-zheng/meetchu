@@ -1,7 +1,7 @@
 <template lang='pug'>
 #content.ml-2
   .page-header
-    h2 Account
+    h2 Profile
 
   .offset-md-1.col-md-10
     .page-header
@@ -105,6 +105,7 @@ export default {
       .forEach(key => {
         this.userModel[key] = temp[key];
       });
+    console.log(this.$route.params);
   },
   computed: {
     ...mapGetters({

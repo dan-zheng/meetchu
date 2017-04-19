@@ -10,6 +10,8 @@ import VueForm from 'vue-form';
 import BootstrapVue from 'bootstrap-vue';
 import VueSocketIO from 'vue-socket.io';
 
+// Sadly necessary to manually import bootstrap because
+// bootstrap-vue modal doesn't work with vue-form.
 import jQuery from 'jquery';
 import Tether from 'tether';
 window.$ = jQuery;
