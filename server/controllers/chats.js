@@ -13,7 +13,7 @@ exports.postChats = (req, res) => {
   chatDao.getChatList(person).then(result =>
     result.cata(
       err => res.status(401).json(err),
-      chatList => res.status(200).json(chatList)
+      chatList => res.status(200).json(chatList.toArray())
     )
   );
 };
@@ -28,7 +28,7 @@ exports.postChatUsers = (req, res) => {
   chatDao.getChatMessages(chat, MAX_MESSAGES).then(result =>
     result.cata(
       err => res.status(401).json(err),
-      chatMessages => res.status(200).json(chatMessages)
+      chatMessages => res.status(200).json(chatMessages.toArray())
     )
   );
 };
