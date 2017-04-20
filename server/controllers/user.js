@@ -75,16 +75,12 @@ exports.postSignup = (req, res, next) => {
   req.assert('confirm_password', 'Passwords do not match.').equals(req.body.password);
   req.sanitize('email').normalizeEmail({ remove_dots: false });
 
-  passport.authenticate('signup', (err, user) => {
+  passport.authenticate('signup', (err, person) => {
     if (err) {
       req.flash('error', err);
       return res.status(401).json(err);
     }
-    const hiddenFields = ['password', 'reset_password_token', 'reset_password_expiration'];
-    hiddenFields.forEach((field) => {
-      delete user[field];
-    });
-    return res.status(200).json(user);
+    return res.status(200).json(person.hide());
   })(req, res, next);
 };
 
@@ -132,24 +128,12 @@ exports.postUpdateAccount = (req, res) => {
  */
 exports.getProfile = (req, res) => {
   const id = req.params.id;
-  const hiddenFields = ['password', 'reset_password_token', 'reset_password_expiration'];
-  const privateFields = ['email', 'major', 'profile_picture_url'];
 
   personDao.findById(id).tap(result =>
     result.cata(
       err => res.status(401).json(err),
       (foundPerson) => {
-        privateFields.forEach((field) => {
-          const privacyField = `privacy_show_${field}`;
-          if (foundPerson[privacyField] === 1) {
-            delete foundPerson[field];
-          }
-          delete foundPerson[privacyField];
-        });
-        hiddenFields.forEach((field) => {
-          delete foundPerson[field];
-        });
-        return res.status(200).json(foundPerson);
+        return res.status(200).json(foundPerson.hide().publicView());
       }
     )
   );
