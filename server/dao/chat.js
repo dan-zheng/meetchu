@@ -73,7 +73,7 @@ module.exports = models => ({
   },
   removeMessage(message) {
     return models.pool.query(
-      'DELETE FROM message WHERE sender_id = ?', [message.sender_id])
+      'DELETE FROM message WHERE id = ?', [message.id])
     .then(result => Either.Right(result.affectedRows))
     .errorToLeft();
   },
