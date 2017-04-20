@@ -87,6 +87,16 @@ module.exports = models => ({
         Either.Right(result.insertId))
       .errorToLeft();
   },
+  /**
+   * @return Promise[Either[String, Integer]]
+   */
+  addPeople(chat, people) {
+    const values = people.map(person => [person.id, chat.id]);
+    return models.pool.query(
+      'INSERT IGNORE INTO person_course (person_id, course_id) VALUES ?', [values])
+      .then(result => Either.Right(result.affectedRows))
+      .errorToLeft();
+  },
   removePerson(chat, person) {
     return models.pool.query(
       `DELETE FROM person_chat

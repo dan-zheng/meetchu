@@ -207,7 +207,7 @@ async function run() {
   const chatDao = require('./dao/chat')(models);
   const Either = require('monet').Either;
 
-/*
+  /*
   const findPerson = await personDao.findByEmail('era878@gmail.com');
   const createChat = await findPerson.flatMap(
     found => chatDao.create({ name: 'HELLO', description: 'WORLD' })

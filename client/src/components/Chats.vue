@@ -208,7 +208,7 @@ export default {
       this.hideModal("#new-chat-modal");
       this.$store.dispatch('createChat', { chat: this.model.newChat });
       this.model.newChat.users.forEach((user) => {
-        this.$store.dispatch('createChat', { chat: this.model.newChat });
+        this.$store.dispatch('addChatUser', { chat: this.model.newChat, user });
       });
     },
     addUserToChat(chat, user, index) {
