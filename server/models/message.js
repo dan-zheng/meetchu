@@ -8,9 +8,11 @@ module.exports = {
       time_sent DATETIME DEFAULT CURRENT_TIMESTAMP,
       PRIMARY KEY (id),
       FOREIGN KEY (sender_id)
-        REFERENCES person(id),
+        REFERENCES person(id)
+        ON DELETE CASCADE,
       FOREIGN KEY (chat_id)
         REFERENCES chat(id)
+        ON DELETE CASCADE
     )`
   ]
 };
