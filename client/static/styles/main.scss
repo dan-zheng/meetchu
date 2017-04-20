@@ -51,15 +51,19 @@ textarea {
   color: $gray-light;
 }
 :-moz-placeholder { /* Mozilla Firefox 4 to 18 */
-   color: $gray-light;
-   opacity:  1;
+  color: $gray-light;
+  opacity:  1;
 }
 ::-moz-placeholder { /* Mozilla Firefox 19+ */
-   color: $gray-light;
-   opacity:  1;
+  color: $gray-light;
+  opacity:  1;
 }
 :-ms-input-placeholder { /* Internet Explorer 10-11 */
-   color: $gray-light;
+  color: $gray-light;
+}
+
+.v-select {
+  font-family: $font-family-base;
 }
 
 // List groups

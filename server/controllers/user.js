@@ -132,9 +132,7 @@ exports.getProfile = (req, res) => {
   personDao.findById(id).tap(result =>
     result.cata(
       err => res.status(401).json(err),
-      (foundPerson) => {
-        return res.status(200).json(foundPerson.hide().publicView());
-      }
+      foundPerson => res.status(200).json(foundPerson.hide().publicView())
     )
   );
 };

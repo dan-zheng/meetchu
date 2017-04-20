@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import * as types from '../mutation-types';
-import { userIndex, addObjects } from '../../services/algolia';
+import { userIndex, addObjects } from '../../common/algolia';
 
 const state = {
   user: null

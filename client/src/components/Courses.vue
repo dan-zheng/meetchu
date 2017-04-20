@@ -9,7 +9,7 @@
         a.text-primary(@click='clear(["purdueUsername", "purduePassword"]); showModal("#sync-course-modal");')
           img(src='static/img/icon-purdue.svg', style='height: 18px')
     #courses-list
-      p.text-muted.px-4.py-2.my-0(v-if='!hasCourses') You are not in any courses.
+      p.text-muted.px-3.py-2.my-0(v-if='!hasCourses') You are not in any courses.
       .list-group(v-else)
         .list-group-item.list-group-item-action.course.rounded-0.border(v-for='course in sortedCourses', :key='course.id', v-bind:class='{ active: currentCourse == course }', @click='setCurrentCourse(course)')
           .d-flex.w-100.justify-content-between
@@ -26,15 +26,16 @@
     .d-flex.px-4.align-items-center(v-else)
       h2.mx-auto.my-2(style='min-height: 35px') Course Info
     #users-list
-      p.text-muted.px-4.py-2.my-0(v-if='!hasCourses') Add a course to see course information!
-      p.text-muted.px-4.py-2.my-0(v-else-if='!hasCurrentCourse') Click on a course to see course information!
+      p.text-muted.px-3.py-2.my-0(v-if='!hasCourses') Add a course to see course information!
+      p.text-muted.px-3.py-2.my-0(v-else-if='!hasCurrentCourse') Click on a course to see course information!
       h4.subtitle.px-2.py-2.my-0(v-else) Students
         span(v-if='hasCurrentCourseUsers')  ({{ currentCourse.users.length }})
       .list-group(v-if='hasCurrentCourse')
-        .list-group-item.list-group-item-action.user.rounded-0.border(v-for='user in currentCourse.users', :key='user.email')
-          .d-flex.w-100.mx-1.justify-content-between.align-items-center
-            h5.mb-0 {{ user.first_name + ' ' + user.last_name }}
-            small.text-right {{ user.email }}
+        div(v-for='user in currentCourse.users', :key='user.email')
+          router-link.list-group-item.list-group-item-action.user.rounded-0.border(:to='"/profile/" + user.id')
+            .d-flex.w-100.mx-1.justify-content-between.align-items-center
+              h5.mb-0 {{ user.first_name + ' ' + user.last_name }}
+              small.text-right {{ user.email }}
 
   //- Modals
   b-modal#add-course-modal(title='Add a course', @shown='clear(["courseHits", "courseQuery"])', size='lg', hide-footer)
@@ -64,8 +65,10 @@
               input.form-control(type='password', name='purduePassword', placeholder='Password', v-model.lazy='purduePassword', required)
               field-messages.form-control-feedback(name='purduePassword', show='$touched || $submitted')
                 div(slot='required') Password is required.
-            .py-2.text-center
-              button.btn.btn-primary(@click='syncCourses(); hideModal("#sync-course-modal")')
+            .d-flex(v-if='spinnerLoading')
+              moon-loader.mx-auto(:loading='spinnerLoading', :color='spinnerColor', :size='spinnerSize', style='margin-bottom: 8px;')
+            .py-2.text-center(v-else)
+              button.btn.btn-primary(@click='syncCourses()')
                 i.fa.fa-user
                 | Login
           small Note: Meetchu does not store your Purdue information.
@@ -78,7 +81,7 @@
             span(aria-hidden='true') ×
         .modal-body
           .py-2.text-center
-            button.btn.btn-danger(v-on:click='removeCourse(currentCourse); hideModal("#course-settings-modal");')
+            button.btn.btn-danger(v-on:click='removeCourse(currentCourse)')
               i.fa.fa-trash
               | Remove this course
 </template>
@@ -86,13 +89,17 @@
 <script>
 import { mapGetters } from 'vuex';
 import { default as swal } from 'sweetalert2';
-import { courseIndex } from '../services/algolia';
-import { validationStyle } from '../services/form';
+import { courseIndex } from '../common/algolia';
+import { validationStyle } from '../common/form';
+import { MoonLoader, spinnerSize, spinnerColor } from '../common/spinner';
 
 export default {
   name: 'courses',
   metaInfo: {
     title: 'Courses'
+  },
+  components: {
+    MoonLoader
   },
   data() {
     return {
@@ -103,7 +110,10 @@ export default {
       purduePassword: '',
       formstate: {
         purdue: {}
-      }
+      },
+      spinnerLoading: false,
+      spinnerSize,
+      spinnerColor
     }
   },
   computed: {
@@ -143,7 +153,7 @@ export default {
     removeCourse(course) {
       this.$store.dispatch('removeCourse', { course });
       this.currentCourse = {};
-      this.$root.$emit('hide::modal','course-settings-modal');
+      this.hideModal("#course-settings-modal");
     },
     setCurrentCourse(course) {
       this.currentCourse = course;
@@ -159,11 +169,14 @@ export default {
         return;
       }
       this.clear(["courseHits", "courseQuery"]);
+      this.spinnerLoading = true;
       this.$store.dispatch('syncCourses', {
         username: this.purdueUsername,
         password: this.purduePassword
       }).then(() => {
         console.log(`Sync courses success.`);
+        this.spinnerLoading = false;
+        this.hideModal("#sync-course-modal");
         // Alert message
         swal({
           type: 'success',
