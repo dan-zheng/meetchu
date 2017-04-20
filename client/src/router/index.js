@@ -79,9 +79,8 @@ router.beforeEach((to, from, next) => {
   const promise = router.app.$store.getters.isLoggedIn ? true : router.app.$store.dispatch('checkAuth');
 
   Promise.all([promise]).then((values) => {
-    console.log(values);
     const loggedIn = router.app.$store.getters.isLoggedIn;
-    console.log(`${loggedIn ? 'Logged in.' : 'Not logged in.'}`);
+    // console.log(`${loggedIn ? 'Logged in.' : 'Not logged in.'}`);
 
     if (to.matched.some(record => record.meta.auth)) {
       // Check if route requires auth
