@@ -187,7 +187,15 @@ export default {
     this.$store.dispatch('getChats')
       .then(() => {
         if (this.sortedChats.length > 0) {
-          this.currentChat = this.sortedChats[0];
+          if (this.$route.query.chat) {
+            const id = parseInt(this.$route.query.chat);
+            const temp = this.sortedChats.find(c => c.id === id);
+            if (temp) {
+              this.currentChat = temp;
+            }
+          } else {
+            this.currentChat = this.sortedChats[0];
+          }
           this.$store.dispatch('getChatUsers', { chat: this.currentChat });
         }
       });
@@ -197,9 +205,11 @@ export default {
       if (!this.formstate.newChat.$valid) {
         return;
       }
-      this.$store.dispatch('createChat', { chat: this.model.newChat });
-      this.resetNewChat();
       this.hideModal("#new-chat-modal");
+      this.$store.dispatch('createChat', { chat: this.model.newChat });
+      this.model.newChat.users.forEach((user) => {
+        this.$store.dispatch('createChat', { chat: this.model.newChat });
+      });
     },
     addUserToChat(chat, user, index) {
       if (chat.users.findIndex(u => u.id === user.id) !== -1) {
@@ -208,10 +218,12 @@ export default {
       }
       chat.users.push(user);
       this.userHits.splice(index, 1);
+      this.$store.dispatch('addChatUser', { chat, user });
     },
     removeUserFromChat(chat, user, index) {
       chat.users.splice(index, 1);
       this.search("userHits", this.userQuery);
+      this.$store.dispatch('removeChatUser', { chat, user });
     },
     setCurrentChat(chat) {
       this.currentChat = chat;

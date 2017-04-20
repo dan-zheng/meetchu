@@ -1,5 +1,7 @@
 const models = require('../models');
+const personDao = require('../dao/person')(models);
 const chatDao = require('../dao/chat')(models);
+const Either = require('monet').Either;
 
 const MAX_MESSAGES = 10;
 
@@ -23,7 +25,7 @@ exports.postChats = (req, res) => {
  * Get a chat's users.
  */
 exports.postChatUsers = (req, res) => {
-  const chat = req.params.chat;
+  const chat = req.body.chat;
 
   chatDao.getChatMessages(chat, MAX_MESSAGES).then(result =>
     result.cata(
@@ -37,148 +39,65 @@ exports.postChatUsers = (req, res) => {
  * POST /chats/create
  * Create a chat.
  */
-exports.postCreateChat = (req, res) => {
-  const chat = req.params.chat;
+exports.postCreateChat = async (req, res) => {
+  const chat = req.body.chat;
+  const person = req.body.user;
 
-  /*
-  chatDao.getChatMessages(chat, MAX_MESSAGES).then(result =>
+  const findPerson = await personDao.findById(person.id);
+  const createChat = await findPerson.cata(
+    err => req.status(401).json(err),
+    found => chatDao.create(chat)
+  );
+  const addPerson = await createChat.cata(
+    err => req.status(401).json(err),
+    found => chatDao.addPerson(createChat.right(), findPerson.right())
+  );
+  return createChat.right();
+};
+
+/**
+ * POST /chats/add
+ * Add a user to a chat.
+ */
+exports.postChatAddUser = (req, res) => {
+  const chat = req.body.chat;
+  const person = req.body.user;
+
+  chatDao.addPerson(chat, person).tap(result =>
     result.cata(
       err => res.status(401).json(err),
-      chatMessages => res.status(200).json(chatMessages.toArray())
+      affectedRows => res.status(200).json(true)
     )
   );
-  */
-  return res.status(401).json(false);
 };
 
 /**
- * POST /chats/:id/invite
- * Invite a user to a chat group.
+ * POST /chats/leave
+ * Leave a chat.
  */
-exports.postInviteToChat = (req, res) => {
-  const id = req.params.id;
+exports.postChatRemoveUser = (req, res) => {
+  const chat = req.body.chat;
+  const person = req.body.user;
 
-  req.assert('email', 'Invitee field is not an email.').isEmail();
-
-  const errors = req.validationErrors();
-  if (errors) {
-    req.flash('error', errors);
-    return res.redirect(`/chats/${id}`);
-  }
-
-  const userEmail = req.body.email;
-
-  models.Group.findOne({
-    where: {
-      id
-    },
-    include: [{
-      model: models.User
-    }]
-  }).then((group) => {
-    if (!group) {
-      req.flash('error', 'The chat does not exist.');
-      return res.redirect('/chats');
-    }
-    models.User.findOne({
-      where: {
-        email: userEmail
-      }
-    }).then((user) => {
-      if (!user) {
-        req.flash('error', 'No user with that email exists.');
-        return res.redirect(`/chats/${id}`);
-      }
-      group.hasUser(user).then((exists) => {
-        if (exists) {
-          req.flash('error', 'The user you tried to invite is already in the chat.');
-          return res.redirect(`/chats/${id}`);
-        }
-        models.Notification.create({
-          message: `You have been invited to the chat ${group.name}.`
-        }).then((notification) => {
-          user.addNotification(notification);
-        });
-        group.addUser(user);
-        req.flash('success', `${user.first_name} has been invited.`);
-        return res.redirect(`/chats/${id}`);
-      });
-    });
-  });
+  chatDao.removePerson(chat, person).tap(result =>
+    result.cata(
+      err => res.status(401).json(err),
+      affectedRows => res.status(200).json(true)
+    )
+  );
 };
 
 /**
- * POST /chats/:id/leave
- * Leave a chat group.
- */
-exports.postLeaveChat = (req, res) => {
-  const id = req.params.id;
-  models.Group.findOne({
-    where: {
-      id
-    },
-    include: [{
-      model: models.User
-    }]
-  }).then((group) => {
-    if (!group) {
-      req.flash('error', 'The chat does not exist.');
-      return res.redirect('/chats');
-    }
-    group.hasUser(req.user).then((exists) => {
-      if (!exists) {
-        req.flash('error', 'You are not in the chat.');
-        return res.redirect('/chats');
-      }
-      group.removeUser(req.user);
-      if (group.Users.length <= 0) {
-        req.flash('info', 'Your chat has been deleted.');
-        return res.redirect('/chats');
-      }
-      req.flash('info', 'You have left the chat.');
-      return res.redirect('/chats');
-    });
-  });
-};
-
-/**
- * POST /chats/:id/delete
- * Delete a chat group.
+ * POST /chats/delete
+ * Delete a chat.
  */
 exports.postDeleteChat = (req, res) => {
-  const id = req.params.id;
-  models.Group.findById(id).then((group) => {
-    if (!group) {
-      req.flash('error', 'The chat does not exist.');
-      return res.redirect('/chats');
-    }
-    group.destroy().then(() => {
-      req.flash('info', 'Your group has been deleted.');
-      return res.redirect('/chats');
-    });
-  });
-};
+  const chat = req.body.chat;
 
-exports.getProto = (req, res) => {
-  models.Group.findAll({
-    include: [{
-      model: models.User,
-      where: {
-        id: req.user.dataValues.id
-      }
-    }]
-  }).then((groups) => {
-    if (groups) {
-      groups = groups.map((group) => {
-        return group.dataValues;
-      });
-      return res.render('chats/proto', {
-        title: 'Chats',
-        groups
-      });
-    }
-    return res.render('chats/proto', {
-      title: 'Chats'
-    });
-  });
+  chatDao.erase(chat).tap(result =>
+    result.cata(
+      err => res.status(401).json(err),
+      affectedRows => res.status(200).json(true)
+    )
+  );
 };

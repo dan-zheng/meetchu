@@ -145,9 +145,9 @@ app.get('/profile/:id', userController.getProfile);
 app.post('/chats', chatController.postChats);
 app.post('/chat/users', chatController.postChatUsers);
 app.post('/chats/create', chatController.postCreateChat);
-app.post('/chats/:id/invite', chatController.postInviteToChat);
-app.post('/chats/:id/leave', chatController.postLeaveChat);
-app.post('/chats/:id/delete', chatController.postDeleteChat);
+app.post('/chats/add', chatController.postChatAddUser);
+app.post('/chats/leave', chatController.postChatRemoveUser);
+app.post('/chats/delete', chatController.postDeleteChat);
 
 app.post('/courses', courseController.postCourses);
 app.post('/course/users', courseController.postCourseUsers);
@@ -201,17 +201,20 @@ async function run() {
   await models.sync();
 
   /* Testing Playground */
+
   const personDao = require('./dao/person')(models);
   const courseDao = require('./dao/course')(models);
   const chatDao = require('./dao/chat')(models);
   const Either = require('monet').Either;
 
-/*
-  const findPerson = await personDao.findByEmail('era878@gmail.com');
-  const createChat = await findPerson.cata(err => Either.Left(err),
+  /*
+  const findPerson = await personDao.findByEmail('a@a.com');
+  const createChat = await findPerson.cata(
+    err => Either.Left(err),
     found => chatDao.create({ name: 'HELLO', description: 'WORLD' })
   );
-  const addPerson = await createChat.cata(err => Either.Left(err),
+  const addPerson = await createChat.cata(
+    err => Either.Left(err),
     found => chatDao.addPerson(createChat.right(), findPerson.right())
   );
   const addMessage = await addPerson.cata(err => Either.Left(err),
@@ -220,7 +223,7 @@ async function run() {
       chat_id: createChat.right().id,
       message: 'LOL'
     }));
-*/
+  */
 
   http.listen(app.get('port'), () => {
     console.log('Express server listening on port %d in %s mode', app.get('port'), app.get('env'));
