@@ -200,7 +200,6 @@ export default {
     this.$store.dispatch('getChats')
       .then(() => {
         if (this.sortedChats.length > 0) {
-          console.log(this.sortedChats);
           this.currentChat = this.sortedChats[0];
           this.$store.dispatch('getChatUsers', { chat: this.currentChat });
         }
@@ -211,7 +210,8 @@ export default {
       if (!this.formstate.newChat.$valid) {
         return;
       }
-      this.chats.push(this.model.newChat);
+      this.$store.dispatch('createChat', { chat: this.model.newChat });
+      this.resetNewChat();
     },
     addUserToChat(chat, user, index) {
       if (chat.users.findIndex(u => u.id === user.id) !== -1) {
@@ -278,15 +278,7 @@ export default {
           this[v] = '';
         }
       });
-      this.model.newChat = {
-        name: '',
-        description: '',
-        last_sender: '',
-        last_msg: '',
-        last_sent: '',
-        users: [],
-        messages: []
-      };
+      this.resetNewChat();
     },
     formatDate(date) {
       if (!date) {
@@ -306,6 +298,17 @@ export default {
       } else {
         return date.format('LL');
       }
+    },
+    resetNewChat() {
+      this.model.newChat = {
+        name: '',
+        description: '',
+        last_sender: '',
+        last_msg: '',
+        last_sent: '',
+        users: [],
+        messages: []
+      };
     },
     onSubmit(type) {
       console.log(this.formstate.newChat.$valid);

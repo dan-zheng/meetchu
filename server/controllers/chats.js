@@ -38,23 +38,17 @@ exports.postChatUsers = (req, res) => {
  * Create a chat.
  */
 exports.postCreateChat = (req, res) => {
-  req.assert('name', 'Chat name is empty.').notEmpty();
+  const chat = req.params.chat;
 
-  const errors = req.validationErrors();
-  if (errors) {
-    req.flash('error', errors);
-    return res.redirect('/chats');
-  }
-  // NOTE: description is empty string instead of NULL, possibly undesirable
-  models.Group.create({
-    name: req.body.name,
-    description: req.body.description
-    // groupType: req.body.groupType
-  }).then((group) => {
-    group.addUser(req.user);
-    req.flash('success', 'Your chat has been created.');
-    return res.redirect('/chats');
-  });
+  /*
+  chatDao.getChatMessages(chat, MAX_MESSAGES).then(result =>
+    result.cata(
+      err => res.status(401).json(err),
+      chatMessages => res.status(200).json(chatMessages.toArray())
+    )
+  );
+  */
+  return res.status(401).json(false);
 };
 
 /**
