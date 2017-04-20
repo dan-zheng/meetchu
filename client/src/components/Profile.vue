@@ -1,36 +1,17 @@
 <template lang='pug'>
 #content.ml-2
-  .page-header
-    h2 Profile
+  div(v-if='isProfileLoaded')
+    h2 {{ fullName }}
 
-  .offset-md-1.col-md-10
-    .page-header
-      h4 Update Profile
-    .offset-md-1.col-md-10
-      vue-form(:state='formstate.profile', v-model='formstate.profile', @submit.prevent='onSubmit("profile")')
-        .form-group.row
-          label.col-md-3.col-form-label Name
-          .col-md-9
-            .row
-              validate.col-md-6.required-field(auto-label, :class='validationStyle(formstate.profile.first_name)')
-                input.form-control(type='text', name='first_name', placeholder='First', required, v-model.lazy='profile.first_name')
-                field-messages.form-control-feedback(auto-label, name='first_name', show='$touched || $submitted')
-                  div(slot='required') First name is required.
-              validate.col-md-6.required-field(auto-label, :class='validationStyle(formstate.profile.last_name)')
-                input.form-control(type='text', name='last_name', placeholder='Last', required, v-model.lazy='profile.last_name')
-                field-messages.form-control-feedback(auto-label, name='last_name', show='$touched || $submitted')
-                  div(slot='required') Last name is required.
-        validate.form-group.row.required-field(auto-label, :class='validationStyle(formstate.profile.email)')
-          label.col-md-3.col-form-label Email
-          .col-md-9
-            input.form-control(type='email', name='email', placeholder='Email', required, v-model.lazy='profile.email')
-            field-messages.form-control-feedback(auto-label, name='email', show='$touched || $submitted')
-              div(slot='required') Email is required.
-              div(slot='email') Email is invalid.
-        .py-2.text-center
-          button.btn.btn-primary(v-on:click='updateAccount("profile")')
-            i.fa.fa-pencil
-            | Update
+    h5 Email:
+      span(v-if='profile.email')  {{ profile.email }}
+      i(v-else)  private
+    h5 Major:
+      span(v-if='profile.major')  {{ profile.major }}
+      i(v-else)  private
+    button.btn.btn-primary(@click='createChat')
+      i.fa.fa-comments-o
+      | Start a chat
 </template>
 
 <script>
@@ -47,10 +28,6 @@ export default {
   },
   data() {
     return {
-      formstate: {
-        profile: {},
-        password: {}
-      },
       profile: {}
     }
   },
@@ -59,7 +36,6 @@ export default {
     this.axios.get(`/profile/${id}`)
       .then((res) => {
         this.profile = Object.assign({}, this.profile, res.data);
-        const fullName = `${this.profile.first_name } ${this.profile.last_name}`;
       })
       .catch((err) => {
         throw err;
@@ -68,9 +44,19 @@ export default {
   computed: {
     ...mapGetters({
       user: 'user'
-    })
+    }),
+    fullName() {
+      return `${this.profile.first_name } ${this.profile.last_name}`;
+    },
+    isProfileLoaded() {
+      return typeof this.profile.id !== 'undefined';
+    }
   },
   methods: {
+    createChat() {
+      // TODO: Add method for starting a 2-person chat
+      this.$router.push({ path: '/chats' });
+    },
     onSubmit(type) {
       console.log(this.formstate[type].$valid);
     },

@@ -7,7 +7,7 @@
         a.text-primary(@click='clear(["userHits", "userQuery"]); showModal("#new-chat-modal");')
           i.fa.fa-lg.fa-plus-square
     #chats-list
-      p.text-muted.px-4.py-2.my-0(v-if='!hasChats') You are not in any chats.
+      p.text-muted.px-3.py-2.my-0(v-if='!hasChats') You are not in any chats.
       .list-group(v-else)
         .list-group-item.list-group-item-action.chat.rounded-0.border(v-for='chat in sortedChats', :key='chat.name', v-bind:class='{ active: currentChat == chat }', @click='setCurrentChat(chat)')
           .d-flex.w-100.justify-content-between
@@ -26,13 +26,15 @@
     .d-flex.text-center.px-4.align-items-center(v-else)
       h2.mx-auto.my-2(style='min-height: 35px') Chat Info
     #messages-list
-      p.text-muted.px-4.py-2.my-0(v-if='!hasChats') Create a chat to start messaging!
-      p.text-muted.px-4.py-2.my-0(v-else-if='!hasCurrentChat') Click on a chat!
-      h4.subtitle.px-2.py-2.my-0(v-else) Messages
-      .list-group(v-if='hasCurrentChat')
-        .list-group-item.message.rounded-0.border(v-for='msg in currentChat.messages', :key='msg.id')
-          | {{ msg }}
-    #message-box
+      p.text-muted.px-3.py-2.my-0(v-if='!hasChats') Create a chat to start messaging!
+      p.text-muted.px-3.py-2.my-0(v-else-if='!hasCurrentChat') Click on a chat!
+      p.text-muted.px-3.py-2.my-0(v-else-if='!hasChatMessages(currentChat)') Send a message!
+      div(v-else)
+        // h4.subtitle.px-2.py-2.my-0 Messages
+        .list-group(v-if='hasCurrentChat')
+          .list-group-item.message.rounded-0.border(v-for='msg in currentChat.messages', :key='msg.id')
+            | {{ msg }}
+    #message-box(v-if='hasCurrentChat')
       input.px-3(v-model='currentMsg', placeholder='Type message...', @keyup.enter='sendMessage(currentChat)')
 
   //- Modals
@@ -178,7 +180,6 @@ export default {
       return this.chats.length > 0;
     },
     hasCurrentChat() {
-      console.log(this.currentChat);
       return typeof this.currentChat.id !== 'undefined';
     }
   },
@@ -301,6 +302,10 @@ export default {
     },
     hasChatUsers(chat) {
       return typeof chat.users !== 'undefined' && chat.users.length > 0;
+    },
+    hasChatMessages(chat) {
+      return typeof chat.messages !== 'undefined' && chat.messages.length > 0;
+      // return typeof chat.last_sent !== 'undefined';
     },
     hasChatLastSent(chat) {
       return typeof chat.last_sent !== 'undefined' && chat.last_sent !== "";

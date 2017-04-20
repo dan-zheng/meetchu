@@ -9,7 +9,7 @@
         a.text-primary(@click='clear(["purdueUsername", "purduePassword"]); showModal("#sync-course-modal");')
           img(src='static/img/icon-purdue.svg', style='height: 18px')
     #courses-list
-      p.text-muted.px-4.py-2.my-0(v-if='!hasCourses') You are not in any courses.
+      p.text-muted.px-3.py-2.my-0(v-if='!hasCourses') You are not in any courses.
       .list-group(v-else)
         .list-group-item.list-group-item-action.course.rounded-0.border(v-for='course in sortedCourses', :key='course.id', v-bind:class='{ active: currentCourse == course }', @click='setCurrentCourse(course)')
           .d-flex.w-100.justify-content-between
@@ -26,26 +26,25 @@
     .d-flex.px-4.align-items-center(v-else)
       h2.mx-auto.my-2(style='min-height: 35px') Course Info
     #users-list
-      p.text-muted.px-4.py-2.my-0(v-if='!hasCourses') Add a course to see course information!
-      p.text-muted.px-4.py-2.my-0(v-else-if='!hasCurrentCourse') Click on a course to see course information!
+      p.text-muted.px-3.py-2.my-0(v-if='!hasCourses') Add a course to see course information!
+      p.text-muted.px-3.py-2.my-0(v-else-if='!hasCurrentCourse') Click on a course to see course information!
       h4.subtitle.px-2.py-2.my-0(v-else) Students
         span(v-if='hasCurrentCourseUsers')  ({{ currentCourse.users.length }})
       .list-group(v-if='hasCurrentCourse')
-        .list-group-item.list-group-item-action.user.rounded-0.border(v-for='user in currentCourse.users', :key='user.email')
-          .d-flex.w-100.mx-1.justify-content-between.align-items-center
-            h5.mb-0 {{ user.first_name + ' ' + user.last_name }}
-            small.text-right {{ user.email }}
+        div(v-for='user in currentCourse.users', :key='user.email')
+          router-link.list-group-item.list-group-item-action.user.rounded-0.border(:to='"/profile/" + user.id')
+            .d-flex.w-100.mx-1.justify-content-between.align-items-center
+              h5.mb-0 {{ user.first_name + ' ' + user.last_name }}
+              small.text-right {{ user.email }}
 
   //- Modals
   b-modal#add-course-modal(title='Add a course', @shown='clear(["courseHits", "courseQuery"])', size='lg', hide-footer)
-    v-select(v-model='selected', :debounce='250', :on-search='searchCourses', :options='courseHits', :multiple='true', placeholder='Search for a course...')
-    //-
-      b-form-input.mb-1(type='text', placeholder='Search for a course...', v-model='courseQuery', @keyup='search("courseHits", courseQuery)')
-      .list-group
-        .list-group-item.list-group-item-action.rounded-0.border(v-for='course in courseHits', :key='course.objectId', @click='addCourse(course)')
-          .d-flex.w-100.mx-1.justify-content-between.align-items-center
-            h5.m-0 {{ course.title }}
-            small.text-right(style='min-width: 80px;') {{ course.subject + ' ' + course.number }}
+    b-form-input.mb-1(type='text', placeholder='Search for a course...', v-model='courseQuery', @keyup='search("courseHits", courseQuery)')
+    .list-group
+      .list-group-item.list-group-item-action.rounded-0.border(v-for='course in courseHits', :key='course.objectId', @click='addCourse(course)')
+        .d-flex.w-100.mx-1.justify-content-between.align-items-center
+          h5.m-0 {{ course.title }}
+          small.text-right(style='min-width: 80px;') {{ course.subject + ' ' + course.number }}
   .modal.fade#sync-course-modal(tabindex='-1', role='dialog', aria-labelledby='syncCoursesModalLabel', aria-hidden='true')
     .modal-dialog.modal-md
       .modal-content
@@ -112,7 +111,6 @@ export default {
       formstate: {
         purdue: {}
       },
-      selected: null,
       spinnerLoading: false,
       spinnerSize,
       spinnerColor
@@ -195,22 +193,6 @@ export default {
           text: e.response.data
         })
         .catch(swal.noop);
-      });
-    },
-    searchCourses(search, loading) {
-      loading(true);
-      courseIndex.search(search, {
-        hitsPerPage: 5
-      }, (error, results) => {
-        const filteredHits = results.hits.filter(el => this.sortedCourses.findIndex(c => c.id === el.objectID) === -1);
-        filteredHits.forEach((el) => {
-          el.id = el.objectID;
-          delete el.objectID;
-          delete el._highlightResult;
-          return el;
-        });
-        this.courseHits = filteredHits;
-        loading(false);
       });
     },
     search(hits, query) {

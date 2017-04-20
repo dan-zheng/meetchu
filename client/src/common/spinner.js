@@ -1,6 +1,6 @@
 import MoonLoader from 'vue-spinner/src/MoonLoader';
 
-const spinnerColor = '#3AB982';
+const spinnerColor = '#584cfd';
 const spinnerSize = '46px';
 
 export {
