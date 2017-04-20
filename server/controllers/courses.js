@@ -1,6 +1,11 @@
 const async = require('async');
 const request = require('superagent');
 
+const monet = require('monet');
+const Either = monet.Either;
+const bluebird = require('bluebird');
+require('../../lib/database-helper.js')(bluebird, monet);
+
 const models = require('../models');
 const courseDao = require('../dao/course')(models);
 
@@ -62,58 +67,68 @@ exports.postCourseRemoveUser = (req, res) => {
   );
 };
 
+function getSchedule(username, password) {
+  return request.get('https://api-dev.purdue.io/Student/Schedule')
+    .auth(username, password)
+    .then(
+      res => Either.Right(res.body),
+      err => Either.Left('Your Purdue credentials are invalid. Please try again.')
+    );
+}
+
+function getCourseId(sectionId) {
+  return request.get('https://api.purdue.io/odata/Sections')
+    .query({
+      $filter: `SectionId eq ${sectionId}`,
+      $expand: 'Class($expand=Course)'
+    })
+    .then(
+      res => Promise.resolve({ id: res.body.value[0].Class.Course.CourseId }),
+      err => Promise.reject('Error finding course id from section id.')
+    );
+}
+
 /**
  * POST /courses/sync
  * Sync a user's courses using their Purdue credentials.
  */
-exports.postCoursesSyncUser = (req, res) => {
+exports.postCoursesSyncUser = async (req, res) => {
   const person = new models.Person(req.body.user);
   const username = req.body.username.replace('@purdue.edu', '');
   const password = req.body.password;
   const encodedString = Buffer.from(`${username}:${password}`).toString('base64');
 
-  request
-  .get('https://api-dev.purdue.io/Student/Schedule')
-  .auth(username, password)
-  .then((res1) => {
-    const term = 'spring 2017';
-    const courses = res1.body[term];
-    async.each(courses, ((sectionId, callback) => {
-      request
-      .get('https://api.purdue.io/odata/Sections')
-      .query({
-        $filter: `SectionId eq ${sectionId}`,
-        $expand: 'Class($expand=Course)'
-      })
-      .then((res2) => {
-        const course = {
-          id: res2.body.value[0].Class.Course.CourseId
-        };
-        courseDao.addPerson(course, person).tap(result =>
-          result.cata(
-            err => callback(err),
-            () => callback(null)
-          )
-        );
-      })
-      .catch((err) => {
-        callback(err);
-      });
-    }), ((err) => {
-      // If error
-      if (err) {
-        req.flash('error', 'A database error occured. Please try again.');
-        return res.status(401).json('A database error occured. Please try again.');
-      }
-      // If success
+  const schedule = await getSchedule(username, password);
+  const currentTerm = schedule.flatMap(enrollment =>
+    Object.keys(enrollment).list().headMaybe().toEither('Current term was not found.')
+  );
+  const sectionIds = currentTerm.flatMap(term =>
+    Either.Right(schedule.right()[term])
+  );
+  const courseIds = await sectionIds.cata(
+    err => Promise.resolve(Either.Left(err)),
+    ids => Promise.all(ids.map(id => getCourseId(id)))
+      .then(arr => Promise.resolve(Either.Right(arr)),
+            err => Promise.resolve(Either.Left(err)))
+  );
+  const nonEmptyCourseIds = courseIds.flatMap(ids =>
+    ids.length > 0 ?
+      Either.Right(ids) :
+      Either.Left('No courses found.')
+  );
+  const bulkInsertion = await nonEmptyCourseIds.cata(
+    err => Promise.resolve(Either.Left(err)),
+    ids => courseDao.addPersonBulk(ids, person)
+  );
+  const courseList = await bulkInsertion.cata(
+    err => Promise.resolve(Either.Left(err)),
+    ids => courseDao.findByPerson(person)
+  );
+  courseList.cata(
+    err => res.status(401).json(err),
+    (list) => {
       req.flash('success', 'Your Purdue courses have been added successfully.');
-      courseDao.findByPerson(person).tap(result =>
-        result.cata(
-          err1 => res.status(401).json(err1),
-          courses1 => res.status(200).json(courses1.toArray())
-        )
-      );
-    }));
-  })
-  .catch(err => res.status(401).json('Your Purdue credentials are invalid. Please try again.'));
+      return res.status(200).json(list.toArray())
+    }
+  )
 };

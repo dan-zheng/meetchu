@@ -205,6 +205,13 @@ const courseDao = require('./dao/course')(models);
 const chatDao = require('./dao/chat')(models);
 
 /*
+// Get Chat List
+chatDao.getChatList({ id: 1 }).then((result) => {
+  result.map((chatList) => {
+    console.log(chatList);
+  });
+});
+
 // Bulk Course Insertions
 personDao.findByEmail('a@a.com')
   .tap((result) => {
