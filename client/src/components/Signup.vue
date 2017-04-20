@@ -44,7 +44,7 @@
 
 <script>
 import { default as swal } from 'sweetalert2';
-import { validationStyle } from '../services/form';
+import { validationStyle } from '../common/form';
 
 export default {
   name: 'signup',

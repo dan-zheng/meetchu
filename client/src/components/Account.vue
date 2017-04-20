@@ -69,7 +69,7 @@
 <script>
 import { mapGetters } from 'vuex';
 import { default as swal } from 'sweetalert2';
-import { validationStyle } from '../services/form';
+import { validationStyle } from '../common/form';
 
 const fields = {
   profile: ['first_name', 'last_name', 'email'],

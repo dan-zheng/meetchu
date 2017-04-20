@@ -64,8 +64,10 @@
               input.form-control(type='password', name='purduePassword', placeholder='Password', v-model.lazy='purduePassword', required)
               field-messages.form-control-feedback(name='purduePassword', show='$touched || $submitted')
                 div(slot='required') Password is required.
-            .py-2.text-center
-              button.btn.btn-primary(@click='syncCourses(); hideModal("#sync-course-modal")')
+            .d-flex(v-if='spinnerLoading')
+              moon-loader.mx-auto(:loading='spinnerLoading', :color='spinnerColor', :size='spinnerSize', style='margin-bottom: 8px;')
+            .py-2.text-center(v-else)
+              button.btn.btn-primary(@click='syncCourses()')
                 i.fa.fa-user
                 | Login
           small Note: Meetchu does not store your Purdue information.
@@ -86,13 +88,17 @@
 <script>
 import { mapGetters } from 'vuex';
 import { default as swal } from 'sweetalert2';
-import { courseIndex } from '../services/algolia';
-import { validationStyle } from '../services/form';
+import { courseIndex } from '../common/algolia';
+import { validationStyle } from '../common/form';
+import { MoonLoader, spinnerSize, spinnerColor } from '../common/spinner';
 
 export default {
   name: 'courses',
   metaInfo: {
     title: 'Courses'
+  },
+  components: {
+    MoonLoader
   },
   data() {
     return {
@@ -103,7 +109,10 @@ export default {
       purduePassword: '',
       formstate: {
         purdue: {}
-      }
+      },
+      spinnerLoading: false,
+      spinnerSize,
+      spinnerColor
     }
   },
   computed: {
@@ -159,11 +168,14 @@ export default {
         return;
       }
       this.clear(["courseHits", "courseQuery"]);
+      this.spinnerLoading = true;
       this.$store.dispatch('syncCourses', {
         username: this.purdueUsername,
         password: this.purduePassword
       }).then(() => {
         console.log(`Sync courses success.`);
+        this.spinnerLoading = false;
+        this.hideModal("#sync-course-modal");
         // Alert message
         swal({
           type: 'success',

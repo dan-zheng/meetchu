@@ -113,8 +113,8 @@
 import { mapGetters } from 'vuex';
 import * as moment from 'moment';
 import { default as swal } from 'sweetalert2';
-import { userIndex } from '../services/algolia';
-import { validationStyle } from '../services/form';
+import { userIndex } from '../common/algolia';
+import { validationStyle } from '../common/form';
 
 const message = {
   chatId: 2,

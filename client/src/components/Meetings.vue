@@ -30,7 +30,7 @@ import { mapGetters } from 'vuex';
 import * as moment from 'moment';
 import { map as _map, groupBy as _groupBy } from 'lodash';
 import { default as swal } from 'sweetalert2';
-import { validationStyle } from '../services/form';
+import { validationStyle } from '../common/form';
 
 const meeting = {
   createdAt: moment().subtract('2', 'days'),
