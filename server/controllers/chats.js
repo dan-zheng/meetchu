@@ -106,7 +106,7 @@ exports.postInviteToChat = (req, res) => {
           user.addNotification(notification);
         });
         group.addUser(user);
-        req.flash('success', `${user.firstName} has been invited.`);
+        req.flash('success', `${user.first_name} has been invited.`);
         return res.redirect(`/chats/${id}`);
       });
     });

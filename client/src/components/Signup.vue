@@ -8,13 +8,13 @@
         label.col-md-3.col-form-label Name
         .col-md-9
           .row
-            validate.col-md-6.required-field(auto-label, :class='validationStyle(formstate.firstName)')
-              input.form-control(type='text', name='firstName', placeholder='First', required, v-model.lazy='model.firstName')
-              field-messages.form-control-feedback(auto-label, name='firstName', show='$touched || $submitted')
+            validate.col-md-6.required-field(auto-label, :class='validationStyle(formstate.first_name)')
+              input.form-control(type='text', name='first_name', placeholder='First', required, v-model.lazy='model.first_name')
+              field-messages.form-control-feedback(auto-label, name='first_name', show='$touched || $submitted')
                 div(slot='required') First name is required.
-            validate.col-md-6.required-field(auto-label, :class='validationStyle(formstate.lastName)')
-              input.form-control(type='text', name='lastName', placeholder='Last', required, v-model.lazy='model.lastName')
-              field-messages.form-control-feedback(auto-label, name='lastName', show='$touched || $submitted')
+            validate.col-md-6.required-field(auto-label, :class='validationStyle(formstate.last_name)')
+              input.form-control(type='text', name='last_name', placeholder='Last', required, v-model.lazy='model.last_name')
+              field-messages.form-control-feedback(auto-label, name='last_name', show='$touched || $submitted')
                 div(slot='required') Last name is required.
       validate.form-group.row.required-field(auto-label, :class='validationStyle(formstate.email)')
         label.col-md-3.col-form-label Email
@@ -55,8 +55,8 @@ export default {
     return {
       formstate: {},
       model: {
-        firstName: '',
-        lastName: '',
+        first_name: '',
+        last_name: '',
         email: '',
         password: '',
         confirmPassword: ''
@@ -69,8 +69,8 @@ export default {
         return;
       }
       this.$store.dispatch('signup', {
-        firstName: this.model.firstName,
-        lastName: this.model.lastName,
+        first_name: this.model.first_name,
+        last_name: this.model.last_name,
         email: this.model.email,
         password: this.model.password,
         confirmPassword: this.model.confirmPassword,

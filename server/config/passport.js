@@ -39,8 +39,8 @@ const addUserToAlgolia = (user) => {
   // Add user to Algolia index
   const userValues = {
     objectID: user.id,
-    firstName: user.first_name,
-    lastName: user.last_name,
+    first_name: user.first_name,
+    last_name: user.last_name,
     email: user.email
   };
   return Promise.resolve(userIndex.addObjects([userValues]));
@@ -79,8 +79,8 @@ passport.use('signup', new LocalStrategy({
 }, (req, email, password, done) => {
   const person = new models.Person({
     email: req.body.email,
-    first_name: req.body.firstName,
-    last_name: req.body.lastName
+    first_name: req.body.first_name,
+    last_name: req.body.last_name
   }).withPassword(password);
   personDao.signup(person).tap(result =>
     result.cata(

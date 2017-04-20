@@ -396,7 +396,7 @@ exports.postInviteMeeting = (req, res) => {
           user.addNotification(notification);
         });
         meeting.addUser(user);
-        req.flash('success', `${user.firstName} has been invited.`);
+        req.flash('success', `${user.first_name} has been invited.`);
         return res.redirect(`/meetings/${id}`);
       });
     });

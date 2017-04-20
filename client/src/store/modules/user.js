@@ -33,20 +33,20 @@ const actions = {
         throw err;
       });
   },
-  signup({ commit }, { firstName, lastName, email, password, confirmPassword }) {
+  signup({ commit }, { first_name, last_name, email, password, confirm_password }) {
     return Vue.axios.post('/signup', {
-      firstName,
-      lastName,
+      first_name,
+      last_name,
       email,
       password,
-      confirmPassword
+      confirm_password
     })
     .then((res) => {
       commit(types.SET_USER, res.data);
       addObjects(userIndex, [{
         objectID: res.data.id,
-        first_name: firstName,
-        last_name: lastName,
+        first_name,
+        last_name,
         email
       }]);
     })

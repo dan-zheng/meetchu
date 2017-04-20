@@ -31,7 +31,7 @@ module.exports = {
       profile_picture_url VARCHAR(255),
       privacy_show_email BOOLEAN DEFAULT 1,
       privacy_show_major BOOLEAN DEFAULT 1,
-      privacy_show_profile_picture BOOLEAN DEFAULT 1,
+      privacy_show_profile_picture_url BOOLEAN DEFAULT 1,
       last_login DATETIME DEFAULT CURRENT_TIMESTAMP,
       PRIMARY KEY (id),
       UNIQUE (email),

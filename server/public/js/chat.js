@@ -38,7 +38,7 @@ searchInput.textcomplete([{
   template: (hit) => {
     // Returns the highlighted version of the name attribute
     return '<span>' + hit._highlightResult.email.value + ' </span><span class="hspace"></spam><span>' +
-      hit._highlightResult.firstName.value + ' ' + hit._highlightResult.lastName.value +
+      hit._highlightResult.first_name.value + ' ' + hit._highlightResult.last_name.value +
       '</span>';
   },
   // Template used to display the selected result in the textarea
