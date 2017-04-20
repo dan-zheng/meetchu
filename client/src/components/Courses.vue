@@ -17,13 +17,14 @@
           p.mb-1
             strong {{ course.title }}
   #current-course.d-flex.flex-column.col-sm-8.px-0(v-model='currentCourse')
-    .d-flex.text-center.align-items-stretch
+    .d-flex.px-4.align-items-stretch(v-if='hasCurrentCourse')
       span.ml-auto
-      h2.text-center.my-2(style='min-height: 35px')
-        span(v-if='hasCurrentCourse') {{ currentCourse.subject + ' ' + currentCourse.number }}
-        span(v-else) Course Info
+      h2.my-2(style='min-height: 35px') {{ currentCourse.subject + ' ' + currentCourse.number }}
       span.d-flex.px-0.ml-auto.align-items-center
-        i.fa.fa-lg.fa-cog
+        a.ml-auto(@click='showModal("#course-settings-modal")')
+          i.fa.fa-lg.fa-cog
+    .d-flex.px-4.align-items-center(v-else)
+      h2.mx-auto.my-2(style='min-height: 35px') Course Info
     #users-list
       p.text-muted.px-4.py-2.my-0(v-if='!hasCourses') Add a course to see course information!
       p.text-muted.px-4.py-2.my-0(v-else-if='!hasCurrentCourse') Click on a course to see course information!
@@ -36,7 +37,7 @@
             small.text-right {{ user.email }}
 
   //- Modals
-  b-modal#add-course-modal(title='Add a course', @shown='clear(["courseHits", "courseQuery"])', hide-footer)
+  b-modal#add-course-modal(title='Add a course', @shown='clear(["courseHits", "courseQuery"])', size='lg', hide-footer)
     b-form-input.mb-1(type='text', placeholder='Search for a course...', v-model='courseQuery', @keyup='search("courseHits", courseQuery)')
     .list-group
       .list-group-item.list-group-item-action.rounded-0.border(v-for='course in courseHits', :key='course.objectId', @click='addCourse(course)')
@@ -68,6 +69,18 @@
                 i.fa.fa-user
                 | Login
           small Note: Meetchu does not store your Purdue information.
+  .modal.fade#course-settings-modal(tabindex='-1', role='dialog', aria-labelledby='courseSettingsModalLabel', aria-hidden='true')
+    .modal-dialog.modal-md
+      .modal-content
+        .modal-header
+          h5.modal-title Course Settings: {{ currentCourse.subject + ' ' + currentCourse.number }}
+          button.close(type='button', data-dismiss='modal', aria-label='Close')
+            span(aria-hidden='true') ×
+        .modal-body
+          .py-2.text-center
+            button.btn.btn-danger(v-on:click='removeCourse(currentCourse); hideModal("#course-settings-modal");')
+              i.fa.fa-trash
+              | Remove this course
 </template>
 
 <script>
@@ -126,6 +139,11 @@ export default {
       }
       this.$store.dispatch('addCourse', { course });
       this.$root.$emit('hide::modal','add-course-modal');
+    },
+    removeCourse(course) {
+      this.$store.dispatch('removeCourse', { course });
+      this.currentCourse = {};
+      this.$root.$emit('hide::modal','course-settings-modal');
     },
     setCurrentCourse(course) {
       this.currentCourse = course;

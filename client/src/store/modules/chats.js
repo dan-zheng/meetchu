@@ -77,8 +77,7 @@ const mutations = {
     state.chats.push(chat);
   },
   [types.REMOVE_CHAT](state, chat) {
-    const index = state.chats.findIndex(c => c.id === chat.id);
-    state.chats.splice(index, 1);
+    state.chats = state.chats.filter(c => c.id !== chat.id);
   },
   [types.SEND_MESSAGE](state, chat, message) {
     const index = state.chats.findIndex(c => c.id === chat.id);
