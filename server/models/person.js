@@ -45,7 +45,7 @@ Person.prototype.publicView = function () {
 
 module.exports = {
   object: Person,
-  query: [
+  create: [
     `CREATE TABLE IF NOT EXISTS person (
       id INT NOT NULL AUTO_INCREMENT,
       google_id INT,
@@ -67,9 +67,7 @@ module.exports = {
       UNIQUE (google_id),
       UNIQUE (facebook_id),
       UNIQUE (reset_password_token)
-    )`
-  ],
-  join: [
+    )`,
     `CREATE TABLE IF NOT EXISTS person_course (
       person_id INT NOT NULL,
       course_id CHAR(36) NOT NULL,

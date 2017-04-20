@@ -4,6 +4,10 @@ const dotenv = require('dotenv');
 const mysql = require('promise-mysql');
 const debugging = false;
 
+const monet = require('monet');
+const Promise = require('bluebird');
+require('../../lib/database-helper.js')(Promise, monet);
+
 /**
  * Load environment variables from .env file
  */
@@ -52,19 +56,19 @@ function withModels(models) {
 }
 
 function executeQuery(query) {
-  pool.query(query).catch((error) => {
+  return pool.query(query).catch((error) => {
     console.log('Error creating table.');
     throw error;
   });
 }
 
-function sync() {
+async function sync() {
   console.log('Creating database tables.');
-  fileExports.filter(model => model.query)
-    .forEach(model => model.query.forEach(query => executeQuery(query)));
-  console.log('Creating junction tables.');
-  fileExports.filter(model => model.join)
-    .forEach(model => model.join.forEach(query => executeQuery(query)));
+  await pool.query('SET FOREIGN_KEY_CHECKS = 0');
+  await Promise.all(fileExports.filter(model => model.create)
+    .map(model => model.create.map(query => executeQuery(query)))
+    .reduce((prev, curr) => prev.concat(curr), []));
+  return pool.query('SET FOREIGN_KEY_CHECKS = 1');
 }
 
 module.exports = withModels({ pool, sync });

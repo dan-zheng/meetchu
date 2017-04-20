@@ -1,5 +1,5 @@
 module.exports = {
-  query: [
+  create: [
     `CREATE TABLE IF NOT EXISTS message (
       id INT AUTO_INCREMENT,
       sender_id INT NOT NULL,

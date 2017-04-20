@@ -5,6 +5,20 @@ const Maybe = monet.Maybe;
 const Either = monet.Either;
 
 module.exports = models => ({
+  create(chat) {
+    return models.pool.query(
+      'INSERT IGNORE INTO chat (name, description) VALUES (?, ?)',
+        [chat.name, chat.description])
+      .then(result => result.affectedRows === 0 ?
+        Either.Left('The chat already exists.') :
+        Either.Right(Object.assign(chat, { id: result.insertId })))
+      .errorToLeft();
+  },
+  erase(chat) {
+    return models.pool.query('DELETE FROM chat WHERE id = ?', [chat.id])
+      .then(result => Either.Right(result.affectedRows))
+      .errorToLeft();
+  },
   getChatList(person) {
     return models.pool.query(`
       SELECT chat.id, chat.name, chat.description, person.first_name, person.last_name, message.message, message.time_sent
@@ -50,9 +64,22 @@ module.exports = models => ({
       .then(result => Either.Right(result.list()))
       .errorToLeft();
   },
+  addMessage(message) {
+    return models.pool.query(
+      'INSERT INTO message (sender_id, chat_id, message) VALUES (?, ?, ?)',
+      [message.sender_id, message.chat_id, message.message])
+      .then(result => Either.Right(Object.assign(message, { id: result.insertId })))
+      .errorToLeft();
+  },
+  removeMessage(message) {
+    return models.pool.query(
+      'DELETE FROM message WHERE sender_id = ?', [message.sender_id])
+    .then(result => Either.Right(result.affectedRows))
+    .errorToLeft();
+  },
   addPerson(chat, person) {
     return models.pool.query(
-      `INSERT INGORE INTO person_chat
+      `INSERT IGNORE INTO person_chat
         (person_id, chat_id)
         VALUES (?, ?)`, [person.id, chat.id])
       .then(result => result.affectedRows === 0 ?

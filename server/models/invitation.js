@@ -1,5 +1,5 @@
 module.exports = {
-  query: [
+  create: [
     `CREATE TABLE IF NOT EXISTS invitation (
       id INT NOT NULL AUTO_INCREMENT,
       chat_id INT NOT NULL,

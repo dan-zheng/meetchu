@@ -194,43 +194,38 @@ io.on('connection', (socket) => {
   */
 });
 
-/**
- * Create any missing database tables and start Express server.
- */
-models.sync();
+async function run() {
+  /**
+   * Create any missing database tables and start Express server.
+   */
+  await models.sync();
 
-/* Testing Playground */
-const personDao = require('./dao/person')(models);
-const courseDao = require('./dao/course')(models);
-const chatDao = require('./dao/chat')(models);
+  /* Testing Playground */
+  const personDao = require('./dao/person')(models);
+  const courseDao = require('./dao/course')(models);
+  const chatDao = require('./dao/chat')(models);
+  const Either = require('monet').Either;
 
 /*
-// Get Chat List
-chatDao.getChatList({ id: 1 }).then((result) => {
-  result.map((chatList) => {
-    console.log(chatList);
-  });
-});
-
-// Bulk Course Insertions
-personDao.findByEmail('a@a.com')
-  .tap((result) => {
-    result.map((person) => {
-      const courses = [
-        { id: '0005ee03-21c1-4662-bc83-c7e9ccdadbff' },
-        { id: '001aac29-ed19-4f3f-855c-1c751c4c79c2' },
-        { id: '0020ac32-74c1-47d5-ad32-af801e14be46' }
-      ];
-      courseDao.addPersonBulk(courses, person)
-        .tap((result) => {
-          console.log(result);
-        });
-    });
-  });
+  const findPerson = await personDao.findByEmail('era878@gmail.com');
+  const createChat = await findPerson.cata(err => err,
+    found => chatDao.create({ name: 'HELLO', description: 'WORLD' })
+  );
+  const addPerson = await createChat.cata(err => err,
+    found => chatDao.addPerson(createChat.right(), findPerson.right())
+  );
+  const addMessage = await addPerson.cata(err => err,
+    found => chatDao.addMessage({
+      sender_id: findPerson.right().id,
+      chat_id: createChat.right().id,
+      message: 'LOL'
+    }));
 */
 
-http.listen(app.get('port'), () => {
-  console.log('Express server listening on port %d in %s mode', app.get('port'), app.get('env'));
-});
+  http.listen(app.get('port'), () => {
+    console.log('Express server listening on port %d in %s mode', app.get('port'), app.get('env'));
+  });
+}
 
+run();
 module.exports = app;

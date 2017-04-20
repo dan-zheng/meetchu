@@ -1,5 +1,5 @@
 module.exports = {
-  query: [
+  create: [
     `CREATE TABLE IF NOT EXISTS course (
       id CHAR(36) NOT NULL,
       title VARCHAR(255) NOT NULL,

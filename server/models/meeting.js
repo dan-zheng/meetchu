@@ -1,5 +1,5 @@
 module.exports = {
-  query: [
+  create: [
     `CREATE TABLE IF NOT EXISTS meeting (
       id INT NOT NULL AUTO_INCREMENT,
       name VARCHAR(255) NOT NULL,
@@ -10,9 +10,7 @@ module.exports = {
       PRIMARY KEY (id),
       FOREIGN KEY (final_time_id)
         REFERENCES meeting_time(id)
-    )`
-  ],
-  join: [
+    )`,
     `CREATE TABLE IF NOT EXISTS meeting_time (
       id INT NOT NULL AUTO_INCREMENT,
       time DATETIME NON NULL,
