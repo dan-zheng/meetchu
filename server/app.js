@@ -208,13 +208,13 @@ async function run() {
 
 /*
   const findPerson = await personDao.findByEmail('era878@gmail.com');
-  const createChat = await findPerson.cata(err => err,
+  const createChat = await findPerson.cata(err => Either.Left(err),
     found => chatDao.create({ name: 'HELLO', description: 'WORLD' })
   );
-  const addPerson = await createChat.cata(err => err,
+  const addPerson = await createChat.cata(err => Either.Left(err),
     found => chatDao.addPerson(createChat.right(), findPerson.right())
   );
-  const addMessage = await addPerson.cata(err => err,
+  const addMessage = await addPerson.cata(err => Either.Left(err),
     found => chatDao.addMessage({
       sender_id: findPerson.right().id,
       chat_id: createChat.right().id,
