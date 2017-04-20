@@ -38,12 +38,14 @@
 
   //- Modals
   b-modal#add-course-modal(title='Add a course', @shown='clear(["courseHits", "courseQuery"])', size='lg', hide-footer)
-    b-form-input.mb-1(type='text', placeholder='Search for a course...', v-model='courseQuery', @keyup='search("courseHits", courseQuery)')
-    .list-group
-      .list-group-item.list-group-item-action.rounded-0.border(v-for='course in courseHits', :key='course.objectId', @click='addCourse(course)')
-        .d-flex.w-100.mx-1.justify-content-between.align-items-center
-          h5.m-0 {{ course.title }}
-          small.text-right(style='min-width: 80px;') {{ course.subject + ' ' + course.number }}
+    v-select(v-model='selected', :debounce='250', :on-search='searchCourses', :options='courseHits', :multiple='true', placeholder='Search for a course...')
+    //-
+      b-form-input.mb-1(type='text', placeholder='Search for a course...', v-model='courseQuery', @keyup='search("courseHits", courseQuery)')
+      .list-group
+        .list-group-item.list-group-item-action.rounded-0.border(v-for='course in courseHits', :key='course.objectId', @click='addCourse(course)')
+          .d-flex.w-100.mx-1.justify-content-between.align-items-center
+            h5.m-0 {{ course.title }}
+            small.text-right(style='min-width: 80px;') {{ course.subject + ' ' + course.number }}
   .modal.fade#sync-course-modal(tabindex='-1', role='dialog', aria-labelledby='syncCoursesModalLabel', aria-hidden='true')
     .modal-dialog.modal-md
       .modal-content
@@ -80,7 +82,7 @@
             span(aria-hidden='true') ×
         .modal-body
           .py-2.text-center
-            button.btn.btn-danger(v-on:click='removeCourse(currentCourse); hideModal("#course-settings-modal");')
+            button.btn.btn-danger(v-on:click='removeCourse(currentCourse)')
               i.fa.fa-trash
               | Remove this course
 </template>
@@ -110,6 +112,7 @@ export default {
       formstate: {
         purdue: {}
       },
+      selected: null,
       spinnerLoading: false,
       spinnerSize,
       spinnerColor
@@ -152,7 +155,7 @@ export default {
     removeCourse(course) {
       this.$store.dispatch('removeCourse', { course });
       this.currentCourse = {};
-      this.$root.$emit('hide::modal','course-settings-modal');
+      this.hideModal("#course-settings-modal");
     },
     setCurrentCourse(course) {
       this.currentCourse = course;
@@ -192,6 +195,22 @@ export default {
           text: e.response.data
         })
         .catch(swal.noop);
+      });
+    },
+    searchCourses(search, loading) {
+      loading(true);
+      courseIndex.search(search, {
+        hitsPerPage: 5
+      }, (error, results) => {
+        const filteredHits = results.hits.filter(el => this.sortedCourses.findIndex(c => c.id === el.objectID) === -1);
+        filteredHits.forEach((el) => {
+          el.id = el.objectID;
+          delete el.objectID;
+          delete el._highlightResult;
+          return el;
+        });
+        this.courseHits = filteredHits;
+        loading(false);
       });
     },
     search(hits, query) {

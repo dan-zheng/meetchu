@@ -37,19 +37,23 @@ const actions = {
   },
   createChat({ commit, rootState }, { chat }) {
     commit(types.ADD_CHAT, chat);
+    /*
     return Vue.axios.post('/chats/create', { chat, user: rootState.user.user })
       .then(res => true)
       .catch((err) => {
         throw err;
       });
+    */
   },
   removeChat({ commit, rootState }, { chat }) {
     commit(types.REMOVE_CHAT, chat);
+    /*
     return Vue.axios.post(`/chats/${chat.id}/remove`, { user: rootState.user.user })
       .then(res => true)
       .catch((err) => {
         throw err;
       });
+    */
   },
   deleteChat({ commit, rootState }, { chat }) {
     commit(types.REMOVE_CHAT, chat);

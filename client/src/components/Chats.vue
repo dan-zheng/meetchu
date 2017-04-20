@@ -7,24 +7,30 @@
         a.text-primary(@click='clear(["userHits", "userQuery"]); showModal("#new-chat-modal");')
           i.fa.fa-lg.fa-plus-square
     #chats-list
-      .list-group
+      p.text-muted.px-4.py-2.my-0(v-if='!hasChats') You are not in any chats.
+      .list-group(v-else)
         .list-group-item.list-group-item-action.chat.rounded-0.border(v-for='chat in sortedChats', :key='chat.name', v-bind:class='{ active: currentChat == chat }', @click='setCurrentChat(chat)')
           .d-flex.w-100.justify-content-between
             h5.mb-1 {{ chat.name }}
-            small(v-if='chat.last_sent !== "undefined"') {{ formatDate(chat.last_sent) }}
-          p.mb-1(v-if='typeof chat.last_sender !== "undefined"')
+            small(v-if='hasChatLastSent(chat)') {{ formatDate(chat.last_sent) }}
+          p.mb-1(v-if='hasChatLastSent(chat)')
             strong {{ chat.last_sender }}:
             |  {{ chat.last_msg }}
   #current-chat.d-flex.flex-column.col-sm-8.px-0(v-model='currentChat')
-    .d-flex.text-center.px-4.align-items-stretch
-      h2.text-center.my-2(style='min-height: 35px')
-        span(v-if='typeof currentChat.name !== "undefined"') {{ currentChat.name }}
+    .d-flex.text-center.px-4.align-items-stretch(v-if='hasCurrentChat')
+      span.ml-auto
+      h2.my-2(style='min-height: 35px') {{ currentChat.name }}
       span.d-flex.px-0.ml-auto.align-items-center
-        a(@click='showModal("#chat-settings-modal")')
+        a.ml-auto(@click='showModal("#chat-settings-modal")')
           i.fa.fa-lg.fa-cog
+    .d-flex.text-center.px-4.align-items-center(v-else)
+      h2.mx-auto.my-2(style='min-height: 35px') Chat Info
     #messages-list
-      b-list-group(v-if='!currentChat || !currentChat.messages')
-        b-list-group-item.message.rounded-0.border(v-for='msg in currentChat.messages', :key='msg.id')
+      p.text-muted.px-4.py-2.my-0(v-if='!hasChats') Create a chat to start messaging!
+      p.text-muted.px-4.py-2.my-0(v-else-if='!hasCurrentChat') Click on a chat!
+      h4.subtitle.px-2.py-2.my-0(v-else) Messages
+      .list-group(v-if='hasCurrentChat')
+        .list-group-item.message.rounded-0.border(v-for='msg in currentChat.messages', :key='msg.id')
           | {{ msg }}
     #message-box
       input.px-3(v-model='currentMsg', placeholder='Type message...', @keyup.enter='sendMessage(currentChat)')
@@ -65,11 +71,11 @@
                   h5.m-0 {{ user.first_name + ' ' + user.last_name }}
                   small.text-right(style='min-width: 80px;') {{ user.email }}
             .py-2.text-center
-              button.btn.btn-primary(v-on:click='createChat(model.newChat); hideModal("#new-chat-modal")')
+              button.btn.btn-primary(v-on:click='createChat(model.newChat)')
                 i.fa.fa-plus-circle
                 | Create chat
 
-  .modal.fade#chat-settings-modal(tabindex='-1', role='dialog', aria-labelledby='chatSeetingsModalLabel', aria-hidden='true')
+  .modal.fade#chat-settings-modal(tabindex='-1', role='dialog', aria-labelledby='chatSettingsModalLabel', aria-hidden='true')
     .modal-dialog.modal-md
       .modal-content
         .modal-header
@@ -77,36 +83,6 @@
           button.close(type='button', data-dismiss='modal', aria-label='Close')
             span(aria-hidden='true') ×
         .modal-body
-          vue-form(:state='formstate.currentChat', v-model='formstate.currentChat', @submit.prevent='onSubmit')
-            validate.form-group.container(auto-label, :class='validationStyle(formstate.currentChat.name)')
-              label.col-form-label Chat name
-              input.form-control(type='text', name='name', placeholder='Chat name', v-model.lazy='currentChat.name', required)
-              field-messages.form-control-feedback(name='name', show='$touched || $submitted')
-                div(slot='required') Chat name is required.
-            field.form-group.container
-              label.col-form-label Description
-              input.form-control(type='text', name='description', placeholder='Description', v-model.lazy='currentChat.description')
-            small.text-success(v-if='typeof currentChat.users != "undefined"') Users
-            .list-group
-              .list-group-item.list-group-item-action.rounded-0.border(v-for='(user, index) in sortedNewChatUsers', :key='user.id', @click='removeUserFromChat(currentChat, user, index)')
-                .d-flex.w-100.mx-1.justify-content-between.align-items-center
-                  i.fa.fa-check.text-success
-                  h5.m-0 {{ user.first_name + ' ' + user.last_name }}
-                  small.text-right(style='min-width: 80px;') {{ user.email }}
-            .form-group.container
-              label.col-form-label Add users
-              input.form-control(type='text', placeholder='Search for a user...', v-model='userQuery', @keyup='search("userHits", userQuery)')
-            small.text-info(v-if='userHits.length > 0') Matches
-            small.text-warning(v-else-if='userQuery.length > 0 && model.newChat.users.length === 0') No matches.
-            .list-group
-              .list-group-item.list-group-item-action.rounded-0.border(v-for='(user, index) in sortedHitUsers', :key='user.objectId', @click='addUserToChat(currentChat, user, index)')
-                .d-flex.w-100.mx-1.justify-content-between.align-items-center
-                  h5.m-0 {{ user.first_name + ' ' + user.last_name }}
-                  small.text-right(style='min-width: 80px;') {{ user.email }}
-            .py-2.text-center
-              button.btn.btn-primary(v-on:click='createChat(model.currentChat)')
-                i.fa.fa-pencil
-                | Update chat
 </template>
 
 <script>
@@ -147,6 +123,8 @@ const chat2 = {
 
 const chats = [chat, chat2];
 
+let id = 4;
+
 export default {
   name: 'chats',
   metaInfo: {
@@ -154,6 +132,7 @@ export default {
   },
   data() {
     return {
+      id,
       currentChat: {},
       formstate: {
         newChat: {},
@@ -194,6 +173,13 @@ export default {
         const u2 = b.first_name + ' ' + b.last_name;
         return u1.localeCompare(u2);
       });
+    },
+    hasChats() {
+      return this.chats.length > 0;
+    },
+    hasCurrentChat() {
+      console.log(this.currentChat);
+      return typeof this.currentChat.id !== 'undefined';
     }
   },
   beforeMount() {
@@ -212,6 +198,7 @@ export default {
       }
       this.$store.dispatch('createChat', { chat: this.model.newChat });
       this.resetNewChat();
+      this.hideModal("#new-chat-modal");
     },
     addUserToChat(chat, user, index) {
       if (chat.users.findIndex(u => u.id === user.id) !== -1) {
@@ -301,6 +288,7 @@ export default {
     },
     resetNewChat() {
       this.model.newChat = {
+        id: this.id,
         name: '',
         description: '',
         last_sender: '',
@@ -309,6 +297,14 @@ export default {
         users: [],
         messages: []
       };
+      this.id++;
+    },
+    hasChatUsers(chat) {
+      return typeof chat.users !== 'undefined' && chat.users.length > 0;
+    },
+    hasChatLastSent(chat) {
+      return typeof chat.last_sent !== 'undefined' && chat.last_sent !== "";
+      // return typeof chat.last_sent !== 'undefined';
     },
     onSubmit(type) {
       console.log(this.formstate.newChat.$valid);
@@ -358,6 +354,10 @@ export default {
   border-top: 1px solid $grid-border-color;
   border-radius: 0;
   overflow-y: scroll;
+}
+
+.subtitle {
+  border-bottom: 1px solid $grid-border-color;
 }
 
 #chats-list,

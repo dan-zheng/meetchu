@@ -7,6 +7,7 @@ import axios from 'axios';
 import VueAxios from 'vue-axios';
 import VueMeta from 'vue-meta';
 import VueForm from 'vue-form';
+import VueSelect from 'vue-select';
 import BootstrapVue from 'bootstrap-vue';
 import VueSocketIO from 'vue-socket.io';
 
@@ -30,6 +31,7 @@ Vue.use(VueMeta);
 Vue.use(VueForm);
 Vue.use(BootstrapVue);
 Vue.use(VueSocketIO, process.env.SOCKET_URL, store);
+Vue.component('v-select', VueSelect);
 
 sync(store, router);
 
