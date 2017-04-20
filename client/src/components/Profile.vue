@@ -40,8 +40,10 @@ import { validationStyle } from '../services/form';
 
 export default {
   name: 'account',
-  metaInfo: {
-    title: 'Account'
+  metaInfo() {
+    return {
+      title: typeof this.profile.first_name === 'undefined' ? 'Profile' : `${this.profile.first_name} ${this.profile.last_name}`
+    }
   },
   data() {
     return {
@@ -52,11 +54,12 @@ export default {
       profile: {}
     }
   },
-  created() {
+  beforeMount() {
     const id = this.$route.params.id;
     this.axios.get(`/profile/${id}`)
       .then((res) => {
         this.profile = Object.assign({}, this.profile, res.data);
+        const fullName = `${this.profile.first_name } ${this.profile.last_name}`;
       })
       .catch((err) => {
         throw err;
