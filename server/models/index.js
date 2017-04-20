@@ -53,7 +53,7 @@ function withModels(models) {
 
 function executeQuery(query) {
   pool.query(query).catch((error) => {
-    console.log(`Error creating table.`);
+    console.log('Error creating table.');
     throw error;
   });
 }

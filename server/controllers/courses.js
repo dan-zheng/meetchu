@@ -93,10 +93,9 @@ function getCourseId(sectionId) {
  * Sync a user's courses using their Purdue credentials.
  */
 exports.postCoursesSyncUser = async (req, res) => {
-  const person = new models.Person(req.body.user);
+  const person = req.body.user;
   const username = req.body.username.replace('@purdue.edu', '');
   const password = req.body.password;
-  const encodedString = Buffer.from(`${username}:${password}`).toString('base64');
 
   const schedule = await getSchedule(username, password);
   const currentTerm = schedule.flatMap(enrollment =>

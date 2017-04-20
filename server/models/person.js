@@ -14,6 +14,35 @@ Person.prototype.withPassword = function (password) {
   return Object.assign(this, { password: hash });
 };
 
+const DEFAULT_HIDDEN_FIELDS = [
+  'password',
+  'reset_password_token',
+  'reset_password_expiration'
+];
+
+Person.prototype.view = function (fields) {
+  return new Person(
+    Object.assign({}, ...Object.keys(this)
+      .filter(key => fields.includes(key))
+      .map(key => ({ [key]: this[key] }))));
+};
+
+Person.prototype.hide = function (fields = DEFAULT_HIDDEN_FIELDS) {
+  return this.view(
+    Object.keys(this).filter(key => !fields.includes(key))
+  );
+};
+
+Person.prototype.isHidden = function (field) {
+  return this[`privacy_show_${field}`] === 0;
+};
+
+Person.prototype.publicView = function () {
+  return this.view(
+    Object.keys(this).filter(key => !this.isHidden(key))
+  );
+};
+
 module.exports = {
   object: Person,
   query: [
