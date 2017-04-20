@@ -20,7 +20,7 @@
       h2.text-center.my-2(style='min-height: 35px')
         span(v-if='typeof currentChat.name !== "undefined"') {{ currentChat.name }}
       span.d-flex.px-0.ml-auto.align-items-center
-        a.text-muted(@click='showModal("#chat-settings-modal")')
+        a(@click='showModal("#chat-settings-modal")')
           i.fa.fa-lg.fa-cog
     #messages-list
       b-list-group(v-if='!currentChat || !currentChat.messages')
@@ -196,7 +196,7 @@ export default {
       });
     }
   },
-  created() {
+  beforeMount() {
     this.$store.dispatch('getChats')
       .then(() => {
         if (this.sortedChats.length > 0) {

@@ -96,7 +96,7 @@ export default {
       }
     }
   },
-  created() {
+  beforeMount() {
     this.userModel = this.$store.getters.user;
   },
   computed: {

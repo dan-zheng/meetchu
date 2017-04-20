@@ -9,19 +9,27 @@
         a.text-primary(@click='clear(["purdueUsername", "purduePassword"]); showModal("#sync-course-modal");')
           img(src='static/img/icon-purdue.svg', style='height: 18px')
     #courses-list
-      .list-group
+      p.text-muted.px-4.py-2.my-0(v-if='!hasCourses') You are not in any courses.
+      .list-group(v-else)
         .list-group-item.list-group-item-action.course.rounded-0.border(v-for='course in sortedCourses', :key='course.id', v-bind:class='{ active: currentCourse == course }', @click='setCurrentCourse(course)')
           .d-flex.w-100.justify-content-between
             h5.mb-1 {{ course.subject + ' ' + course.number }}
           p.mb-1
             strong {{ course.title }}
   #current-course.d-flex.flex-column.col-sm-8.px-0(v-model='currentCourse')
-    h2.text-center.my-2(style='min-height: 35px')
-      span(v-if='typeof currentCourse.subject !== "undefined"') {{ currentCourse.subject + ' ' + currentCourse.number }}
+    .d-flex.text-center.align-items-stretch
+      span.ml-auto
+      h2.text-center.my-2(style='min-height: 35px')
+        span(v-if='hasCurrentCourse') {{ currentCourse.subject + ' ' + currentCourse.number }}
+        span(v-else) Course Info
+      span.d-flex.px-0.ml-auto.align-items-center
+        i.fa.fa-lg.fa-cog
     #users-list
-      h4.subtitle.text-center.py-2.my-0 Students
-        span(v-if='typeof currentCourse !== "undefined" && typeof currentCourse.users !== "undefined" && currentCourse.users.length !== 0')  ({{ currentCourse.users.length }})
-      .list-group(v-if='typeof currentCourse !== "undefined"')
+      p.text-muted.px-4.py-2.my-0(v-if='!hasCourses') Add a course to see course information!
+      p.text-muted.px-4.py-2.my-0(v-else-if='!hasCurrentCourse') Click on a course to see course information!
+      h4.subtitle.px-2.py-2.my-0(v-else) Students
+        span(v-if='hasCurrentCourseUsers')  ({{ currentCourse.users.length }})
+      .list-group(v-if='hasCurrentCourse')
         .list-group-item.list-group-item-action.user.rounded-0.border(v-for='user in currentCourse.users', :key='user.email')
           .d-flex.w-100.mx-1.justify-content-between.align-items-center
             h5.mb-0 {{ user.first_name + ' ' + user.last_name }}
@@ -90,9 +98,18 @@ export default {
       user: 'user',
       courses: 'courses',
       sortedCourses: 'sortedCourses'
-    })
+    }),
+    hasCourses() {
+      return this.courses.length > 0;
+    },
+    hasCurrentCourse() {
+      return typeof this.currentCourse.id !== 'undefined';
+    },
+    hasCurrentCourseUsers() {
+      return typeof this.currentCourse.users !== 'undefined' && this.currentCourse.users.length > 0;
+    }
   },
-  created() {
+  beforeMount() {
     this.$store.dispatch('getCourses')
       .then(() => {
         if (this.sortedCourses.length > 0) {
