@@ -4,8 +4,8 @@ const chatDao = require('../dao/chat')(models);
 const MAX_MESSAGES = 10;
 
 /**
- * GET /chats
- * Chats page.
+ * POST /chats
+ * Get a user's chats.
  */
 exports.getChats = (req, res) => {
   const person = req.body.user;

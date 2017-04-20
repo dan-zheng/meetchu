@@ -6,7 +6,18 @@ const state = {
 };
 
 const getters = {
-  chats: state => state.chats
+  chats: state => state.chats,
+  sortedChats: state => {
+    const temp = state.courses.slice(0);
+    return temp.sort((a, b) => {
+      if (!a.time_last_sent) {
+        return 1;
+      } else if (!b.time_last_sent) {
+        return -1;
+      }
+      return b.time_last_sent.isAfter(a.time_last_sent);
+    });
+  }
 };
 
 const actions = {

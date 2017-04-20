@@ -71,7 +71,7 @@ const mutations = {
   [types.SET_COURSE_USERS](state, { course, users }) {
     state.courses.forEach((c, i) => {
       if (c.id === course.id) {
-        state.courses[i].users = users;
+        Vue.set(state.courses[i], 'users', users);
       }
     });
   },
