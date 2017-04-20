@@ -20,8 +20,8 @@
       span(v-if='typeof currentCourse.subject !== "undefined"') {{ currentCourse.subject + ' ' + currentCourse.number }}
     #users-list
       h4.subtitle.text-center.py-2.my-0 Students
+        span(v-if='typeof currentCourse !== "undefined" && typeof currentCourse.users !== "undefined" && currentCourse.users.length !== 0')  ({{ currentCourse.users.length }})
       .list-group(v-if='typeof currentCourse !== "undefined"')
-        // p(v-if='!currentCourse || !currentCourse.users || currentCourse.users.length === 0') There are no users.
         .list-group-item.list-group-item-action.user.rounded-0.border(v-for='user in currentCourse.users', :key='user.email')
           .d-flex.w-100.mx-1.justify-content-between.align-items-center
             h5.mb-0 {{ user.first_name + ' ' + user.last_name }}
@@ -228,7 +228,8 @@ export default {
   flex: 1;
 }
 
-.course {
+.course,
+.user {
   border-left: 0;
   border-right: 0;
 }
