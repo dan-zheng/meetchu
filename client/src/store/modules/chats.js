@@ -8,7 +8,7 @@ const state = {
 const getters = {
   chats: state => state.chats,
   sortedChats: state => {
-    const temp = state.courses.slice(0);
+    const temp = state.chats.slice(0);
     return temp.sort((a, b) => {
       if (!a.time_last_sent) {
         return 1;
@@ -22,15 +22,22 @@ const getters = {
 
 const actions = {
   getChats({ commit, rootState }) {
-    return Vue.axios.post('/chats', { userId: rootState.user.id })
+    return Vue.axios.post('/chats', { user: rootState.user.user })
       .then(res => commit(types.SET_CHATS, res.data))
+      .catch((err) => {
+        throw err;
+      });
+  },
+  getChatUsers({ commit }, { chat }) {
+    return Vue.axios.post('/chat/users', { chat })
+      .then(res => commit(types.SET_CHAT_USERS, { chat, users: res.data }))
       .catch((err) => {
         throw err;
       });
   },
   createChat({ commit, rootState }, { chat }) {
     commit(types.ADD_CHAT, res.data);
-    return Vue.axios.post('/chats/create', { chat, userId: rootState.user.id })
+    return Vue.axios.post('/chats/create', { chat, user: rootState.user.user })
       .then(res => true)
       .catch((err) => {
         throw err;
@@ -38,7 +45,7 @@ const actions = {
   },
   removeChat({ commit, rootState }, { chat }) {
     commit(types.REMOVE_CHAT, chat);
-    return Vue.axios.post(`/chats/${chat.id}/remove`, { userId: rootState.user.id })
+    return Vue.axios.post(`/chats/${chat.id}/remove`, { user: rootState.user.user })
       .then(res => true)
       .catch((err) => {
         throw err;
@@ -46,7 +53,7 @@ const actions = {
   },
   deleteChat({ commit, rootState }, { chat }) {
     commit(types.REMOVE_CHAT, chat);
-    return Vue.axios.post(`/chats/${chat.id}/delete`, { userId: rootState.user.id })
+    return Vue.axios.post(`/chats/${chat.id}/delete`, { user: rootState.user.user })
       .then(res => true)
       .catch((err) => {
         throw err;
@@ -56,7 +63,15 @@ const actions = {
 
 const mutations = {
   [types.SET_CHATS](state, chats) {
+    console.log(chats);
     state.chats = chats;
+  },
+  [types.SET_CHAT_USERS](state, { chat, users }) {
+    state.chats.forEach((c, i) => {
+      if (c.id === chat.id) {
+        Vue.set(state.chats[i], 'users', users);
+      }
+    });
   },
   [types.ADD_CHAT](state, chat) {
     state.chats.push(chat);

@@ -7,7 +7,7 @@ const MAX_MESSAGES = 10;
  * POST /chats
  * Get a user's chats.
  */
-exports.getChats = (req, res) => {
+exports.postChats = (req, res) => {
   const person = req.body.user;
 
   chatDao.getChatList(person).then(result =>
@@ -19,10 +19,10 @@ exports.getChats = (req, res) => {
 };
 
 /**
- * GET /chats/:id
- * Chat page.
+ * POST /chat/users
+ * Get a chat's users.
  */
-exports.getChat = (req, res) => {
+exports.postChatUsers = (req, res) => {
   const chat = req.params.chat;
 
   chatDao.getChatMessages(chat, MAX_MESSAGES).then(result =>

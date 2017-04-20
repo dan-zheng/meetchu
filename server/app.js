@@ -142,8 +142,8 @@ app.post('/account/delete', userController.postDeleteAccount);
 
 app.get('/profile/:id', userController.getProfile);
 
-app.get('/chats', chatController.getChats);
-app.get('/chats/:id', chatController.getChat);
+app.post('/chats', chatController.postChats);
+app.post('/chat/users', chatController.postChatUsers);
 app.post('/chats/create', chatController.postCreateChat);
 app.post('/chats/:id/invite', chatController.postInviteToChat);
 app.post('/chats/:id/leave', chatController.postLeaveChat);

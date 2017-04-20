@@ -20,9 +20,9 @@
       span(v-if='typeof currentCourse.subject !== "undefined"') {{ currentCourse.subject + ' ' + currentCourse.number }}
     #users-list
       h4.subtitle.text-center.py-2.my-0 Students
-      b-list-group(v-if='typeof currentCourse !== "undefined"')
+      .list-group(v-if='typeof currentCourse !== "undefined"')
         // p(v-if='!currentCourse || !currentCourse.users || currentCourse.users.length === 0') There are no users.
-        b-list-group-item.user.rounded-0.border(v-for='user in currentCourse.users', :key='user.email')
+        .list-group-item.list-group-item-action.user.rounded-0.border(v-for='user in currentCourse.users', :key='user.email')
           .d-flex.w-100.mx-1.justify-content-between.align-items-center
             h5.mb-0 {{ user.first_name + ' ' + user.last_name }}
             small.text-right {{ user.email }}
@@ -39,7 +39,7 @@
     .modal-dialog.modal-md
       .modal-content
         .modal-header
-          h5.modal-title Create a chat
+          h5.modal-title Sync Purdue courses
           button.close(type='button', data-dismiss='modal', aria-label='Close')
             span(aria-hidden='true') ×
         .modal-body
@@ -95,9 +95,9 @@ export default {
   created() {
     this.$store.dispatch('getCourses')
       .then(() => {
-        if (courses.length > 0) {
-          this.currentCourse = this.courses[0];
-          this.$store.dispatch('getCourseUsers', { currentCourse });
+        if (this.sortedCourses.length > 0) {
+          this.currentCourse = this.sortedCourses[0];
+          this.$store.dispatch('getCourseUsers', { course: this.currentCourse });
         }
       });
   },

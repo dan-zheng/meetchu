@@ -11,18 +11,19 @@
         .list-group-item.list-group-item-action.chat.rounded-0.border(v-for='chat in sortedChats', :key='chat.name', v-bind:class='{ active: currentChat == chat }', @click='setCurrentChat(chat)')
           .d-flex.w-100.justify-content-between
             h5.mb-1 {{ chat.name }}
-            small(v-if='!!chat.lastSent') {{ formatDate(chat.lastSent) }}
-          p.mb-1(v-if='!!chat.lastSender && !!chat.lastMsg')
-            strong {{ chat.lastSender }}:
-            |  {{ chat.lastMsg }}
+            small(v-if='chat.last_sent !== "undefined"') {{ formatDate(chat.last_sent) }}
+          p.mb-1(v-if='typeof chat.last_sender !== "undefined"')
+            strong {{ chat.last_sender }}:
+            |  {{ chat.last_msg }}
   #current-chat.d-flex.flex-column.col-sm-8.px-0(v-model='currentChat')
     .d-flex.text-center.px-4.align-items-stretch
-      h2.text-center.my-2 {{ currentChat.name }}
+      h2.text-center.my-2(style='min-height: 35px')
+        span(v-if='typeof currentChat.name !== "undefined"') {{ currentChat.name }}
       span.d-flex.px-0.ml-auto.align-items-center
         a.text-muted(@click='showModal("#chat-settings-modal")')
           i.fa.fa-lg.fa-cog
     #messages-list
-      b-list-group
+      b-list-group(v-if='!currentChat || !currentChat.messages')
         b-list-group-item.message.rounded-0.border(v-for='msg in currentChat.messages', :key='msg.id')
           | {{ msg }}
     #message-box
@@ -50,7 +51,7 @@
               label.col-form-label Add users
               input.form-control(type='text', placeholder='Search for a user...', v-model='userQuery', @keyup='search("userHits", userQuery)')
             small.text-info(v-if='userHits.length > 0') Matches
-            small.text-warning(v-else-if='userQuery.length > 0 && model.newChat.users.length === 0') No matches.
+            small.text-warning(v-else-if='userQuery.length > 0 && typeof model.newChat !== "undefined"') No matches.
             .list-group
               .list-group-item.list-group-item-action.rounded-0.border(v-for='(user, index) in sortedHitUsers', :key='user.objectId', @click='addUserToChat(model.newChat, user, index)')
                 .d-flex.w-100.mx-1.justify-content-between.align-items-center
@@ -85,7 +86,7 @@
             field.form-group.container
               label.col-form-label Description
               input.form-control(type='text', name='description', placeholder='Description', v-model.lazy='currentChat.description')
-            small.text-success(v-if='currentChat.users.length > 0') Users
+            small.text-success(v-if='typeof currentChat.users != "undefined"') Users
             .list-group
               .list-group-item.list-group-item-action.rounded-0.border(v-for='(user, index) in sortedNewChatUsers', :key='user.id', @click='removeUserFromChat(currentChat, user, index)')
                 .d-flex.w-100.mx-1.justify-content-between.align-items-center
@@ -126,9 +127,9 @@ const chat = {
   id: 2,
   name: 'CS 307 Team',
   description: 'Team chat for CS 307',
-  lastSender: 'Eric Aguilera',
-  lastMsg: 'Functional programming is so nice! I love monads.',
-  lastSent: moment().subtract('1', 'days'),
+  last_sender: 'Eric Aguilera',
+  last_msg: 'Functional programming is so nice! I love monads.',
+  last_sent: moment().subtract('1', 'days'),
   users: [],
   messages: Array(3).fill(message)
 };
@@ -137,9 +138,9 @@ const chat2 = {
   id: 3,
   name: 'CS 252 Squad',
   description: 'CS 252 Study Buddies',
-  lastSender: 'Carson Harmon',
-  lastMsg: 'I just finished part 3 using anonymous functions. Couldn\'t have done it without functional programming!',
-  lastSent: moment().subtract('3', 'days'),
+  last_sender: 'Carson Harmon',
+  last_msg: 'I just finished part 3 using anonymous functions. Couldn\'t have done it without functional programming!',
+  last_sent: moment().subtract('3', 'days'),
   users: [],
   messages: []
 };
@@ -153,8 +154,7 @@ export default {
   },
   data() {
     return {
-      chats,
-      currentChat: chats.length > 0 ? chats[0] : null,
+      currentChat: {},
       formstate: {
         newChat: {},
         currentChat: {}
@@ -163,9 +163,9 @@ export default {
         newChat: {
           name: '',
           description: '',
-          lastSender: '',
-          lastMsg: '',
-          lastSent: '',
+          last_sender: '',
+          last_msg: '',
+          last_sent: '',
           users: [],
           messages: []
         }
@@ -177,18 +177,10 @@ export default {
   },
   computed: {
     ...mapGetters({
-      user: 'user'
+      user: 'user',
+      chats: 'chats',
+      sortedChats: 'sortedChats',
     }),
-    sortedChats() {
-      return this.chats.sort((a, b) => {
-        if (!a.lastSent) {
-          return 1;
-        } else if (!b.lastSent) {
-          return -1;
-        }
-        return b.lastSent.isAfter(a.lastSent);
-      });
-    },
     sortedHitUsers() {
       return this.userHits.sort((a, b) => {
         const u1 = a.first_name + ' ' + a.last_name;
@@ -203,6 +195,16 @@ export default {
         return u1.localeCompare(u2);
       });
     }
+  },
+  created() {
+    this.$store.dispatch('getChats')
+      .then(() => {
+        if (this.sortedChats.length > 0) {
+          console.log(this.sortedChats);
+          this.currentChat = this.sortedChats[0];
+          this.$store.dispatch('getChatUsers', { chat: this.currentChat });
+        }
+      });
   },
   methods: {
     createChat() {
@@ -244,9 +246,9 @@ export default {
         timeSent: now
       });
       const fullName = this.$store.getters.user.first_name + ' ' + this.$store.getters.user.last_name;
-      this.$set(chat, 'lastSent', now);
-      this.$set(chat, 'lastSender', fullName);
-      this.$set(chat, 'lastMsg',this.currentMsg);
+      this.$set(chat, 'last_sent', now);
+      this.$set(chat, 'last_sender', fullName);
+      this.$set(chat, 'last_msg',this.currentMsg);
       this.currentMsg = '';
     },
     search(hits, query) {
@@ -279,9 +281,9 @@ export default {
       this.model.newChat = {
         name: '',
         description: '',
-        lastSender: '',
-        lastMsg: '',
-        lastSent: '',
+        last_sender: '',
+        last_msg: '',
+        last_sent: '',
         users: [],
         messages: []
       };
