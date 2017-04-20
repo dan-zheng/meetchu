@@ -36,7 +36,7 @@ module.exports = models => ({
   /**
    * Retrieves a person by email.
    * @param {Object} email - the person's email.
-   * @return {Maybe} Maybe[Person]
+   * @return {Promise} Either[String, Person]
    */
   findByEmail(email) {
     return models.pool.query('SELECT * FROM person WHERE email = ? LIMIT 1', [email])

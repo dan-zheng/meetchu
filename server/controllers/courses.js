@@ -105,10 +105,10 @@ exports.postCoursesSyncUser = async (req, res) => {
     Either.Right(schedule.right()[term])
   );
   const courseIds = await sectionIds.cata(
-    err => Promise.resolve(Either.Left(err)),
+    err => Either.Left(err),
     ids => Promise.all(ids.map(id => getCourseId(id)))
-      .then(arr => Promise.resolve(Either.Right(arr)),
-            err => Promise.resolve(Either.Left(err)))
+      .then(arr => Either.Right(arr),
+            err => Either.Left(err))
   );
   const nonEmptyCourseIds = courseIds.flatMap(ids =>
     ids.length > 0 ?
@@ -116,11 +116,11 @@ exports.postCoursesSyncUser = async (req, res) => {
       Either.Left('No courses found.')
   );
   const bulkInsertion = await nonEmptyCourseIds.cata(
-    err => Promise.resolve(Either.Left(err)),
+    err => Either.Left(err),
     ids => courseDao.addPersonBulk(ids, person)
   );
   const courseList = await bulkInsertion.cata(
-    err => Promise.resolve(Either.Left(err)),
+    err => Either.Left(err),
     ids => courseDao.findByPerson(person)
   );
   courseList.cata(
