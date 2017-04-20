@@ -79,8 +79,7 @@ const mutations = {
     state.courses.push(course);
   },
   [types.REMOVE_COURSE](state, course) {
-    const index = state.courses.findIndex(c => c.id === course.id);
-    state.courses.splice(index, 1);
+    state.courses = state.courses.filter(c => c.id !== course.id);
   },
   [types.UNSET_USER](state) {
     state.courses = [];
