@@ -7,7 +7,7 @@ const Either = monet.Either;
 module.exports = models => ({
   getChatList(person) {
     return models.pool.query(`
-      SELECT chat.id, chat.name, chat.description, person.first_name, person.last_name, message.message
+      SELECT chat.id, chat.name, chat.description, person.first_name, person.last_name, message.message, message.time_sent
       FROM person_chat
       JOIN chat
       ON chat_id = chat.id AND person_id = ?
