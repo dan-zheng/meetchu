@@ -13,9 +13,9 @@ module.exports = {
     )`,
     `CREATE TABLE IF NOT EXISTS meeting_time (
       id INT NOT NULL AUTO_INCREMENT,
-      time DATETIME NON NULL,
-      meeting_id INT NON NULL,
-      PRIMARY KEY (id)
+      time DATETIME NOT NULL,
+      meeting_id INT NOT NULL,
+      PRIMARY KEY (id),
       FOREIGN KEY (meeting_id)
         REFERENCES meeting(id)
         ON DELETE CASCADE

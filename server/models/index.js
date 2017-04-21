@@ -32,7 +32,7 @@ if (debugging) {
 }
 
 const dirs = [__dirname];
-const valid = ['person.js', 'course.js', 'invitation.js', 'message.js', 'chat.js', 'notification.js'];
+const valid = ['person.js', 'course.js', 'invitation.js', 'message.js', 'chat.js', 'notification.js', 'datetime.js', 'meeting.js'];
 // TODO: invitation.js requires new foreign key for when chats are made
 
 // Flatten and filter directory files
