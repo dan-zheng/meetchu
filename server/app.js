@@ -133,7 +133,6 @@ if (process.env.NODE_ENV === 'production') {
  */
 // TODO: Rewrite authentication
 app.get('/', homeController.index);
-app.get('/signup', userController.getSignup);
 app.post('/signup', userController.postSignup);
 app.post('/login', userController.postLogin);
 app.get('/logout', userController.getLogout);

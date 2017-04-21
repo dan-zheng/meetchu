@@ -67,7 +67,7 @@
       //- // NOTE: Save until adding users to chat is completed
         p.text-muted.px-3.py-2.my-0(v-else-if='!hasCurrentChatUsers') Add another user to start chatting!
       p.text-muted.px-3.py-2.my-0(v-else-if='!hasChatMessages(currentChat)') Send a message!
-      .list-group(v-else, v-resize='onMessageListResize')
+      .list-group(v-else, v-resize='onMessageListResize', @scroll='handleScroll')
         .list-group-item.message.rounded-0.border.mt-auto(v-for='msg in currentChat.messages', :key='msg.id')
           | {{ msg }}
     #message-box(v-if='hasChats && !isCurrentChatNew && hasCurrentChat')
@@ -112,6 +112,7 @@ export default {
       newChat: null,
       currentChat: {},
       isCurrentChatNew: false,
+      hasScrolled: false,
       formstate: {
         newChat: {},
         currentChat: {}
@@ -229,21 +230,6 @@ export default {
       this.search("userHits", this.userQuery);
       // this.$store.dispatch('removeChatUser', { chat, user });
     },
-    setCurrentChat(chat, isNewChat) {
-      this.currentChat = chat;
-      if (isNewChat) {
-        this.setCurrentChatToNew();
-        return;
-      }
-      this.isCurrentChatNew = false;
-      if (chat.users && chat.users.length > 0) {
-        this.$store.dispatch('getChatUsers', { chat: this.currentChat });
-        this.$store.dispatch('getChatMessages', { chat: this.currentChat })
-          .then(() => {
-            this.scrollMessagesToBottom();
-          });
-      }
-    },
     sendMessage(chat) {
       if (!this.currentMsg[chat.id] || this.currentMsg[chat.id] === '') {
         return;
@@ -291,6 +277,9 @@ export default {
       });
       this.resetNewChat();
     },
+    handleScroll() {
+      this.hasScrolled = true;
+    },
     scrollMessagesToBottom() {
       const messages = $('#messages-list')[0];
       messages.scrollTop = messages.scrollHeight;
@@ -299,7 +288,7 @@ export default {
       const messages = $('#messages-list')[0];
       const lastMessage = $('#messages-list .list-group .list-group-item:last-of-type')[0];
       if (this.hasCurrentChat) {
-        if (messages.scrollHeight - messages.scrollTop - lastMessage.clientHeight === messages.offsetHeight) {
+        if (!this.hasScrolled || messages.scrollHeight - messages.scrollTop - lastMessage.clientHeight === messages.offsetHeight) {
           this.scrollMessagesToBottom();
         }
       }
@@ -336,9 +325,26 @@ export default {
         this.currentChat = null;
       }
     },
+    setCurrentChat(chat, isNewChat) {
+      this.currentChat = chat;
+      if (isNewChat) {
+        this.setCurrentChatToNew();
+        return;
+      }
+      this.hasScrolled = false;
+      this.isCurrentChatNew = false;
+      if (chat.users && chat.users.length > 0) {
+        this.$store.dispatch('getChatUsers', { chat: this.currentChat });
+        this.$store.dispatch('getChatMessages', { chat: this.currentChat })
+          .then(() => {
+            this.scrollMessagesToBottom();
+          });
+      }
+    },
     setCurrentChatToNew() {
       this.currentChat = this.newChat;
       this.isCurrentChatNew = true;
+      this.hasScrolled = false;
     },
     hasChatUsers(chat) {
       return typeof chat.users !== 'undefined' && chat.users.length > 0;

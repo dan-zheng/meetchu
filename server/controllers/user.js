@@ -37,19 +37,6 @@ const client = algoliasearch(process.env.ALGOLIA_ID, process.env.ALGOLIA_ADMIN_K
 const userIndex = client.initIndex('users');
 
 /**
- * GET /signup
- * Sign up page.
- */
-exports.getSignup = (req, res) => {
-  if (req.user) {
-    return res.redirect('/');
-  }
-  return res.render('account/signup', {
-    title: 'Sign up'
-  });
-};
-
-/**
  * Adds a new user to algolia.
  * @param {User} user - a user model.
  * @return {Promise} a bluebird promise.

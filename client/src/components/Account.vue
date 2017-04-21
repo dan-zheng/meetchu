@@ -98,8 +98,8 @@ export default {
   },
   created() {
     this.userModel = this.$store.getters.user;
-    // delete this.userModel.password;
-    // delete this.userModel.confirm_password;
+    delete this.userModel.password;
+    delete this.userModel.confirm_password;
     // resetForm(this.formstate.password);
   },
   computed: {

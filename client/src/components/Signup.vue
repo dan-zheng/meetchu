@@ -76,7 +76,7 @@ export default {
         confirmPassword: this.model.confirmPassword,
       }).then(() => {
         console.log('Local signup success.');
-        resetForm(this.formstate[type]);
+        resetForm(this.formstate);
         // Redirect page
         this.$router.push('/');
         // Alert message
@@ -88,7 +88,7 @@ export default {
         .catch(swal.noop);
       }).catch((e) => {
         console.log('Local signup fail.');
-        resetForm(this.formstate[type]);
+        resetForm(this.formstate);
         // Alert message
         swal({
           type: 'error',
