@@ -57,8 +57,8 @@ module.exports = models => ({
   },
   findByPerson(person) {
     return models.pool.query(
-      `SELECT * FROM course
-        JOIN person_course
+      `SELECT * FROM chat
+        JOIN person_chat
         ON person_id = id
         WHERE person_id = ?`, [person.id])
       .then(result => Either.Right(result.list()))
@@ -93,7 +93,7 @@ module.exports = models => ({
   addPeople(chat, people) {
     const values = people.map(person => [person.id, chat.id]);
     return models.pool.query(
-      'INSERT IGNORE INTO person_course (person_id, course_id) VALUES ?', [values])
+      'INSERT IGNORE INTO person_chat (person_id, chat_id) VALUES ?', [values])
       .then(result => Either.Right(result.affectedRows))
       .errorToLeft();
   },

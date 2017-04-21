@@ -43,16 +43,14 @@ exports.postCreateChat = async (req, res) => {
   const chat = req.body.chat;
   const person = req.body.user;
 
-  const findPerson = await personDao.findById(person.id);
-  const createChat = await findPerson.cata(
-    err => req.status(401).json(err),
-    found => chatDao.create(chat)
+  const createChat = await chatDao.create(chat);
+  const addPerson = await createChat.flatMap(
+    found => chatDao.addPerson(createChat.right(), person)
   );
-  const addPerson = await createChat.cata(
-    err => req.status(401).json(err),
-    found => chatDao.addPerson(createChat.right(), findPerson.right())
+  addPerson.cata(
+    err => res.status(401).json(err),
+    affectedRows => res.status(200).json(true)
   );
-  return createChat.right();
 };
 
 /**
