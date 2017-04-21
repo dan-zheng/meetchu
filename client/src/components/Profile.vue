@@ -4,11 +4,13 @@
     h2 {{ fullName }}
 
     h5 Email:
-      span(v-if='profile.email')  {{ profile.email }}
-      i(v-else)  private
+      span(v-if='profile.privacy_show_email && profile.email')  {{ profile.email }}
+      i.text-muted(v-else-if='profile.privacy_show_email && !profile.email')  unspecificied
+      i.text-muted(v-else)  private
     h5 Major:
-      span(v-if='profile.major')  {{ profile.major }}
-      i(v-else)  private
+      span(v-if='profile.privacy_show_major && profile.major')  {{ profile.major }}
+      i.text-muted(v-else-if='profile.privacy_show_major && !profile.major')  unspecificied
+      i.text-muted(v-else)  private
     button.btn.btn-primary(@click='createChat')
       i.fa.fa-comments-o
       | Start a chat
@@ -36,6 +38,7 @@ export default {
     this.axios.get(`/profile/${id}`)
       .then((res) => {
         this.profile = Object.assign({}, this.profile, res.data);
+        console.log(this.profile);
       })
       .catch((err) => {
         throw err;
