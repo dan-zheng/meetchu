@@ -102,6 +102,14 @@ module.exports = {
       FOREIGN KEY (person_id)
         REFERENCES person(id)
         ON DELETE CASCADE
+    )`,
+    `CREATE TABLE IF NOT EXISTS person_meeting_time (
+      meeting_id INT NOT NULL,
+      times JSON NOT NULL,
+      PRIMARY KEY (meeting_id),
+      FOREIGN KEY (meeting_id)
+        REFERENCES meeting(id)
+        ON DELETE CASCADE
     )`
   ]
 };

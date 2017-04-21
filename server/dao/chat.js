@@ -25,6 +25,15 @@ module.exports = models => ({
       .then(result => Either.Right(result.affectedRows))
       .errorToLeft();
   },
+  update(chat, fields) {
+    const keys = fields || Object.keys(chat);
+    const values = keys.map(key => chat[key]);
+    const updates = keys.map(key => `${key} = ?`).join(', ');
+    const query = ['UPDATE chat', `SET ${updates}`, 'WHERE id = ?'].join('\n\t');
+    return models.pool.query(query, [...values, chat.id])
+      .then(result => Either.Right(result.affectedRows))
+      .errorToLeft();
+  },
   /**
    * @return Promise[Either[String, List[Chat]]]
    */
@@ -119,7 +128,7 @@ module.exports = models => ({
         (person_id, chat_id)
         VALUES (?, ?)`, [person.id, chat.id])
       .then(result => result.affectedRows === 0 ?
-        Either.Left('User was already added to chat.') :
+        Either.Left('User was already added to the chat.') :
         Either.Right(result.insertId))
       .errorToLeft();
   },
