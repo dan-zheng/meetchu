@@ -107,7 +107,7 @@ module.exports = models => ({
       .errorToLeft();
   },
   erase(person) {
-    return models.pool.query(`DELETE FROM person WHERE id = ?`, [person.id])
+    return models.pool.query('DELETE FROM person WHERE id = ?', [person.id])
       .then(result => Either.Right(result.affectedRows))
       .errorToLeft();
   },

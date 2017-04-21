@@ -270,7 +270,7 @@ export default {
       userIndex.search(query, {
         hitsPerPage: 5
       }, (error, results) => {
-        const filteredHits = results.hits.filter(el => this.user.id != el.objectID && this.newChat.users.findIndex(u => u.id === el.objectID) === -1);
+        const filteredHits = results.hits.filter(el => this.user.id != el.objectID && !this.newChat.users.some(u => u.id === el.objectID));
         filteredHits.forEach((el) => {
           el.id = el.objectID;
           delete el.objectID;

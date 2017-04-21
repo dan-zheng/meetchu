@@ -15,11 +15,7 @@ exports.loginCallback = ((strategy, req, res, next) => {
       req.flash('error', err);
       return res.status(401).json(err);
     }
-    const hiddenFields = ['password', 'reset_password_token', 'reset_password_expiration'];
-    hiddenFields.forEach((field) => {
-      delete user[field];
-    });
-    return res.status(200).json(user);
+    return res.status(200).json(user.hide());
   })(req, res, next);
 });
 
