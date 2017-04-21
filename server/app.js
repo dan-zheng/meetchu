@@ -181,19 +181,10 @@ app.get('/auth/facebook/callback', authController.getAuthFacebookCallback);
  * Socket.io configuration.
  */
 io.on('connection', (socket) => {
-  socket.on('send_message', (req) => {
-    console.log(`Message received from user id ${req.senderId}: '${req.text}'`);
+  socket.on('new_message', (data) => {
+    console.log(`Message received from user id ${data.sender_id}: '${data.body}'`);
+    socket.broadcast.emit('new_message', data);
   });
-  /*
-  socket.on('send message', (rec) => {
-    models.Message.create({
-      senderId: rec.senderId,
-      groupId: rec.groupId,
-      message: rec.message.body
-    });
-    io.emit(`receive message ${rec.groupId}`, rec.message);
-  });
-  */
 });
 
 async function run() {

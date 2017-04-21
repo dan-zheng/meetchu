@@ -216,7 +216,7 @@ export default {
         time_sent: now
       };
       // Emit message
-      this.$socket.emit('send_message', message);
+      this.$socket.emit('new_message', message);
       this.$store.dispatch('sendMessage', { message });
       delete this.currentMsg[chat.id];
     },

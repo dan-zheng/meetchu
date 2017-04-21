@@ -11,7 +11,7 @@ export const ADD_CHAT = 'ADD_CHAT';
 export const REMOVE_CHAT = 'REMOVE_CHAT';
 export const ADD_CHAT_USER = 'ADD_CHAT_USER';
 export const REMOVE_CHAT_USER = 'REMOVE_CHAT_USER';
-export const SEND_MESSAGE = 'SEND_MESSAGE';
+export const ADD_MESSAGE = 'ADD_MESSAGE';
 
 // Course related mutations
 export const SET_COURSES = 'SET_COURSES';

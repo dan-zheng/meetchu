@@ -80,8 +80,17 @@ const actions = {
         throw err;
       });
   },
+  addMessage({ commit }, { message }) {
+    commit(types.ADD_MESSAGE, {
+      update: false,
+      message
+    });
+  },
   sendMessage({ commit }, { message }) {
-    commit(types.SEND_MESSAGE, message);
+    commit(types.ADD_MESSAGE, {
+      update: true,
+      message
+    });
     return Vue.axios.post(`/chats/send`, { message })
       .then(res => true)
       .catch((err) => {
@@ -126,17 +135,31 @@ const mutations = {
     const users = state.chats[index].users.filter(u => u.id !== user.id);
     Vue.set(state.chats[index], 'users', users);
   },
-  [types.SEND_MESSAGE](state, message) {
+  [types.ADD_MESSAGE](state, { message, update }) {
     const index = state.chats.findIndex(c => c.id === message.chat_id);
+    if (index === -1) {
+      return;
+    }
+    // TODO: refactor update
     if (!state.chats[index].messages) {
+      if (!update) {
+        return;
+      }
       state.chats[index].messages = [];
     }
-    state.chats[index].messages.push(message);
-    // TODO: update last_sent, last_sender, last_msg
-    Vue.set(state.chats[index], 'time_sent', message.time_sent);
+    const displayedMessage = {
+      id: message.chat_id,
+      first_name: message.sender_first_name,
+      last_name: message.sender_last_name,
+      body: message.body,
+      time_sent: message.time_sent
+    };
+    state.chats[index].messages.push(displayedMessage);
+    // TODO: update last_sent, last_sender, last_msg of chat
     Vue.set(state.chats[index], 'first_name', message.sender_first_name);
     Vue.set(state.chats[index], 'last_name', message.sender_last_name);
     Vue.set(state.chats[index], 'body', message.body);
+    Vue.set(state.chats[index], 'time_sent', message.time_sent);
   }
 };
 

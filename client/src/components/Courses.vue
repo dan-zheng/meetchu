@@ -180,6 +180,7 @@ export default {
         })
         .catch(swal.noop);
       }).catch((e) => {
+        this.spinnerLoading = false;
         console.log(`Sync courses fail.`);
         // Alert message
         swal({

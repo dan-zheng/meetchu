@@ -42,7 +42,7 @@ module.exports = models => ({
   getChatMessages(chat, max) {
     return models.pool.query(`
       SELECT * FROM (
-        SELECT chat.name, person.first_name, person.last_name, message.body, message.time_sent
+        SELECT chat.id, person.first_name, person.last_name, message.body, message.time_sent
           FROM chat
           JOIN message
           ON chat.id = message.chat_id
