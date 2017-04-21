@@ -68,6 +68,14 @@ const actions = {
         throw err;
       });
   },
+  sendMessage({ commit }, { message }) {
+    commit(types.SEND_MESSAGE, message);
+    return Vue.axios.post(`/chats/send`, { message })
+      .then(res => true)
+      .catch((err) => {
+        throw err;
+      });
+  },
   deleteChat({ commit }, { chat }) {
     commit(types.REMOVE_CHAT, chat);
     return Vue.axios.post(`/chats/delete`, { chat })
@@ -83,11 +91,8 @@ const mutations = {
     state.chats = chats;
   },
   [types.SET_CHAT_USERS](state, { chat, users }) {
-    state.chats.forEach((c, i) => {
-      if (c.id === chat.id) {
-        Vue.set(state.chats[i], 'users', users);
-      }
-    });
+    const index = state.chats.findIndex(c => c.id === chat.id);
+    Vue.set(state.chats[index], 'users', users);
   },
   [types.ADD_CHAT](state, chat) {
     state.chats.push(chat);
@@ -96,22 +101,16 @@ const mutations = {
     state.chats = state.chats.filter(c => c.id !== chat.id);
   },
   [types.ADD_CHAT_USER](state, chat, user) {
-    state.chats.forEach((c, i) => {
-      if (c.id === chat.id) {
-        state.chats[i].users.push(user);
-      }
-    });
+    const index = state.chats.findIndex(c => c.id === chat.id);
+    state.chats[index].users.push(user);
   },
   [types.REMOVE_CHAT_USER](state, chat, user) {
-    state.chats.forEach((c, i) => {
-      if (c.id === chat.id) {
-        const users = c.users.filter(u => u.id !== user.id);
-        Vue.set(state.chats[i], 'users', users);
-      }
-    });
-  },
-  [types.SEND_MESSAGE](state, chat, message) {
     const index = state.chats.findIndex(c => c.id === chat.id);
+    const users = state.chats[index].users.filter(u => u.id !== user.id);
+    Vue.set(state.chats[index], 'users', users);
+  },
+  [types.SEND_MESSAGE](state, message) {
+    const index = state.chats.findIndex(c => c.id === message.chat_id);
     state.chats[index].messages.push(message);
   }
 };

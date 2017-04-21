@@ -86,6 +86,21 @@ exports.postChatRemoveUser = (req, res) => {
 };
 
 /**
+ * POST /chats/send
+ * Leave a chat.
+ */
+exports.postChatSendMessage = (req, res) => {
+  const message = req.body.message;
+
+  chatDao.addMessage(message).tap(result =>
+    result.cata(
+      err => res.status(401).json(err),
+      msg => res.status(200).json(msg)
+    )
+  );
+};
+
+/**
  * POST /chats/delete
  * Delete a chat.
  */

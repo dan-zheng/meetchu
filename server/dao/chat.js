@@ -21,7 +21,7 @@ module.exports = models => ({
   },
   getChatList(person) {
     return models.pool.query(`
-      SELECT chat.id, chat.name, chat.description, person.first_name, person.last_name, message.message, message.time_sent
+      SELECT chat.id, chat.name, chat.description, person.first_name, person.last_name, message.text, message.time_sent
       FROM person_chat
       JOIN chat
       ON chat_id = chat.id AND person_id = ?
@@ -42,7 +42,7 @@ module.exports = models => ({
   getChatMessages(chat, max) {
     return models.pool.query(`
       SELECT * FROM (
-        SELECT chat.name, person.first_name, person.last_name, message.message, message.time_sent
+        SELECT chat.name, person.first_name, person.last_name, message.text, message.time_sent
           FROM chat
           JOIN message
           ON chat.id = message.chat_id
@@ -66,8 +66,8 @@ module.exports = models => ({
   },
   addMessage(message) {
     return models.pool.query(
-      'INSERT INTO message (sender_id, chat_id, message) VALUES (?, ?, ?)',
-      [message.sender_id, message.chat_id, message.message])
+      'INSERT INTO message (sender_id, chat_id, text) VALUES (?, ?, ?)',
+      [message.sender_id, message.chat_id, message.text])
       .then(result => Either.Right(Object.assign(message, { id: result.insertId })))
       .errorToLeft();
   },
