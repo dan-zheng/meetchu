@@ -6,6 +6,10 @@ body {
   padding-top: 0px;
 }
 
+#sidebar {
+  min-width: 60px;
+}
+
 // Sidebar
 
 @mixin styling($sidebar-width, $icon-padding) {

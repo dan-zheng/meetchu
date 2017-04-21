@@ -6,6 +6,7 @@ export const UNSET_USER = 'UNSET_USER';
 // Chat related mutations
 export const SET_CHATS = 'SET_CHATS';
 export const SET_CHAT_USERS = 'SET_CHAT_USERS';
+export const SET_CHAT_MESSAGES = 'SET_CHAT_MESSAGES';
 export const ADD_CHAT = 'ADD_CHAT';
 export const REMOVE_CHAT = 'REMOVE_CHAT';
 export const ADD_CHAT_USER = 'ADD_CHAT_USER';

@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import * as types from '../mutation-types';
+import * as moment from 'moment';
 
 const state = {
   chats: []
@@ -10,12 +11,14 @@ const getters = {
   sortedChats: state => {
     const temp = state.chats.slice(0);
     return temp.sort((a, b) => {
-      if (!a.time_last_sent) {
-        return 1;
-      } else if (!b.time_last_sent) {
+      if (!a.time_sent && !b.time_sent) {
+        return moment(a.created_at).isBefore(moment(b.created_at));
+      } else if (!a.time_sent) {
         return -1;
+      } else if (!b.time_sent) {
+        return 1;
       }
-      return b.time_last_sent.isAfter(a.time_last_sent);
+      return moment(a.time_sent).isBefore(moment(b.time_sent));
     });
   }
 };
@@ -23,7 +26,10 @@ const getters = {
 const actions = {
   getChats({ commit, rootState }) {
     return Vue.axios.post('/chats', { user: rootState.user.user })
-      .then(res => commit(types.SET_CHATS, res.data))
+      .then(res => {
+        // console.log(res.data);
+        return commit(types.SET_CHATS, res.data);
+      })
       .catch((err) => {
         throw err;
       });
@@ -35,12 +41,18 @@ const actions = {
         throw err;
       });
   },
+  getChatMessages({ commit }, { chat }) {
+    return Vue.axios.post('/chat/messages', { chat })
+      .then(res => commit(types.SET_CHAT_MESSAGES, { chat, messages: res.data }))
+      .catch((err) => {
+        throw err;
+      });
+  },
   createChat({ commit, rootState }, { chat }) {
     commit(types.ADD_CHAT, chat);
     return Vue.axios.post('/chats/create', { chat, user: rootState.user.user })
       .then(res => true)
       .catch((err) => {
-        console.log(err);
         throw err;
       });
   },
@@ -94,6 +106,11 @@ const mutations = {
     const index = state.chats.findIndex(c => c.id === chat.id);
     Vue.set(state.chats[index], 'users', users);
   },
+  [types.SET_CHAT_MESSAGES](state, { chat, messages }) {
+    const lastMessage = messages[0];
+    const index = state.chats.findIndex(c => c.id === chat.id);
+    Vue.set(state.chats[index], 'messages', messages);
+  },
   [types.ADD_CHAT](state, chat) {
     state.chats.push(chat);
   },
@@ -111,7 +128,15 @@ const mutations = {
   },
   [types.SEND_MESSAGE](state, message) {
     const index = state.chats.findIndex(c => c.id === message.chat_id);
+    if (!state.chats[index].messages) {
+      state.chats[index].messages = [];
+    }
     state.chats[index].messages.push(message);
+    // TODO: update last_sent, last_sender, last_msg
+    Vue.set(state.chats[index], 'time_sent', message.time_sent);
+    Vue.set(state.chats[index], 'first_name', message.sender_first_name);
+    Vue.set(state.chats[index], 'last_name', message.sender_last_name);
+    Vue.set(state.chats[index], 'body', message.body);
   }
 };
 

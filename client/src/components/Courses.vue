@@ -157,12 +157,7 @@ export default {
     },
     setCurrentCourse(course) {
       this.currentCourse = course;
-      this.$store.dispatch('getCourseUsers', { course })
-        .then(() => {
-          this.currentCourse = this.sortedCourses.find(c => c.id === course.id);
-        }).catch((e) => {
-          console.log('Get course users failed.');
-        });
+      this.$store.dispatch('getCourseUsers', { course });
     },
     syncCourses() {
       if (!this.formstate.purdue.$valid) {

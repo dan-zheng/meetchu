@@ -47,7 +47,7 @@ module.exports = models => ({
   /**
    * @return Promise[Either[String, List[Person]]]
    */
-  findPeopleByCourse(course) {
+  getPeopleByCourse(course) {
     return models.pool.query(
       `SELECT person.* FROM person
         JOIN person_course

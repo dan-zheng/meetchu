@@ -27,10 +27,25 @@ exports.postChats = (req, res) => {
 exports.postChatUsers = (req, res) => {
   const chat = req.body.chat;
 
+  chatDao.getPeopleByChat(chat).then(result =>
+    result.cata(
+      err => res.status(401).json(err),
+      people => res.status(200).json(people.toArray())
+    )
+  );
+};
+
+/**
+ * POST /chat/messages
+ * Get a chat's messages.
+ */
+exports.postChatMessages = (req, res) => {
+  const chat = req.body.chat;
+
   chatDao.getChatMessages(chat, MAX_MESSAGES).then(result =>
     result.cata(
       err => res.status(401).json(err),
-      chatMessages => res.status(200).json(chatMessages.toArray())
+      messages => res.status(200).json(messages.toArray())
     )
   );
 };

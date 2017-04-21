@@ -1,6 +1,6 @@
 <template lang='pug'>
 #content.d-flex
-  #chats.d-flex.flex-column.col-sm-4.px-0
+  #chats.d-flex.flex-column.col-4.px-0
     .d-flex.text-center.px-4.align-items-stretch
       h2.my-2 Chats
       span.d-flex.px-0.ml-auto.align-items-center
@@ -9,14 +9,18 @@
     #chats-list
       p.text-muted.px-3.py-2.my-0(v-if='!hasChats') You are not in any chats.
       .list-group(v-else)
-        .list-group-item.list-group-item-action.chat.rounded-0.border(v-for='chat in sortedChats', :key='chat.name', v-bind:class='{ active: currentChat == chat }', @click='setCurrentChat(chat)')
-          .d-flex.w-100.justify-content-between
-            h5.mb-1 {{ chat.name }}
-            small(v-if='hasChatLastSent(chat)') {{ formatDate(chat.last_sent) }}
-          p.mb-1(v-if='hasChatLastSent(chat)')
-            strong {{ chat.last_sender }}:
-            |  {{ chat.last_msg }}
-  #current-chat.d-flex.flex-column.col-sm-8.px-0(v-model='currentChat')
+        .list-group-item.list-group-item-action.chat.rounded-0.border(v-for='chat in sortedChats', :key='chat.name', :class='{ active: currentChat == chat }', @click='setCurrentChat(chat)')
+          //- TODO: Need to refactor
+          .list-group-item.p-0.border-0(v-if='hasChatLastSent(chat)', style='background-color: transparent;')
+            .d-flex.w-100.justify-content-between.flex-wrap
+              h5.mb-1 {{ chat.name }}
+              small {{ formatDate(chat.time_sent) }}
+            p.mb-1(v-if='hasChatLastSent(chat)')
+              strong {{ chat.first_name + ' ' + chat.last_name }}:
+              |  {{ chat.body }}
+          .d-flex.w-100.justify-content-between.flex-wrap(v-else)
+            h5.word-wrap.mb-1 {{ chat.name }}
+  #current-chat.d-flex.flex-column.col-8.px-0(v-model='currentChat')
     .d-flex.text-center.px-4.align-items-stretch(v-if='hasCurrentChat')
       span.ml-auto
       h2.my-2(style='min-height: 35px') {{ currentChat.name }}
@@ -28,6 +32,7 @@
     #messages-list
       p.text-muted.px-3.py-2.my-0(v-if='!hasChats') Create a chat to start messaging!
       p.text-muted.px-3.py-2.my-0(v-else-if='!hasCurrentChat') Click on a chat!
+      //- p.text-muted.px-3.py-2.my-0(v-else-if='!hasCurrentChatUsers') Add another user to start chatting!
       p.text-muted.px-3.py-2.my-0(v-else-if='!hasChatMessages(currentChat)') Send a message!
       div(v-else)
         // h4.subtitle.px-2.py-2.my-0 Messages
@@ -35,7 +40,10 @@
           .list-group-item.message.rounded-0.border(v-for='msg in currentChat.messages', :key='msg.id')
             | {{ msg }}
     #message-box(v-if='hasCurrentChat')
-      input.px-3(v-model='currentMsg', placeholder='Type message...', @keyup.enter='sendMessage(currentChat)')
+      input.px-3(v-model='currentMsg[currentChat.id]', placeholder='Type message...', @keyup.enter='sendMessage(currentChat)')
+      //-
+        input.px-3(v-if='hasCurrentChatUsers', v-model='currentMsg[currentChat.id]', placeholder='Type message...', @keyup.enter='sendMessage(currentChat)')
+        input.px-3(v-else, v-model='currentMsg[currentChat.id]', placeholder='Add another user to chat!', disabled)
 
   //- Modals
   .modal.fade#new-chat-modal(tabindex='-1', role='dialog', aria-labelledby='newChatModalLabel', aria-hidden='true')
@@ -110,14 +118,11 @@ export default {
         newChat: {
           name: '',
           description: '',
-          last_sender: '',
-          last_msg: '',
-          last_sent: '',
           users: [],
           messages: []
         }
       },
-      currentMsg: '',
+      currentMsg: {},
       userQuery: '',
       userHits: []
     }
@@ -136,7 +141,8 @@ export default {
       });
     },
     sortedNewChatUsers() {
-      return this.model.newChat.users.sort((a, b) => {
+      const temp = this.model.newChat.users
+      return temp.sort((a, b) => {
         const u1 = a.first_name + ' ' + a.last_name;
         const u2 = b.first_name + ' ' + b.last_name;
         return u1.localeCompare(u2);
@@ -146,7 +152,10 @@ export default {
       return this.chats.length > 0;
     },
     hasCurrentChat() {
-      return typeof this.currentChat.id !== 'undefined';
+      return typeof this.currentChat.name !== 'undefined';
+    },
+    hasCurrentChatUsers() {
+      return typeof this.currentChat.users !== 'undefined' && this.currentChat.users.length > 1;
     }
   },
   beforeMount() {
@@ -163,6 +172,7 @@ export default {
             this.currentChat = this.sortedChats[0];
           }
           this.$store.dispatch('getChatUsers', { chat: this.currentChat });
+          this.$store.dispatch('getChatMessages', { chat: this.currentChat });
         }
       });
   },
@@ -178,14 +188,6 @@ export default {
       });
     },
     addUserToChat(chat, user, index) {
-      /*
-      if (chat.users.findIndex(u => u.id === user.id) !== -1) {
-        console.log(`User ${user.id} is already in chat ${chat.id}`);
-        return false;
-      }
-      chat.users.push(user);
-      this.userHits.splice(index, 1);
-      */
       this.userHits.splice(index, 1);
       this.$store.dispatch('addChatUser', { chat, user });
     },
@@ -196,33 +198,26 @@ export default {
     },
     setCurrentChat(chat) {
       this.currentChat = chat;
+      // console.log(chat);
+      if (chat.users && chat.users.length > 0) {
+        this.$store.dispatch('getChatUsers', { chat: this.currentChat });
+        this.$store.dispatch('getChatMessages', { chat: this.currentChat });
+      }
     },
     sendMessage(chat) {
       const now = moment();
       const message = {
         chat_id: chat.id,
         sender_id: this.$store.getters.user.id,
-        text: this.currentMsg
+        sender_first_name: this.$store.getters.user.first_name,
+        sender_last_name: this.$store.getters.user.last_name,
+        body: this.currentMsg[chat.id],
+        time_sent: now
       };
       // Emit message
       this.$socket.emit('send_message', message);
       this.$store.dispatch('sendMessage', { message });
-      console.log('hi');
-      // TODO: Add store dispatch
-      // In the meantime, the local chats object is updated.
-      /*
-      chat.messages.push({
-        chatId: chat.id,
-        senderId: this.$store.getters.user.id,
-        text: this.currentMsg,
-        timeSent: now
-      });
-      const fullName = this.$store.getters.user.first_name + ' ' + this.$store.getters.user.last_name;
-      this.$set(chat, 'last_sent', now);
-      this.$set(chat, 'last_sender', fullName);
-      this.$set(chat, 'last_msg',this.currentMsg);
-      */
-      this.currentMsg = '';
+      delete this.currentMsg[chat.id];
     },
     search(hits, query) {
       if (!query) {
@@ -257,6 +252,7 @@ export default {
       if (!date) {
         return '';
       }
+      date = moment(date);
       const now = moment();
       const dayDiff = now.diff(date, 'days');
       const isSameYear = now.isSame(date, 'years');
@@ -276,9 +272,6 @@ export default {
       this.model.newChat = {
         name: '',
         description: '',
-        last_sender: '',
-        last_msg: '',
-        last_sent: '',
         users: [],
         messages: []
       };
@@ -288,11 +281,9 @@ export default {
     },
     hasChatMessages(chat) {
       return typeof chat.messages !== 'undefined' && chat.messages.length > 0;
-      // return typeof chat.last_sent !== 'undefined';
     },
     hasChatLastSent(chat) {
-      return typeof chat.last_sent !== 'undefined' && chat.last_sent !== "";
-      // return typeof chat.last_sent !== 'undefined';
+      return typeof chat.time_sent !== 'undefined' && chat.time_sent !== null;
     },
     onSubmit(type) {
       console.log(this.formstate.newChat.$valid);

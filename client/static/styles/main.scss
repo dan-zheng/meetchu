@@ -66,6 +66,12 @@ textarea {
   font-family: $font-family-base;
 }
 
+.word-wrap {
+  max-width: 100%;
+  word-wrap: break-word;
+  overflow-x: hidden;
+}
+
 // List groups
 
 .list-group-item {
