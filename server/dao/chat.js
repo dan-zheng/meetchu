@@ -5,6 +5,9 @@ const Maybe = monet.Maybe;
 const Either = monet.Either;
 
 module.exports = models => ({
+  /**
+   * @return Promise[Either[String, Chat]]
+   */
   create(chat) {
     return models.pool.query(
       'INSERT IGNORE INTO chat (name, description) VALUES (?, ?)',
@@ -14,11 +17,17 @@ module.exports = models => ({
         Either.Right(Object.assign(chat, { id: result.insertId })))
       .errorToLeft();
   },
+  /**
+   * @return Promise[Either[String, Integer]]
+   */
   erase(chat) {
     return models.pool.query('DELETE FROM chat WHERE id = ?', [chat.id])
       .then(result => Either.Right(result.affectedRows))
       .errorToLeft();
   },
+  /**
+   * @return Promise[Either[String, List[Chat]]]
+   */
   getChatList(person) {
     return models.pool.query(`
       SELECT chat.id, chat.name, chat.description, chat.created_at, person.first_name, person.last_name, message.body, message.time_sent
@@ -39,6 +48,9 @@ module.exports = models => ({
     .then(result => Either.Right(result.list()))
     .errorToLeft();
   },
+  /**
+   * @return Promise[Either[String, List[Message]]]
+   */
   getChatMessages(chat, max) {
     return models.pool.query(`
       SELECT * FROM (
@@ -55,6 +67,9 @@ module.exports = models => ({
     .then(result => Either.Right(result.list()))
     .errorToLeft();
   },
+  /**
+   * @return Promise[Either[String, List[Person]]]
+   */
   getPeopleByChat(chat) {
     return models.pool.query(
       `SELECT person.* FROM person
@@ -64,6 +79,9 @@ module.exports = models => ({
       .then(rows => Either.Right(rows.list().map(person => new models.Person(person))))
       .errorToLeft();
   },
+  /**
+   * @return Promise[Either[String, List[Chat]]]
+   */
   findByPerson(person) {
     return models.pool.query(
       `SELECT * FROM chat
@@ -73,6 +91,9 @@ module.exports = models => ({
       .then(result => Either.Right(result.list()))
       .errorToLeft();
   },
+  /**
+   * @return Promise[Either[String, Message]]
+   */
   addMessage(message) {
     return models.pool.query(
       'INSERT INTO message (sender_id, chat_id, body) VALUES (?, ?, ?)',
@@ -80,12 +101,18 @@ module.exports = models => ({
       .then(result => Either.Right(Object.assign(message, { id: result.insertId })))
       .errorToLeft();
   },
+  /**
+   * @return Promise[Either[String, Integer]]
+   */
   removeMessage(message) {
     return models.pool.query(
       'DELETE FROM message WHERE id = ?', [message.id])
     .then(result => Either.Right(result.affectedRows))
     .errorToLeft();
   },
+  /**
+   * @return Promise[Either[String, Integer]]
+   */
   addPerson(chat, person) {
     return models.pool.query(
       `INSERT IGNORE INTO person_chat
@@ -106,6 +133,9 @@ module.exports = models => ({
       .then(result => Either.Right(result.affectedRows))
       .errorToLeft();
   },
+  /**
+   * @return Promise[Either[String, Integer]]
+   */
   removePerson(chat, person) {
     return models.pool.query(
       `DELETE FROM person_chat
