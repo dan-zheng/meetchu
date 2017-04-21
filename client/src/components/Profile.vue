@@ -69,11 +69,17 @@ export default {
         return;
       }
       const chat = {
-        name: `${this.profile.first_name} ${this.profile.last_name}`,
+        name: this.fullName,
         description: ''
       };
       this.$store.dispatch('createChat', { chat, users: [this.profile] }).then((chat) => {
         this.$router.push({ path: '/chats' });
+        swal({
+          type: 'success',
+          title: 'Woohoo!',
+          text: `You've started a chat with ${this.fullName}.`
+        })
+        .catch(swal.noop);
       });
     },
     onSubmit(type) {
