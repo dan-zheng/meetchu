@@ -77,46 +77,6 @@
         input.px-3(v-else, v-model='currentMsg[currentChat.id]', placeholder='Add another user to chat!', disabled)
 
   //- Modals
-  //-
-    .modal.fade#new-chat-modal(tabindex='-1', role='dialog', aria-labelledby='newChatModalLabel', aria-hidden='true')
-      .modal-dialog.modal-md
-        .modal-content
-          .modal-header
-            h5.modal-title Create a chat
-            button.close(type='button', data-dismiss='modal', aria-label='Close')
-              span(aria-hidden='true') ×
-          .modal-body
-            vue-form(:state='formstate.newChat', v-model='formstate.newChat', @submit.prevent='onSubmit')
-              validate.form-group.container(auto-label, :class='validationStyle(formstate.newChat.chatName)')
-                label.col-form-label Chat name
-                input.form-control(type='text', name='chatName', placeholder='Chat name', v-model.lazy='model.newChat.name', required)
-                field-messages.form-control-feedback(name='chatName', show='$touched || $submitted')
-                  div(slot='required') Chat name is required.
-              .form-group.container
-                label.col-form-label Description
-                input.form-control(type='text', name='description', placeholder='Description', v-model.lazy='model.newChat.description')
-              .form-group.container
-                label.col-form-label Add users
-                input.form-control(type='text', placeholder='Search for a user...', v-model='userQuery', @keyup='search("userHits", userQuery)')
-              small.text-info(v-if='userHits.length > 0') Matches
-              small.text-warning(v-else-if='userQuery.length > 0 && typeof model.newChat !== "undefined"') No matches.
-              .list-group
-                .list-group-item.list-group-item-action.rounded-0.border(v-for='(user, index) in sortedHitUsers', :key='user.objectId', @click='addUserToChat(model.newChat, user, index)')
-                  .d-flex.w-100.mx-1.justify-content-between.align-items-center
-                    h5.m-0 {{ user.first_name + ' ' + user.last_name }}
-                    small.text-right(style='min-width: 80px;') {{ user.email }}
-              small.text-success(v-if='model.newChat.users.length > 0') Selected
-              .list-group
-                .list-group-item.list-group-item-action.rounded-0.border(v-for='(user, index) in sortedNewChatUsers', :key='user.id', @click='removeUserFromChat(model.newChat, user, index)')
-                  .d-flex.w-100.mx-1.justify-content-between.align-items-center
-                    i.fa.fa-check.text-success
-                    h5.m-0 {{ user.first_name + ' ' + user.last_name }}
-                    small.text-right(style='min-width: 80px;') {{ user.email }}
-              .py-2.text-center
-                button.btn.btn-primary(v-on:click='createChat(model.newChat)')
-                  i.fa.fa-plus-circle
-                  | Create chat
-
   .modal.fade#chat-settings-modal(tabindex='-1', role='dialog', aria-labelledby='chatSettingsModalLabel', aria-hidden='true')
     .modal-dialog.modal-md
       .modal-content
@@ -127,8 +87,8 @@
         .modal-body
           .py-2.text-center
             button.btn.btn-danger(v-on:click='removeChat(currentChat)')
-              i.fa.fa-trash
-              | Remove this chat
+              i.fa.fa-minus-square
+              | Leave this chat
 </template>
 
 <script>
@@ -183,7 +143,6 @@ export default {
       });
     },
     sortedNewChatUsers() {
-      // const temp = this.model.newChat.users;
       const temp = this.newChat.users;
       return temp.sort((a, b) => {
         const u1 = a.first_name + ' ' + a.last_name;
@@ -233,25 +192,14 @@ export default {
       }
     },
     createChat() {
-      /*
-      if (!this.formstate.newChat.$valid) {
+      if (!this.newChat.users || this.newChat.users.length === 0) {
         return;
       }
-      this.hideModal("#new-chat-modal");
-      */
       this.newChat.name = this.newChat.users.map(u => u.first_name).join(', ');
-      this.$store.dispatch('createChat', { chat: this.newChat }).then((chat) => {
-        this.currentChat = chat;
-        this.$store.dispatch('addChatUsers', { chat: this.currentChat, this.currentChat.users });
-        /*
-        this.currentChat.users.forEach((user) => {
-          this.$store.dispatch('addChatUser', { chat: this.currentChat, user });
-        });
-        */
-        // this.setCurrentChat(this.sortedChats[0]);
+      this.$store.dispatch('createChat', { chat: this.newChat, users: this.newChat.users }).then((chat) => {
+        this.setCurrentChat(chat);
         this.resetNewChat();
       });
-      // this.setCurrentChat(this.newChat);
     },
     removeChat(chat) {
       this.$store.dispatch('removeChat', { chat });
@@ -284,7 +232,6 @@ export default {
         return;
       }
       this.isCurrentChatNew = false;
-      // this.resetNewChat();
       if (chat.users && chat.users.length > 0) {
         this.$store.dispatch('getChatUsers', { chat: this.currentChat });
         this.$store.dispatch('getChatMessages', { chat: this.currentChat });
@@ -294,7 +241,6 @@ export default {
       if (!this.currentMsg[chat.id] || this.currentMsg[chat.id] === '') {
         return;
       }
-      // console.log(chat);
       const now = moment();
       const message = {
         chat_id: chat.id,
@@ -317,7 +263,7 @@ export default {
       userIndex.search(query, {
         hitsPerPage: 5
       }, (error, results) => {
-        const filteredHits = results.hits.filter(el => this.newChat.users.findIndex(u => u.id === el.objectID) === -1);
+        const filteredHits = results.hits.filter(el => this.user.id != el.objectID && this.newChat.users.findIndex(u => u.id === el.objectID) === -1);
         filteredHits.forEach((el) => {
           el.id = el.objectID;
           delete el.objectID;
@@ -364,7 +310,7 @@ export default {
     },
     resetNewChat() {
       this.newChat = null;
-      this.isCurrentChatNew = false
+      this.isCurrentChatNew = false;
     },
     resetCurrentChat(isNewChat) {
       if (!isNewChat && this.sortedChats.length > 0) {

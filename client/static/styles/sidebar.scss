@@ -48,16 +48,16 @@ body {
       }
     }
   }
-
-  #content {
-    // flex: 1;
-  }
 }
 
-@include media-breakpoint-up(xs) {
+@include media-breakpoint-up(sm) {
   @include styling($sidebar-width: 60px, $icon-padding: 3px);
 }
 
 @include media-breakpoint-up(md) {
+  @include styling($sidebar-width: 80px, $icon-padding: 4px);
+}
+
+@include media-breakpoint-up(lg) {
   @include styling($sidebar-width: 100px, $icon-padding: 5px);
 }

@@ -10,6 +10,7 @@ export const SET_CHAT_MESSAGES = 'SET_CHAT_MESSAGES';
 export const ADD_CHAT = 'ADD_CHAT';
 export const REMOVE_CHAT = 'REMOVE_CHAT';
 export const ADD_CHAT_USER = 'ADD_CHAT_USER';
+export const ADD_CHAT_USERS = 'ADD_CHAT_USERS';
 export const REMOVE_CHAT_USER = 'REMOVE_CHAT_USER';
 export const ADD_MESSAGE = 'ADD_MESSAGE';
 
