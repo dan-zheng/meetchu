@@ -34,11 +34,9 @@
       p.text-muted.px-3.py-2.my-0(v-else-if='!hasCurrentChat') Click on a chat!
       //- p.text-muted.px-3.py-2.my-0(v-else-if='!hasCurrentChatUsers') Add another user to start chatting!
       p.text-muted.px-3.py-2.my-0(v-else-if='!hasChatMessages(currentChat)') Send a message!
-      div(v-else)
-        // h4.subtitle.px-2.py-2.my-0 Messages
-        .list-group(v-if='hasCurrentChat')
-          .list-group-item.message.rounded-0.border(v-for='msg in currentChat.messages', :key='msg.id')
-            | {{ msg }}
+      .list-group(v-else, v-resize='onMessageListResize')
+        .list-group-item.message.rounded-0.border.mt-auto(v-for='msg in currentChat.messages', :key='msg.id')
+          | {{ msg }}
     #message-box(v-if='hasCurrentChat')
       input.px-3(v-model='currentMsg[currentChat.id]', placeholder='Type message...', @keyup.enter='sendMessage(currentChat)')
       //-
@@ -99,6 +97,7 @@
 import { mapGetters } from 'vuex';
 import * as moment from 'moment';
 import { default as swal } from 'sweetalert2';
+import resize from 'vue-resize-directive'
 import { userIndex } from '../common/algolia';
 import { validationStyle } from '../common/form';
 
@@ -106,6 +105,9 @@ export default {
   name: 'chats',
   metaInfo: {
     title: 'Chats'
+  },
+  directives: {
+    resize,
   },
   data() {
     return {
@@ -206,6 +208,9 @@ export default {
       }
     },
     sendMessage(chat) {
+      if (!this.currentMsg[chat.id] || this.currentMsg[chat.id] === '') {
+        return;
+      }
       const now = moment();
       const message = {
         chat_id: chat.id,
@@ -248,6 +253,10 @@ export default {
         }
       });
       this.resetNewChat();
+    },
+    onMessageListResize() {
+      const messages = $('#messages-list');
+      messages[0].scrollTop = messages[0].scrollHeight;
     },
     formatDate(date) {
       if (!date) {
@@ -331,6 +340,7 @@ export default {
 
 #chats-list,
 #messages-list {
+  flex: 1;
   border-top: 1px solid $grid-border-color;
   border-radius: 0;
   overflow-y: scroll;
@@ -338,11 +348,6 @@ export default {
 
 .subtitle {
   border-bottom: 1px solid $grid-border-color;
-}
-
-#chats-list,
-#messages-list {
-  flex: 1;
 }
 
 #message-box {

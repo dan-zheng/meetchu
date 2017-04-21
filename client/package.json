@@ -31,6 +31,7 @@
     "vue-axios": "^2.0.1",
     "vue-form": "^4.0.0",
     "vue-meta": "^0.5.6",
+    "vue-resize-directive": "^1.0.0",
     "vue-router": "^2.3.0",
     "vue-select": "^2.2.0",
     "vue-socket.io": "^2.1.1-a",

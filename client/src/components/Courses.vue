@@ -258,6 +258,7 @@ export default {
 
 #courses-list,
 #users-list {
+  flex: 1;
   border-top: 1px solid $grid-border-color;
   border-radius: 0;
   overflow-y: scroll;
@@ -265,11 +266,6 @@ export default {
 
 .subtitle {
   border-bottom: 1px solid $grid-border-color;
-}
-
-#courses-list,
-#users-list {
-  flex: 1;
 }
 
 .course,
