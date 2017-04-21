@@ -143,7 +143,7 @@ export default {
   },
   methods: {
     addCourse(course) {
-      if (this.courses.findIndex(c => c.id === course.id) !== -1) {
+      if (this.courses.some(c => c.id === course.id)) {
         console.log(`Course ${c.id} has already been added`);
         return false;
       }
@@ -206,7 +206,7 @@ export default {
       courseIndex.search(query, {
         hitsPerPage: 5
       }, (error, results) => {
-        const filteredHits = results.hits.filter(el => this.sortedCourses.findIndex(c => c.id === el.objectID) === -1);
+        const filteredHits = results.hits.filter(el => !this.sortedCourses.some(c => c.id === el.objectID));
         filteredHits.forEach((el) => {
           el.id = el.objectID;
           delete el.objectID;

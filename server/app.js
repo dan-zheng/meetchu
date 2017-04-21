@@ -35,9 +35,9 @@ const models = require('./models');
 const homeController = require('./controllers/home');
 const userController = require('./controllers/user');
 const authController = require('./controllers/auth');
-const chatController = require('./controllers/chats');
-const meetingController = require('./controllers/meetings');
-const courseController = require('./controllers/courses');
+const chatController = require('./controllers/chat');
+const meetingController = require('./controllers/meeting');
+const courseController = require('./controllers/course');
 const notificationController = require('./controllers/notification');
 
 /**
