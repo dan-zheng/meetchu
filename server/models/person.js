@@ -34,7 +34,8 @@ Person.prototype.hide = function (fields = DEFAULT_HIDDEN_FIELDS) {
 };
 
 Person.prototype.isHidden = function (field) {
-  return this[`privacy_show_${field}`] === 0;
+  // 1 represents TRUE
+  return this[`privacy_show_${field}`] === 1;
 };
 
 Person.prototype.publicView = function () {

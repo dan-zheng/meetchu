@@ -55,7 +55,23 @@ export default {
   methods: {
     createChat() {
       // TODO: Add method for starting a 2-person chat
-      this.$router.push({ path: '/chats' });
+      if (this.profile.id === this.user.id) {
+        // Alert message
+        swal({
+          type: 'error',
+          title: 'Oops.',
+          text: 'You can\'t make a chat with yourself. Try someone else!'
+        })
+        .catch(swal.noop);
+        return;
+      }
+      const chat = {
+        name: `${this.profile.first_name} ${this.profile.last_name}`,
+        description: ''
+      };
+      this.$store.dispatch('createChat', { chat, users: [this.profile] }).then((chat) => {
+        this.$router.push({ path: '/chats' });
+      });
     },
     onSubmit(type) {
       console.log(this.formstate[type].$valid);
