@@ -44,7 +44,7 @@
 
 <script>
 import { default as swal } from 'sweetalert2';
-import { validationStyle } from '../common/form';
+import { validationStyle, resetForm } from '../common/form';
 
 export default {
   name: 'signup',
@@ -76,6 +76,7 @@ export default {
         confirmPassword: this.model.confirmPassword,
       }).then(() => {
         console.log('Local signup success.');
+        resetForm(this.formstate[type]);
         // Redirect page
         this.$router.push('/');
         // Alert message
@@ -87,6 +88,7 @@ export default {
         .catch(swal.noop);
       }).catch((e) => {
         console.log('Local signup fail.');
+        resetForm(this.formstate[type]);
         // Alert message
         swal({
           type: 'error',

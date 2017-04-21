@@ -3,7 +3,7 @@ const personDao = require('../dao/person')(models);
 const chatDao = require('../dao/chat')(models);
 const Either = require('monet').Either;
 
-const MAX_MESSAGES = 10;
+const MAX_MESSAGES = 20;
 
 /**
  * POST /chats

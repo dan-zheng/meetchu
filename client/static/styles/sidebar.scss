@@ -50,7 +50,7 @@ body {
   }
 }
 
-@include media-breakpoint-up(sm) {
+@include media-breakpoint-up(xs) {
   @include styling($sidebar-width: 60px, $icon-padding: 3px);
 }
 

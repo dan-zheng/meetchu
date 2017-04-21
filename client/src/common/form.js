@@ -16,3 +16,13 @@ export function validationStyle(field, showSuccess) {
     return 'has-danger';
   }
 }
+
+export function resetForm(formstate) {
+  Object.keys(formstate)
+    .filter(k => k[0] !== '$' && k[0] !== '_')
+    .forEach(k => {
+      const field = formstate[k];
+      field._setPristine();
+      field._setUntouched();
+    });
+}

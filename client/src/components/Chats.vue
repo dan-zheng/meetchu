@@ -26,7 +26,7 @@
           .d-flex.w-100.justify-content-between.flex-wrap(v-else)
             h5.word-wrap.mb-1 {{ chat.name }}
   #current-chat.d-flex.flex-column.col-8.px-0(v-model='currentChat')
-    .d-flex.text-center.px-4.align-items-stretch(v-if='hasCurrentChat')
+    #chat-name.d-flex.text-center.px-4.align-items-stretch(v-if='hasCurrentChat')
       span.ml-auto
       h2.my-2(style='min-height: 35px') {{ currentChat.name }}
       span.d-flex.px-0.ml-auto.align-items-center
@@ -70,7 +70,7 @@
       .list-group(v-else, v-resize='onMessageListResize')
         .list-group-item.message.rounded-0.border.mt-auto(v-for='msg in currentChat.messages', :key='msg.id')
           | {{ msg }}
-    #message-box(v-if='!isCurrentChatNew && hasCurrentChat')
+    #message-box(v-if='hasChats && !isCurrentChatNew && hasCurrentChat')
       input.px-3(v-model='currentMsg[currentChat.id]', placeholder='Type message...', @keyup.enter='sendMessage(currentChat)')
       //- // NOTE: Save until adding users to chat is completed
         input.px-3(v-if='hasCurrentChatUsers', v-model='currentMsg[currentChat.id]', placeholder='Type message...', @keyup.enter='sendMessage(currentChat)')
@@ -97,7 +97,7 @@ import * as moment from 'moment';
 import { default as swal } from 'sweetalert2';
 import resize from 'vue-resize-directive'
 import { userIndex } from '../common/algolia';
-import { validationStyle } from '../common/form';
+import { validationStyle, resetForm } from '../common/form';
 
 export default {
   name: 'chats',
@@ -163,7 +163,7 @@ export default {
       return typeof this.currentChat.users !== 'undefined' && this.currentChat.users.length > 1;
     }
   },
-  beforeMount() {
+  beforeCreate() {
     this.$store.dispatch('getChats')
       .then(() => {
         if (this.sortedChats.length > 0) {
@@ -177,7 +177,11 @@ export default {
             this.currentChat = this.sortedChats[0];
           }
           this.$store.dispatch('getChatUsers', { chat: this.currentChat });
-          this.$store.dispatch('getChatMessages', { chat: this.currentChat });
+          this.$store.dispatch('getChatMessages', { chat: this.currentChat })
+            .then(() => {
+              const messages = $('#messages-list')[0];
+              messages.scrollTop = messages.scrollHeight;
+            });
         }
       });
   },
@@ -234,7 +238,10 @@ export default {
       this.isCurrentChatNew = false;
       if (chat.users && chat.users.length > 0) {
         this.$store.dispatch('getChatUsers', { chat: this.currentChat });
-        this.$store.dispatch('getChatMessages', { chat: this.currentChat });
+        this.$store.dispatch('getChatMessages', { chat: this.currentChat })
+          .then(() => {
+            this.scrollMessagesToBottom();
+          });
       }
     },
     sendMessage(chat) {
@@ -284,9 +291,18 @@ export default {
       });
       this.resetNewChat();
     },
+    scrollMessagesToBottom() {
+      const messages = $('#messages-list')[0];
+      messages.scrollTop = messages.scrollHeight;
+    },
     onMessageListResize() {
-      const messages = $('#messages-list');
-      messages[0].scrollTop = messages[0].scrollHeight;
+      const messages = $('#messages-list')[0];
+      const lastMessage = $('#messages-list .list-group .list-group-item:last-of-type')[0];
+      if (this.hasCurrentChat) {
+        if (messages.scrollHeight - messages.scrollTop - lastMessage.clientHeight === messages.offsetHeight) {
+          this.scrollMessagesToBottom();
+        }
+      }
     },
     formatDate(date) {
       if (!date) {
@@ -396,7 +412,7 @@ export default {
   input {
     border: none;
     width: 100%;
-    height: 50px;
+    height: 49px;
   }
 }
 

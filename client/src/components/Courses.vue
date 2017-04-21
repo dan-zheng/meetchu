@@ -90,7 +90,7 @@
 import { mapGetters } from 'vuex';
 import { default as swal } from 'sweetalert2';
 import { courseIndex } from '../common/algolia';
-import { validationStyle } from '../common/form';
+import { validationStyle, resetForm } from '../common/form';
 import { MoonLoader, spinnerSize, spinnerColor } from '../common/spinner';
 
 export default {
@@ -111,6 +111,7 @@ export default {
       formstate: {
         purdue: {}
       },
+      resetForm,
       spinnerLoading: false,
       spinnerSize,
       spinnerColor
@@ -132,7 +133,7 @@ export default {
       return typeof this.currentCourse.users !== 'undefined' && this.currentCourse.users.length > 0;
     }
   },
-  beforeMount() {
+  created() {
     this.$store.dispatch('getCourses')
       .then(() => {
         if (this.sortedCourses.length > 0) {
@@ -225,6 +226,7 @@ export default {
           this[v] = '';
         }
       });
+      resetForm(this.formstate.purdue);
     },
     onSubmit() {
       console.log(this.formstate.purdue.$valid);

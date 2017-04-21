@@ -123,6 +123,7 @@ exports.postCoursesSyncUser = async (req, res) => {
   courseList.cata(
     err => res.status(401).json(err),
     (list) => {
+      console.log(list);
       req.flash('success', 'Your Purdue courses have been added successfully.');
       return res.status(200).json(list.toArray())
     }

@@ -31,7 +31,7 @@ export default {
       profile: {}
     }
   },
-  beforeMount() {
+  beforeCreate() {
     const id = this.$route.params.id;
     this.axios.get(`/profile/${id}`)
       .then((res) => {

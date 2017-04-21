@@ -31,7 +31,7 @@
 
 <script>
 import { default as swal } from 'sweetalert2';
-import { validationStyle } from '../common/form';
+import { validationStyle, resetForm } from '../common/form';
 
 export default {
   name: 'login',
@@ -68,8 +68,8 @@ export default {
         })
         .catch(swal.noop);
       }).catch((e) => {
-        console.log(e);
         console.log('Local login fail.');
+        resetForm(this.formstate[type]);
         // Alert message
         swal({
           type: 'error',

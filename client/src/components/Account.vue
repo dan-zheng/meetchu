@@ -69,7 +69,7 @@
 <script>
 import { mapGetters } from 'vuex';
 import { default as swal } from 'sweetalert2';
-import { validationStyle } from '../common/form';
+import { validationStyle, resetForm } from '../common/form';
 
 const fields = {
   profile: ['first_name', 'last_name', 'email'],
@@ -96,8 +96,11 @@ export default {
       }
     }
   },
-  beforeMount() {
+  created() {
     this.userModel = this.$store.getters.user;
+    // delete this.userModel.password;
+    // delete this.userModel.confirm_password;
+    // resetForm(this.formstate.password);
   },
   computed: {
     ...mapGetters({
@@ -114,6 +117,7 @@ export default {
         fields: fields[type]
       }).then(() => {
         console.log(`Update ${type} success.`);
+        this.clearForm(type);
         // Alert message
         swal({
           type: 'success',
@@ -123,6 +127,7 @@ export default {
         .catch(swal.noop);
       }).catch((e) => {
         console.log(`Update ${type} fail.`);
+        this.clearForm(type);
         // Alert message
         swal({
           type: 'error',
@@ -156,6 +161,14 @@ export default {
         })
         .catch(swal.noop);
       })
+    },
+    clearForm(type) {
+      // TODO: Fix clear form
+      if (type === 'password') {
+        this.userModel.password = '';
+        this.userModel.confirmPassword = '';
+      }
+      resetForm(this.formstate[type]);
     },
     onSubmit(type) {
       console.log(this.formstate[type].$valid);
