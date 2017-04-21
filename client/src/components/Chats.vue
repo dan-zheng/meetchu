@@ -186,6 +186,7 @@ export default {
       this.model.newChat.users.forEach((user) => {
         this.$store.dispatch('addChatUser', { chat: this.model.newChat, user });
       });
+      this.setCurrentChat(this.model.newChat);
     },
     addUserToChat(chat, user, index) {
       this.userHits.splice(index, 1);

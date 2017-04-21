@@ -12,7 +12,7 @@ const getters = {
     const temp = state.chats.slice(0);
     return temp.sort((a, b) => {
       if (!a.time_sent && !b.time_sent) {
-        return moment(a.created_at).isBefore(moment(b.created_at));
+        return moment(a.created_at).isBefore(moment(b.created_at)) ? 1 : -1;
       } else if (!a.time_sent) {
         return -1;
       } else if (!b.time_sent) {
