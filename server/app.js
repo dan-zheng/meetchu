@@ -147,7 +147,7 @@ app.post('/chat/users', chatController.postChatUsers);
 app.post('/chat/messages', chatController.postChatMessages);
 app.post('/chats/create', chatController.postCreateChat);
 app.post('/chats/add', chatController.postChatAddUser);
-app.post('/chats/leave', chatController.postChatRemoveUser);
+app.post('/chats/remove', chatController.postChatRemoveUser);
 app.post('/chats/send', chatController.postChatSendMessage);
 app.post('/chats/delete', chatController.postDeleteChat);
 

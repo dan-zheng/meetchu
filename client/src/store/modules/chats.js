@@ -48,9 +48,24 @@ const actions = {
         throw err;
       });
   },
-  createChat({ commit, rootState }, { chat }) {
-    commit(types.ADD_CHAT, chat);
-    return Vue.axios.post('/chats/create', { chat, user: rootState.user.user })
+  createChat({ commit, rootState }, { chat, users }) {
+    if (users) {
+      users.push(rootState.user.user);
+    } else {
+      users = [rootState.user.user];
+    }
+    return Vue.axios.post('/chats/create', { chat, users })
+      .then((res) => {
+        commit(types.ADD_CHAT, res.data);
+        return res.data;
+      })
+      .catch((err) => {
+        throw err;
+      });
+  },
+  removeChat({ commit, rootState }, { chat }) {
+    commit(types.REMOVE_CHAT, chat);
+    return Vue.axios.post(`/chats/remove`, { chat, user: rootState.user.user })
       .then(res => true)
       .catch((err) => {
         throw err;
@@ -67,14 +82,6 @@ const actions = {
   removeChatUser({ commit }, { chat, user }) {
     commit(types.REMOVE_CHAT_USER, chat, user);
     return Vue.axios.post(`/chats/remove`, { chat, user })
-      .then(res => true)
-      .catch((err) => {
-        throw err;
-      });
-  },
-  leaveChat({ commit, rootState }, { chat }) {
-    commit(types.REMOVE_CHAT, chat);
-    return Vue.axios.post(`/chats/remove`, { chat, user: rootState.user.user })
       .then(res => true)
       .catch((err) => {
         throw err;
@@ -129,6 +136,10 @@ const mutations = {
   [types.ADD_CHAT_USER](state, chat, user) {
     const index = state.chats.findIndex(c => c.id === chat.id);
     state.chats[index].users.push(user);
+  },
+  [types.ADD_CHAT_USERS](state, chat, users) {
+    const index = state.chats.findIndex(c => c.id === chat.id);
+    state.chats[index].users.concat(users);
   },
   [types.REMOVE_CHAT_USER](state, chat, user) {
     const index = state.chats.findIndex(c => c.id === chat.id);

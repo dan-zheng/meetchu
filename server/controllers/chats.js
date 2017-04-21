@@ -56,15 +56,15 @@ exports.postChatMessages = (req, res) => {
  */
 exports.postCreateChat = async (req, res) => {
   const chat = req.body.chat;
-  const person = req.body.user;
+  const people = req.body.users ? req.body.users : [req.body.user];
 
   const createChat = await chatDao.create(chat);
-  const addPerson = await createChat.flatMap(
-    found => chatDao.addPerson(createChat.right(), person)
+  const addPeople = await createChat.flatMap(
+    found => chatDao.addPeople(createChat.right(), people)
   );
-  addPerson.cata(
+  addPeople.cata(
     err => res.status(401).json(err),
-    affectedRows => res.status(200).json(true)
+    affectedRows => res.status(200).json(createChat.right())
   );
 };
 
@@ -74,9 +74,9 @@ exports.postCreateChat = async (req, res) => {
  */
 exports.postChatAddUser = (req, res) => {
   const chat = req.body.chat;
-  const person = req.body.user;
+  const people = req.body.users ? req.body.users : [req.body.user];
 
-  chatDao.addPerson(chat, person).tap(result =>
+  chatDao.addPeople(chat, people).tap(result =>
     result.cata(
       err => res.status(401).json(err),
       affectedRows => res.status(200).json(true)
@@ -85,8 +85,8 @@ exports.postChatAddUser = (req, res) => {
 };
 
 /**
- * POST /chats/leave
- * Leave a chat.
+ * POST /chats/remove
+ * Remove a user from a chat.
  */
 exports.postChatRemoveUser = (req, res) => {
   const chat = req.body.chat;

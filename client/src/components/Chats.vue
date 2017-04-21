@@ -4,11 +4,16 @@
     .d-flex.text-center.px-4.align-items-stretch
       h2.my-2 Chats
       span.d-flex.px-0.ml-auto.align-items-center
-        a.text-primary(@click='clear(["userHits", "userQuery"]); showModal("#new-chat-modal");')
+        //- NOTE: Create new chat button
+        a.text-primary(@click='clear(["userHits", "userQuery"]); startNewChat();')
           i.fa.fa-lg.fa-plus-square
     #chats-list
-      p.text-muted.px-3.py-2.my-0(v-if='!hasChats') You are not in any chats.
+      p.text-muted.px-3.py-2.my-0(v-if='!hasNewChat && !hasChats') You are not in any chats.
       .list-group(v-else)
+        .list-group-item.list-group-item-action.chat.rounded-0.border(v-if='hasNewChat', :class='{ active: isCurrentChatNew }', @click='setCurrentChat(newChat, true)')
+          .d-flex.w-100.justify-content-between.flex-wrap
+            h5.mb-1 New Chat
+              //
         .list-group-item.list-group-item-action.chat.rounded-0.border(v-for='chat in sortedChats', :key='chat.name', :class='{ active: currentChat == chat }', @click='setCurrentChat(chat)')
           //- TODO: Need to refactor
           .list-group-item.p-0.border-0(v-if='hasChatLastSent(chat)', style='background-color: transparent;')
@@ -28,60 +33,89 @@
         a.ml-auto(@click='showModal("#chat-settings-modal")')
           i.fa.fa-lg.fa-cog
     .d-flex.text-center.px-4.align-items-center(v-else)
-      h2.mx-auto.my-2(style='min-height: 35px') Chat Info
+      h2.mx-auto.my-2(style='min-height: 35px')
+        span(v-if='isCurrentChatNew') Create a chat
+        span(v-else) Chat Info
     #messages-list
-      p.text-muted.px-3.py-2.my-0(v-if='!hasChats') Create a chat to start messaging!
+      div(v-if='isCurrentChatNew')
+        #new-chat-input.d-flex.align-items-center
+          span.mx-2 To:
+          input#user-search-input.px-2(v-model='userQuery', placeholder='Search for users...', @keyup='search("userHits", userQuery)')
+
+        .card.m-3.p-2
+          small.text-info(v-if='userHits.length > 0') Matches
+          small.text-warning(v-else-if='userQuery.length > 0 && typeof newChat !== "undefined"') No matches.
+          .list-group
+            .list-group-item.list-group-item-action.rounded-0.border(v-for='(user, index) in sortedHitUsers', :key='user.objectId', @click='addUserToNewChat(user, index)')
+              .d-flex.w-100.mx-1.justify-content-between.align-items-center
+                h5.m-0 {{ user.first_name + ' ' + user.last_name }}
+                small.text-right(style='min-width: 80px;') {{ user.email }}
+          small.text-success(v-if='newChat.users.length > 0') Selected
+          .list-group
+            .list-group-item.list-group-item-action.rounded-0.border(v-for='(user, index) in sortedNewChatUsers', :key='user.id', @click='removeUserFromNewChat(user, index)')
+              .d-flex.w-100.mx-1.justify-content-between.align-items-center
+                i.fa.fa-check.text-success
+                h5.m-0 {{ user.first_name + ' ' + user.last_name }}
+                small.text-right(style='min-width: 80px;') {{ user.email }}
+          .py-2.text-center
+            button.btn.btn-primary(v-on:click='createChat(newChat)')
+              i.fa.fa-plus-circle
+              | Create chat
+
+      p.text-muted.px-3.py-2.my-0(v-else-if='!hasChats') Create a chat to start messaging!
       p.text-muted.px-3.py-2.my-0(v-else-if='!hasCurrentChat') Click on a chat!
-      //- p.text-muted.px-3.py-2.my-0(v-else-if='!hasCurrentChatUsers') Add another user to start chatting!
+      //- // NOTE: Save until adding users to chat is completed
+        p.text-muted.px-3.py-2.my-0(v-else-if='!hasCurrentChatUsers') Add another user to start chatting!
       p.text-muted.px-3.py-2.my-0(v-else-if='!hasChatMessages(currentChat)') Send a message!
       .list-group(v-else, v-resize='onMessageListResize')
         .list-group-item.message.rounded-0.border.mt-auto(v-for='msg in currentChat.messages', :key='msg.id')
           | {{ msg }}
-    #message-box(v-if='hasCurrentChat')
+    #message-box(v-if='!isCurrentChatNew && hasCurrentChat')
       input.px-3(v-model='currentMsg[currentChat.id]', placeholder='Type message...', @keyup.enter='sendMessage(currentChat)')
-      //-
+      //- // NOTE: Save until adding users to chat is completed
         input.px-3(v-if='hasCurrentChatUsers', v-model='currentMsg[currentChat.id]', placeholder='Type message...', @keyup.enter='sendMessage(currentChat)')
         input.px-3(v-else, v-model='currentMsg[currentChat.id]', placeholder='Add another user to chat!', disabled)
 
   //- Modals
-  .modal.fade#new-chat-modal(tabindex='-1', role='dialog', aria-labelledby='newChatModalLabel', aria-hidden='true')
-    .modal-dialog.modal-md
-      .modal-content
-        .modal-header
-          h5.modal-title Create a chat
-          button.close(type='button', data-dismiss='modal', aria-label='Close')
-            span(aria-hidden='true') ×
-        .modal-body
-          vue-form(:state='formstate.newChat', v-model='formstate.newChat', @submit.prevent='onSubmit')
-            validate.form-group.container(auto-label, :class='validationStyle(formstate.newChat.chatName)')
-              label.col-form-label Chat name
-              input.form-control(type='text', name='chatName', placeholder='Chat name', v-model.lazy='model.newChat.name', required)
-              field-messages.form-control-feedback(name='chatName', show='$touched || $submitted')
-                div(slot='required') Chat name is required.
-            .form-group.container
-              label.col-form-label Description
-              input.form-control(type='text', name='description', placeholder='Description', v-model.lazy='model.newChat.description')
-            .form-group.container
-              label.col-form-label Add users
-              input.form-control(type='text', placeholder='Search for a user...', v-model='userQuery', @keyup='search("userHits", userQuery)')
-            small.text-info(v-if='userHits.length > 0') Matches
-            small.text-warning(v-else-if='userQuery.length > 0 && typeof model.newChat !== "undefined"') No matches.
-            .list-group
-              .list-group-item.list-group-item-action.rounded-0.border(v-for='(user, index) in sortedHitUsers', :key='user.objectId', @click='addUserToChat(model.newChat, user, index)')
-                .d-flex.w-100.mx-1.justify-content-between.align-items-center
-                  h5.m-0 {{ user.first_name + ' ' + user.last_name }}
-                  small.text-right(style='min-width: 80px;') {{ user.email }}
-            small.text-success(v-if='model.newChat.users.length > 0') Selected
-            .list-group
-              .list-group-item.list-group-item-action.rounded-0.border(v-for='(user, index) in sortedNewChatUsers', :key='user.id', @click='removeUserFromChat(model.newChat, user, index)')
-                .d-flex.w-100.mx-1.justify-content-between.align-items-center
-                  i.fa.fa-check.text-success
-                  h5.m-0 {{ user.first_name + ' ' + user.last_name }}
-                  small.text-right(style='min-width: 80px;') {{ user.email }}
-            .py-2.text-center
-              button.btn.btn-primary(v-on:click='createChat(model.newChat)')
-                i.fa.fa-plus-circle
-                | Create chat
+  //-
+    .modal.fade#new-chat-modal(tabindex='-1', role='dialog', aria-labelledby='newChatModalLabel', aria-hidden='true')
+      .modal-dialog.modal-md
+        .modal-content
+          .modal-header
+            h5.modal-title Create a chat
+            button.close(type='button', data-dismiss='modal', aria-label='Close')
+              span(aria-hidden='true') ×
+          .modal-body
+            vue-form(:state='formstate.newChat', v-model='formstate.newChat', @submit.prevent='onSubmit')
+              validate.form-group.container(auto-label, :class='validationStyle(formstate.newChat.chatName)')
+                label.col-form-label Chat name
+                input.form-control(type='text', name='chatName', placeholder='Chat name', v-model.lazy='model.newChat.name', required)
+                field-messages.form-control-feedback(name='chatName', show='$touched || $submitted')
+                  div(slot='required') Chat name is required.
+              .form-group.container
+                label.col-form-label Description
+                input.form-control(type='text', name='description', placeholder='Description', v-model.lazy='model.newChat.description')
+              .form-group.container
+                label.col-form-label Add users
+                input.form-control(type='text', placeholder='Search for a user...', v-model='userQuery', @keyup='search("userHits", userQuery)')
+              small.text-info(v-if='userHits.length > 0') Matches
+              small.text-warning(v-else-if='userQuery.length > 0 && typeof model.newChat !== "undefined"') No matches.
+              .list-group
+                .list-group-item.list-group-item-action.rounded-0.border(v-for='(user, index) in sortedHitUsers', :key='user.objectId', @click='addUserToChat(model.newChat, user, index)')
+                  .d-flex.w-100.mx-1.justify-content-between.align-items-center
+                    h5.m-0 {{ user.first_name + ' ' + user.last_name }}
+                    small.text-right(style='min-width: 80px;') {{ user.email }}
+              small.text-success(v-if='model.newChat.users.length > 0') Selected
+              .list-group
+                .list-group-item.list-group-item-action.rounded-0.border(v-for='(user, index) in sortedNewChatUsers', :key='user.id', @click='removeUserFromChat(model.newChat, user, index)')
+                  .d-flex.w-100.mx-1.justify-content-between.align-items-center
+                    i.fa.fa-check.text-success
+                    h5.m-0 {{ user.first_name + ' ' + user.last_name }}
+                    small.text-right(style='min-width: 80px;') {{ user.email }}
+              .py-2.text-center
+                button.btn.btn-primary(v-on:click='createChat(model.newChat)')
+                  i.fa.fa-plus-circle
+                  | Create chat
 
   .modal.fade#chat-settings-modal(tabindex='-1', role='dialog', aria-labelledby='chatSettingsModalLabel', aria-hidden='true')
     .modal-dialog.modal-md
@@ -91,6 +125,10 @@
           button.close(type='button', data-dismiss='modal', aria-label='Close')
             span(aria-hidden='true') ×
         .modal-body
+          .py-2.text-center
+            button.btn.btn-danger(v-on:click='removeChat(currentChat)')
+              i.fa.fa-trash
+              | Remove this chat
 </template>
 
 <script>
@@ -111,7 +149,9 @@ export default {
   },
   data() {
     return {
+      newChat: null,
       currentChat: {},
+      isCurrentChatNew: false,
       formstate: {
         newChat: {},
         currentChat: {}
@@ -143,7 +183,8 @@ export default {
       });
     },
     sortedNewChatUsers() {
-      const temp = this.model.newChat.users
+      // const temp = this.model.newChat.users;
+      const temp = this.newChat.users;
       return temp.sort((a, b) => {
         const u1 = a.first_name + ' ' + a.last_name;
         const u2 = b.first_name + ' ' + b.last_name;
@@ -153,8 +194,11 @@ export default {
     hasChats() {
       return this.chats.length > 0;
     },
+    hasNewChat() {
+      return typeof this.newChat !== 'undefined' && this.newChat !== null;
+    },
     hasCurrentChat() {
-      return typeof this.currentChat.name !== 'undefined';
+      return typeof this.currentChat !== 'undefined' && !!this.currentChat && this.currentChat.name !== '';
     },
     hasCurrentChatUsers() {
       return typeof this.currentChat.users !== 'undefined' && this.currentChat.users.length > 1;
@@ -179,16 +223,40 @@ export default {
       });
   },
   methods: {
+    startNewChat() {
+      this.setCurrentChatToNew();
+      if (!this.newChat || !this.newChat.users) {
+        this.newChat = {
+          name: 'New Chat',
+          users: []
+        };
+      }
+    },
     createChat() {
+      /*
       if (!this.formstate.newChat.$valid) {
         return;
       }
       this.hideModal("#new-chat-modal");
-      this.$store.dispatch('createChat', { chat: this.model.newChat });
-      this.model.newChat.users.forEach((user) => {
-        this.$store.dispatch('addChatUser', { chat: this.model.newChat, user });
+      */
+      this.newChat.name = this.newChat.users.map(u => u.first_name).join(', ');
+      this.$store.dispatch('createChat', { chat: this.newChat }).then((chat) => {
+        this.currentChat = chat;
+        this.$store.dispatch('addChatUsers', { chat: this.currentChat, this.currentChat.users });
+        /*
+        this.currentChat.users.forEach((user) => {
+          this.$store.dispatch('addChatUser', { chat: this.currentChat, user });
+        });
+        */
+        // this.setCurrentChat(this.sortedChats[0]);
+        this.resetNewChat();
       });
-      this.setCurrentChat(this.model.newChat);
+      // this.setCurrentChat(this.newChat);
+    },
+    removeChat(chat) {
+      this.$store.dispatch('removeChat', { chat });
+      this.resetCurrentChat();
+      this.hideModal("#chat-settings-modal");
     },
     addUserToChat(chat, user, index) {
       this.userHits.splice(index, 1);
@@ -199,9 +267,24 @@ export default {
       this.search("userHits", this.userQuery);
       this.$store.dispatch('removeChatUser', { chat, user });
     },
-    setCurrentChat(chat) {
+    addUserToNewChat(user, index) {
+      this.userHits.splice(index, 1);
+      // this.$store.dispatch('addChatUser', { chat, user });
+      this.newChat.users.push(user);
+    },
+    removeUserFromNewChat(user, index) {
+      this.newChat.users.splice(index, 1);
+      this.search("userHits", this.userQuery);
+      // this.$store.dispatch('removeChatUser', { chat, user });
+    },
+    setCurrentChat(chat, isNewChat) {
       this.currentChat = chat;
-      // console.log(chat);
+      if (isNewChat) {
+        this.setCurrentChatToNew();
+        return;
+      }
+      this.isCurrentChatNew = false;
+      // this.resetNewChat();
       if (chat.users && chat.users.length > 0) {
         this.$store.dispatch('getChatUsers', { chat: this.currentChat });
         this.$store.dispatch('getChatMessages', { chat: this.currentChat });
@@ -211,6 +294,7 @@ export default {
       if (!this.currentMsg[chat.id] || this.currentMsg[chat.id] === '') {
         return;
       }
+      // console.log(chat);
       const now = moment();
       const message = {
         chat_id: chat.id,
@@ -233,7 +317,7 @@ export default {
       userIndex.search(query, {
         hitsPerPage: 5
       }, (error, results) => {
-        const filteredHits = results.hits.filter(el => this.model.newChat.users.findIndex(u => u.id === el.objectID) === -1);
+        const filteredHits = results.hits.filter(el => this.newChat.users.findIndex(u => u.id === el.objectID) === -1);
         filteredHits.forEach((el) => {
           el.id = el.objectID;
           delete el.objectID;
@@ -279,12 +363,20 @@ export default {
       }
     },
     resetNewChat() {
-      this.model.newChat = {
-        name: '',
-        description: '',
-        users: [],
-        messages: []
-      };
+      this.newChat = null;
+      this.isCurrentChatNew = false
+    },
+    resetCurrentChat(isNewChat) {
+      if (!isNewChat && this.sortedChats.length > 0) {
+        this.currentChat = this.sortedChats[0];
+        this.isCurrentChatNew = false;
+      } else {
+        this.currentChat = null;
+      }
+    },
+    setCurrentChatToNew() {
+      this.currentChat = this.newChat;
+      this.isCurrentChatNew = true;
     },
     hasChatUsers(chat) {
       return typeof chat.users !== 'undefined' && chat.users.length > 0;
@@ -319,6 +411,7 @@ export default {
 .list-group-item {
   flex: 1;
   &:first-child {
+    // border-top: 0;
     border-top-left-radius: 0;
     border-top-right-radius: 0;
   }
@@ -357,7 +450,23 @@ export default {
   input {
     border: none;
     width: 100%;
-    height: 100%;
+    height: 50px;
+  }
+}
+
+#messages-list {
+  #new-chat-input {
+    border: none;
+    border-bottom: 1px solid $grid-border-color;
+    width: 100%;
+    height: 40px;
+
+    #user-search-input {
+      border: none;
+      height: 100%;
+      padding-top: 2px;
+      flex: 1;
+    }
   }
 }
 

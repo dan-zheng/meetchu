@@ -191,6 +191,13 @@ export default {
         .catch(swal.noop);
       });
     },
+    resetCurrentCourse() {
+      if (this.sortedCourses.length > 0) {
+        this.currentCourse = this.sortedCourses[0];
+      } else {
+        this.currentCourse = null;
+      }
+    },
     search(hits, query) {
       if (!query) {
         this[hits] = [];
