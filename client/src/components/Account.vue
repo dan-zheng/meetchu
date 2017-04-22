@@ -36,7 +36,7 @@
           button.btn.btn-primary(@click='updateAccount("profile")')
             i.fa.fa-pencil
             | Update
-
+    hr
     .mt-2
       h4 Privacy Settings
     .offset-md-1.col-md-10
@@ -56,7 +56,7 @@
       button.btn.btn-primary(@click='updateAccount("privacy")')
         i.fa.fa-pencil
         | Update
-
+    hr
     .mt-2
       h4 Update Password
     .offset-md-1.col-md-10
@@ -78,7 +78,7 @@
           button.btn.btn-primary(@click='updateAccount("password")')
             i.fa.fa-lock
             | Change password
-
+    hr
     .mt-2
       h4 Delete Account
     .offset-md-1.col-md-10
