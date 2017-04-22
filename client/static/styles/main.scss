@@ -39,6 +39,17 @@ a[role='button'] {
   }
 }
 
+a.no-link-style {
+  transition: none;
+  color: inherit;
+
+  &:hover,
+  &:focus {
+    text-decoration: none;
+    color: inherit;
+  }
+}
+
 button,
 input,
 optgroup,

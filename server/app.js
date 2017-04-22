@@ -180,9 +180,12 @@ app.get('/auth/facebook/callback', authController.getAuthFacebookCallback);
  * Socket.io configuration.
  */
 io.on('connection', (socket) => {
+  socket.on('new_chat', (data) => {
+    console.log(`New chat created by user id ${data.creator_id}: '${data.body}'`);
+    socket.broadcast.emit('new_chat', data);
+  });
   socket.on('new_message', (data) => {
     console.log(`Message received from user id ${data.sender_id}: '${data.body}'`);
-    console.log(data);
     socket.broadcast.emit('new_message', data);
   });
 });

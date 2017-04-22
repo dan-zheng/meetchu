@@ -71,7 +71,7 @@ export default {
       const chat = {
         name: `${this.user.first_name}, ${this.profile.first_name}`
       };
-      this.$store.dispatch('createChat', { chat, users: [this.profile] }).then((chat) => {
+      this.$store.dispatch('createChat', { chat, users: [this.user, this.profile] }).then((chat) => {
         this.$router.push({ path: '/chats' });
         swal({
           type: 'success',

@@ -4,7 +4,7 @@
     h2 Account
 
   .offset-md-1.col-md-10
-    .page-header
+    .mt-2
       h4 Update Profile
     .offset-md-1.col-md-10
       vue-form(:state='formstate.profile', v-model='formstate.profile', @submit.prevent='onSubmit("profile")')
@@ -27,12 +27,37 @@
             field-messages.form-control-feedback(auto-label, name='email', show='$touched || $submitted')
               div(slot='required') Email is required.
               div(slot='email') Email is invalid.
+        validate.form-group.row.required-field(auto-label, :class='validationStyle(formstate.profile.major)')
+          label.col-md-3.col-form-label Major
+          .col-md-9
+            input.form-control(type='text', name='major', placeholder='Major', v-model.lazy='userModel.major')
+            field-messages.form-control-feedback(auto-label, name='major', show='$touched || $submitted')
         .py-2.text-center
           button.btn.btn-primary(v-on:click='updateAccount("profile")')
             i.fa.fa-pencil
             | Update
 
-    .page-header
+    .mt-2
+      h4 Privacy Settings
+    .offset-md-1.col-md-10
+      .form-group.row
+        label.col-md-5.col-form-label Show Email
+        .col-md-5.text-center
+          b-form-checkbox(v-model.lazy='userModel.privacy_show_email', value='1', unchecked-value='0')
+      .form-group.row
+        label.col-md-5.col-form-label Show Major
+        .col-md-5.text-center
+          b-form-checkbox(v-model.lazy='userModel.privacy_show_major', value='1', unchecked-value='0')
+      .form-group.row
+        label.col-md-5.col-form-label Show Profile Picture
+        .col-md-5.text-center
+          b-form-checkbox(v-model.lazy='userModel.privacy_show_profile_picture_url', value='1', unchecked-value='0')
+    .py-2.text-center
+      button.btn.btn-primary(v-on:click='updateAccount("privacy")')
+        i.fa.fa-pencil
+        | Update
+
+    .mt-2
       h4 Update Password
     .offset-md-1.col-md-10
       vue-form(:state='formstate.password', v-model='formstate.password', @submit.prevent='onSubmit("password")')
@@ -54,7 +79,7 @@
             i.fa.fa-lock
             | Change password
 
-    .page-header
+    .mt-2
       h4 Delete Account
     .offset-md-1.col-md-10
       p You can delete your account, but keep in mind this action is irreversible.
@@ -72,7 +97,8 @@ import { default as swal } from 'sweetalert2';
 import { validationStyle, resetForm } from '../common/form';
 
 const fields = {
-  profile: ['first_name', 'last_name', 'email'],
+  profile: ['first_name', 'last_name', 'email', 'major'],
+  privacy: ['privacy_show_email', 'privacy_show_major', 'privacy_show_profile_picture_url'],
   password: ['password']
 };
 
@@ -88,18 +114,23 @@ export default {
         password: {}
       },
       userModel: {
-        first_name: '',
-        last_name: '',
-        email: '',
-        password: '',
-        confirm_password: ''
+        first_name: null,
+        last_name: null,
+        email: null,
+        major: null,
+        privacy_show_email: null,
+        privacy_show_major: null,
+        privacy_show_profile_picture_url: null,
       }
     }
   },
   created() {
-    this.userModel = this.$store.getters.user;
+    this.userModel = Object.assign({}, this.$store.getters.user);
     delete this.userModel.password;
     delete this.userModel.confirm_password;
+    fields.privacy.forEach((field) => {
+      this.userModel[field] = this.userModel[field].toString();
+    })
     // resetForm(this.formstate.password);
   },
   computed: {
@@ -109,7 +140,7 @@ export default {
   },
   methods: {
     updateAccount(type) {
-      if (!this.formstate[type].$valid) {
+      if (type !== 'privacy' && !this.formstate[type].$valid) {
         return;
       }
       this.$store.dispatch('updateAccount', {
@@ -118,11 +149,12 @@ export default {
       }).then(() => {
         console.log(`Update ${type} success.`);
         this.clearForm(type);
+        const alertText = type === 'privacy' ? `Your ${type} settings have been updated.` : `Your ${type} has been updated.`;
         // Alert message
         swal({
           type: 'success',
           title: 'Yay!',
-          text: `Your ${type} has been updated.`,
+          text: alertText,
         })
         .catch(swal.noop);
       }).catch((e) => {
@@ -164,6 +196,9 @@ export default {
     },
     clearForm(type) {
       // TODO: Fix clear form
+      if (type === 'privacy') {
+        return;
+      }
       if (type === 'password') {
         this.userModel.password = '';
         this.userModel.confirmPassword = '';

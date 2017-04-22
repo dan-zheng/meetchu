@@ -27,7 +27,6 @@ const actions = {
   getChats({ commit, rootState }) {
     return Vue.axios.post('/chats', { user: rootState.user.user })
       .then(res => {
-        // console.log(res.data);
         return commit(types.SET_CHATS, res.data);
       })
       .catch((err) => {
@@ -48,12 +47,10 @@ const actions = {
         throw err;
       });
   },
+  addChat({ commit, rootState }, { chat }) {
+    commit(types.ADD_CHAT, chat);
+  },
   createChat({ commit, rootState }, { chat, users }) {
-    if (users) {
-      users.push(rootState.user.user);
-    } else {
-      users = [rootState.user.user];
-    }
     return Vue.axios.post('/chats/create', { chat, users })
       .then((res) => {
         commit(types.ADD_CHAT, res.data);

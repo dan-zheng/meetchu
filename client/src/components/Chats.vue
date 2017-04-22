@@ -20,9 +20,9 @@
               h5.mb-1 {{ chat.name }}
               small {{ formatDate(chat.last_time_sent) }}
             p.mb-1(v-if='hasChatLastSent(chat)')
-              // router-link.text-white(:to='"/profile/" + chat.sender_id')
-              strong {{ chat.sender_first_name + ' ' + chat.sender_last_name }}:
-              |  {{ chat.last_message_body }}
+              router-link.no-link-style(:to='"/profile/" + chat.sender_id')
+                strong {{ chat.sender_first_name + ' ' + chat.sender_last_name }}
+              | : {{ chat.last_message_body }}
           .d-flex.w-100.justify-content-between.flex-wrap(v-else)
             h5.word-wrap.mb-1 {{ chat.name }}
   #current-chat.d-flex.flex-column.col-8.px-0(v-model='currentChat')
@@ -37,6 +37,7 @@
         span(v-if='isCurrentChatNew') Create a chat
         span(v-else) Chat Info
     #messages-list
+      // #messages-list(@scroll='handleScroll')
       div(v-if='isCurrentChatNew')
         #new-chat-input.d-flex.align-items-center
           span.mx-2 To:
@@ -87,7 +88,7 @@
             span(aria-hidden='true') ×
         .modal-body
           h6 Chat users
-          .list-group(v-if='hasCurrentChat')
+          .list-group.mb-2(v-if='hasCurrentChat')
             div(v-for='user in currentChat.users', :key='user.email')
               a.list-group-item.list-group-item-action.user.rounded-0.border(@click='goToProfile(user.id)')
                 .d-flex.w-100.mx-1.justify-content-between.align-items-center
@@ -208,9 +209,10 @@ export default {
       if (!this.newChat.users || this.newChat.users.length === 0) {
         return;
       }
-      this.newChat.name = [this.user.first_name].concat(this.newChat.users.map(u => u.first_name));
-      this.newChat.name = this.newChat.name.join(', ');
+      this.newChat.users.unshift(this.user);
+      this.newChat.name = this.newChat.users.map(u => u.first_name).join(', ');
       this.$store.dispatch('createChat', { chat: this.newChat, users: this.newChat.users }).then((chat) => {
+        this.$socket.emit('new_chat', chat);
         this.setCurrentChat(chat);
         this.resetNewChat();
       });
@@ -303,7 +305,7 @@ export default {
     onMessageListResize() {
       const messages = $('#messages-list')[0];
       const lastMessage = $('#messages-list .list-group .list-group-item:last-of-type')[0];
-      if (this.hasCurrentChat) {
+      if (this.hasCurrentChat) {;
         if (!this.hasScrolled || messages.scrollHeight - messages.scrollTop - lastMessage.clientHeight === messages.offsetHeight) {
           this.scrollMessagesToBottom();
         }
@@ -419,6 +421,10 @@ export default {
   border-top: 1px solid $grid-border-color;
   border-radius: 0;
   overflow-y: scroll;
+
+  .list-group {
+    overflow-y: scroll;
+  }
 }
 
 .subtitle {

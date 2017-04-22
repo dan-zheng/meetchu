@@ -90,6 +90,9 @@ export default {
         console.log(e);
       })
     },
+    onSubmit() {
+      console.log(this.formstate.$valid);
+    },
     validationStyle
   }
 }
