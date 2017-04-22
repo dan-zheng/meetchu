@@ -182,6 +182,7 @@ app.get('/auth/facebook/callback', authController.getAuthFacebookCallback);
 io.on('connection', (socket) => {
   socket.on('new_message', (data) => {
     console.log(`Message received from user id ${data.sender_id}: '${data.body}'`);
+    console.log(data);
     socket.broadcast.emit('new_message', data);
   });
 });

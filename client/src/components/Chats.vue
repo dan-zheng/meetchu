@@ -13,16 +13,16 @@
         .list-group-item.list-group-item-action.chat.rounded-0.border(v-if='hasNewChat', :class='{ active: isCurrentChatNew }', @click='setCurrentChat(newChat, true)')
           .d-flex.w-100.justify-content-between.flex-wrap
             h5.mb-1 New Chat
-              //
         .list-group-item.list-group-item-action.chat.rounded-0.border(v-for='chat in sortedChats', :key='chat.name', :class='{ active: currentChat == chat }', @click='setCurrentChat(chat)')
           //- TODO: Need to refactor
           .list-group-item.p-0.border-0(v-if='hasChatLastSent(chat)', style='background-color: transparent;')
             .d-flex.w-100.justify-content-between.flex-wrap
               h5.mb-1 {{ chat.name }}
-              small {{ formatDate(chat.time_sent) }}
+              small {{ formatDate(chat.last_time_sent) }}
             p.mb-1(v-if='hasChatLastSent(chat)')
-              strong {{ chat.first_name + ' ' + chat.last_name }}:
-              |  {{ chat.body }}
+              // router-link.text-white(:to='"/profile/" + chat.sender_id')
+              strong {{ chat.sender_first_name + ' ' + chat.sender_last_name }}:
+              |  {{ chat.last_message_body }}
           .d-flex.w-100.justify-content-between.flex-wrap(v-else)
             h5.word-wrap.mb-1 {{ chat.name }}
   #current-chat.d-flex.flex-column.col-8.px-0(v-model='currentChat')
@@ -68,8 +68,9 @@
         p.text-muted.px-3.py-2.my-0(v-else-if='!hasCurrentChatUsers') Add another user to start chatting!
       p.text-muted.px-3.py-2.my-0(v-else-if='!hasChatMessages(currentChat)') Send a message!
       .list-group(v-else, v-resize='onMessageListResize', @scroll='handleScroll')
-        .list-group-item.message.rounded-0.border.mt-auto(v-for='msg in currentChat.messages', :key='msg.id')
-          | {{ msg }}
+        .list-group-item.message.rounded-0.border.mt-auto(v-for='msg in currentChat.messages', :key='msg.id', :class='{ "message-new": msg.new }')
+          span.text-primary(v-if='msg.sender_id === user.id') {{ msg }}
+          span.text-success(v-else) {{ msg }}
     #message-box(v-if='hasChats && !isCurrentChatNew && hasCurrentChat')
       input.px-3(v-model='currentMsg[currentChat.id]', placeholder='Type message...', @keyup.enter='sendMessage(currentChat)')
       //- // NOTE: Save until adding users to chat is completed
@@ -85,6 +86,13 @@
           button.close(type='button', data-dismiss='modal', aria-label='Close')
             span(aria-hidden='true') ×
         .modal-body
+          h6 Chat users
+          .list-group(v-if='hasCurrentChat')
+            div(v-for='user in currentChat.users', :key='user.email')
+              a.list-group-item.list-group-item-action.user.rounded-0.border(@click='goToProfile(user.id)')
+                .d-flex.w-100.mx-1.justify-content-between.align-items-center
+                  h5.mb-0 {{ user.first_name + ' ' + user.last_name }}
+                  small.text-right {{ user.email }}
           .py-2.text-center
             button.btn.btn-danger(v-on:click='removeChat(currentChat)')
               i.fa.fa-minus-square
@@ -181,7 +189,7 @@ export default {
           this.$store.dispatch('getChatMessages', { chat: this.currentChat })
             .then(() => {
               const messages = $('#messages-list')[0];
-              messages.scrollTop = messages.scrollHeight;
+              this.scrollMessagesToBottom();
             });
         }
       });
@@ -200,7 +208,8 @@ export default {
       if (!this.newChat.users || this.newChat.users.length === 0) {
         return;
       }
-      this.newChat.name = this.newChat.users.map(u => u.first_name).join(', ');
+      this.newChat.name = [this.user.first_name].concat(this.newChat.users.map(u => u.first_name));
+      this.newChat.name = this.newChat.name.join(', ');
       this.$store.dispatch('createChat', { chat: this.newChat, users: this.newChat.users }).then((chat) => {
         this.setCurrentChat(chat);
         this.resetNewChat();
@@ -241,12 +250,17 @@ export default {
         sender_first_name: this.$store.getters.user.first_name,
         sender_last_name: this.$store.getters.user.last_name,
         body: this.currentMsg[chat.id],
-        time_sent: now
+        time_sent: now,
+        new: true
       };
       // Emit message
       this.$socket.emit('new_message', message);
       this.$store.dispatch('sendMessage', { message });
       delete this.currentMsg[chat.id];
+    },
+    goToProfile(id) {
+      this.hideModal('#chat-settings-modal');
+      this.$router.push(`/profile/${id}`);
     },
     search(hits, query) {
       if (!query) {
@@ -282,7 +296,9 @@ export default {
     },
     scrollMessagesToBottom() {
       const messages = $('#messages-list')[0];
-      messages.scrollTop = messages.scrollHeight;
+      if (messages.scrollHeight) {
+        messages.scrollTop = messages.scrollHeight;
+      }
     },
     onMessageListResize() {
       const messages = $('#messages-list')[0];
@@ -333,13 +349,11 @@ export default {
       }
       this.hasScrolled = false;
       this.isCurrentChatNew = false;
-      if (chat.users && chat.users.length > 0) {
-        this.$store.dispatch('getChatUsers', { chat: this.currentChat });
-        this.$store.dispatch('getChatMessages', { chat: this.currentChat })
-          .then(() => {
-            this.scrollMessagesToBottom();
-          });
-      }
+      this.$store.dispatch('getChatUsers', { chat: this.currentChat });
+      this.$store.dispatch('getChatMessages', { chat: this.currentChat })
+        .then(() => {
+          this.scrollMessagesToBottom();
+        });
     },
     setCurrentChatToNew() {
       this.currentChat = this.newChat;
@@ -353,7 +367,7 @@ export default {
       return typeof chat.messages !== 'undefined' && chat.messages.length > 0;
     },
     hasChatLastSent(chat) {
-      return typeof chat.time_sent !== 'undefined' && chat.time_sent !== null;
+      return typeof chat.last_time_sent !== 'undefined' && chat.last_time_sent !== null;
     },
     onSubmit(type) {
       console.log(this.formstate.newChat.$valid);
@@ -442,5 +456,25 @@ export default {
 .message {
   border-left: 0;
   border-right: 0;
+}
+
+.message.message-new {
+  animation: bounce 300ms linear both;
+}
+
+@keyframes bounce {
+  0% { transform: matrix3d(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1); }
+  4.7% { transform: matrix3d(0.45, 0, 0, 0, 0, 0.45, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1); }
+  9.41% { transform: matrix3d(0.883, 0, 0, 0, 0, 0.883, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1); }
+  14.11% { transform: matrix3d(1.141, 0, 0, 0, 0, 1.141, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1); }
+  18.72% { transform: matrix3d(1.212, 0, 0, 0, 0, 1.212, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1); }
+  24.32% { transform: matrix3d(1.151, 0, 0, 0, 0, 1.151, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1); }
+  29.93% { transform: matrix3d(1.048, 0, 0, 0, 0, 1.048, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1); }
+  35.54% { transform: matrix3d(0.979, 0, 0, 0, 0, 0.979, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1); }
+  41.04% { transform: matrix3d(0.961, 0, 0, 0, 0, 0.961, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1); }
+  52.15% { transform: matrix3d(0.991, 0, 0, 0, 0, 0.991, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1); }
+  63.26% { transform: matrix3d(1.007, 0, 0, 0, 0, 1.007, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1); }
+  85.49% { transform: matrix3d(0.999, 0, 0, 0, 0, 0.999, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1); }
+  100% { transform: matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1); }
 }
 </style>

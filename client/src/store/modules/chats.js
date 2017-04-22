@@ -11,14 +11,14 @@ const getters = {
   sortedChats: state => {
     const temp = state.chats.slice(0);
     return temp.sort((a, b) => {
-      if (!a.time_sent && !b.time_sent) {
+      if (!a.last_time_sent && !b.last_time_sent) {
         return moment(a.created_at).isBefore(moment(b.created_at)) ? 1 : -1;
-      } else if (!a.time_sent) {
+      } else if (!a.last_time_sent) {
         return -1;
-      } else if (!b.time_sent) {
+      } else if (!b.last_time_sent) {
         return 1;
       }
-      return moment(a.time_sent).isBefore(moment(b.time_sent));
+      return moment(a.last_time_sent).isBefore(moment(b.last_time_sent));
     });
   }
 };
@@ -88,12 +88,14 @@ const actions = {
       });
   },
   addMessage({ commit }, { message }) {
+    message = Object.assign({}, message, { new: true });
     commit(types.ADD_MESSAGE, {
       update: false,
       message
     });
   },
   sendMessage({ commit }, { message }) {
+    message = Object.assign({}, message, { new: true });
     commit(types.ADD_MESSAGE, {
       update: true,
       message
@@ -152,25 +154,25 @@ const mutations = {
       return;
     }
     // TODO: refactor update
-    if (!state.chats[index].messages) {
-      if (!update) {
-        return;
+    if (update) {
+      const displayedMessage = {
+        id: message.chat_id,
+        sender_id: message.sender_id,
+        sender_first_name: message.sender_first_name,
+        sender_last_name: message.sender_last_name,
+        body: message.body,
+        time_sent: message.time_sent,
+        new: message.new
+      };
+      if (!state.chats[index].messages) {
+        state.chats[index].messages = [];
       }
-      state.chats[index].messages = [];
+      state.chats[index].messages.push(displayedMessage);
     }
-    const displayedMessage = {
-      id: message.chat_id,
-      first_name: message.sender_first_name,
-      last_name: message.sender_last_name,
-      body: message.body,
-      time_sent: message.time_sent
-    };
-    state.chats[index].messages.push(displayedMessage);
-    // TODO: update last_sent, last_sender, last_msg of chat
-    Vue.set(state.chats[index], 'first_name', message.sender_first_name);
-    Vue.set(state.chats[index], 'last_name', message.sender_last_name);
-    Vue.set(state.chats[index], 'body', message.body);
-    Vue.set(state.chats[index], 'time_sent', message.time_sent);
+    Vue.set(state.chats[index], 'sender_first_name', message.sender_first_name);
+    Vue.set(state.chats[index], 'sender_last_name', message.sender_last_name);
+    Vue.set(state.chats[index], 'last_message_body', message.body);
+    Vue.set(state.chats[index], 'last_time_sent', message.time_sent);
   }
 };
 

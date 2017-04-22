@@ -39,7 +39,12 @@ module.exports = models => ({
    */
   getChatList(person) {
     return models.pool.query(`
-      SELECT chat.id, chat.name, chat.description, chat.created_at, person.first_name, person.last_name, message.body, message.time_sent
+      SELECT chat.id, chat.name, chat.description, chat.created_at,
+        person.id as sender_id,
+        person.first_name as sender_first_name,
+        person.last_name as sender_last_name,
+        message.body as last_message_body,
+        message.time_sent as last_time_sent
       FROM person_chat
       JOIN chat
       ON chat_id = chat.id AND person_id = ?
@@ -63,15 +68,20 @@ module.exports = models => ({
   getChatMessages(chat, max) {
     return models.pool.query(`
       SELECT * FROM (
-        SELECT chat.id, person.first_name, person.last_name, message.body, message.time_sent
-          FROM chat
-          JOIN message
-          ON chat.id = message.chat_id
-          JOIN person
-          ON message.sender_id = person.id
-          WHERE chat.id = ?
-          ORDER BY message.time_sent DESC
-          LIMIT ?) messages
+        SELECT chat.id as chat_id,
+          person.id as sender_id,
+          person.first_name as sender_first_name,
+          person.last_name as sender_last_name,
+          message.body,
+          message.time_sent
+        FROM chat
+        JOIN message
+        ON chat.id = message.chat_id
+        JOIN person
+        ON message.sender_id = person.id
+        WHERE chat.id = ?
+        ORDER BY message.time_sent DESC
+        LIMIT ?) messages
       ORDER BY messages.time_sent ASC`, [chat.id, max])
     .then(result => Either.Right(result.list()))
     .errorToLeft();
