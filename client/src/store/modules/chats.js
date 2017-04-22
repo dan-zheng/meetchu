@@ -68,9 +68,9 @@ const actions = {
         throw err;
       });
   },
-  addChatUser({ commit }, { chat, user }) {
-    commit(types.ADD_CHAT_USER, chat, user);
-    return Vue.axios.post(`/chats/add`, { chat, user })
+  addChatUsers({ commit }, { chat, users }) {
+    commit(types.ADD_CHAT_USERS, { chat, users });
+    return Vue.axios.post(`/chats/add`, { chat, users })
       .then(res => true)
       .catch((err) => {
         throw err;
@@ -130,13 +130,9 @@ const mutations = {
   [types.REMOVE_CHAT](state, chat) {
     state.chats = state.chats.filter(c => c.id !== chat.id);
   },
-  [types.ADD_CHAT_USER](state, chat, user) {
+  [types.ADD_CHAT_USERS](state, { chat, users }) {
     const index = state.chats.findIndex(c => c.id === chat.id);
-    state.chats[index].users.push(user);
-  },
-  [types.ADD_CHAT_USERS](state, chat, users) {
-    const index = state.chats.findIndex(c => c.id === chat.id);
-    state.chats[index].users.concat(users);
+    state.chats[index].users = state.chats[index].users.concat(users);
   },
   [types.REMOVE_CHAT_USER](state, chat, user) {
     const index = state.chats.findIndex(c => c.id === chat.id);

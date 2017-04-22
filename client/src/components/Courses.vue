@@ -81,7 +81,7 @@
             span(aria-hidden='true') ×
         .modal-body
           .py-2.text-center
-            button.btn.btn-danger(v-on:click='removeCourse(currentCourse)')
+            button.btn.btn-danger(@click='removeCourse(currentCourse)')
               i.fa.fa-trash
               | Remove this course
 </template>

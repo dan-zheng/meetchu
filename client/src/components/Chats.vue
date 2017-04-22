@@ -4,8 +4,7 @@
     .d-flex.text-center.px-4.align-items-stretch
       h2.my-2 Chats
       span.d-flex.px-0.ml-auto.align-items-center
-        //- NOTE: Create new chat button
-        a.text-primary(@click='clear(["userHits", "userQuery"]); startNewChat();')
+        a.text-primary(@click='resetNewChat(); clear(["userHits", "userQuery"]); startNewChat();')
           i.fa.fa-lg.fa-plus-square
     #chats-list
       p.text-muted.px-3.py-2.my-0(v-if='!hasNewChat && !hasChats') You are not in any chats.
@@ -30,7 +29,7 @@
       span.ml-auto
       h2.my-2(style='min-height: 35px') {{ currentChat.name }}
       span.d-flex.px-0.ml-auto.align-items-center
-        a.ml-auto(@click='showModal("#chat-settings-modal")')
+        a.ml-auto(@click='resetCurrentChatNewUsers(); showModal("#chat-settings-modal");')
           i.fa.fa-lg.fa-cog
     .d-flex.text-center.px-4.align-items-center(v-else)
       h2.mx-auto.my-2(style='min-height: 35px')
@@ -41,7 +40,7 @@
       div(v-if='isCurrentChatNew')
         #new-chat-input.d-flex.align-items-center
           span.mx-2 To:
-          input#user-search-input.px-2(v-model='userQuery', placeholder='Search for users...', @keyup='search("userHits", userQuery)')
+          input#user-search-input.px-2(v-model='userQuery', placeholder='Search for users...', @keyup='search("userHits", userQuery, newChat)')
 
         .card.m-3.p-2
           small.text-info(v-if='userHits.length > 0') Matches
@@ -59,7 +58,7 @@
                 h5.m-0 {{ user.first_name + ' ' + user.last_name }}
                 small.text-right(style='min-width: 80px;') {{ user.email }}
           .py-2.text-center
-            button.btn.btn-primary(v-on:click='createChat(newChat)')
+            button.btn.btn-primary(@click='createChat(newChat)')
               i.fa.fa-plus-circle
               | Create chat
 
@@ -88,14 +87,37 @@
             span(aria-hidden='true') ×
         .modal-body
           h6 Chat users
-          .list-group.mb-2(v-if='hasCurrentChat')
+          .list-group.mb-3(v-if='hasCurrentChat')
             div(v-for='user in currentChat.users', :key='user.email')
               a.list-group-item.list-group-item-action.user.rounded-0.border(@click='goToProfile(user.id)')
                 .d-flex.w-100.mx-1.justify-content-between.align-items-center
                   h5.mb-0 {{ user.first_name + ' ' + user.last_name }}
                   small.text-right {{ user.email }}
+          h6 Add users
+          #new-chat-input.d-flex.align-items-center
+            input#user-search-input.px-2(v-model='userQuery', placeholder='Search for users...', @keyup='search("userHits", userQuery, currentChat)')
+          div.m-3
+            .card.p-2(v-if='userQuery.length > 0')
+              small.text-info(v-if='userHits.length > 0') Matches
+              small.text-warning(v-else) No matches.
+              .list-group
+                .list-group-item.list-group-item-action.rounded-0.border(v-for='(user, index) in sortedHitUsers', :key='user.objectId', @click='addUserToNewCurrentChatNewUsers(user, index)')
+                  .d-flex.w-100.mx-1.justify-content-between.align-items-center
+                    h5.m-0 {{ user.first_name + ' ' + user.last_name }}
+                    small.text-right(style='min-width: 80px;') {{ user.email }}
+              small.text-success(v-if='currentChatNewUsers.length > 0') Selected
+              .list-group
+                .list-group-item.list-group-item-action.rounded-0.border(v-for='(user, index) in sortedCurrentChatNewUsers', :key='user.id', @click='removeUserFromCurrentChatNewUsers(user, index)')
+                  .d-flex.w-100.mx-1.justify-content-between.align-items-center
+                    i.fa.fa-check.text-success
+                    h5.m-0 {{ user.first_name + ' ' + user.last_name }}
+                    small.text-right(style='min-width: 80px;') {{ user.email }}
+              .py-2.text-center
+                button.btn.btn-primary(@click='clear(["userHits", "userQuery"]); addUsersToCurrentChat();')
+                  i.fa.fa-user-plus
+                  | Add users
           .py-2.text-center
-            button.btn.btn-danger(v-on:click='removeChat(currentChat)')
+            button.btn.btn-danger(@click='removeChat(currentChat)')
               i.fa.fa-minus-square
               | Leave this chat
 </template>
@@ -135,6 +157,7 @@ export default {
         }
       },
       currentMsg: {},
+      currentChatNewUsers: [],
       userQuery: '',
       userHits: []
     }
@@ -154,6 +177,15 @@ export default {
     },
     sortedNewChatUsers() {
       const temp = this.newChat.users;
+      return temp.sort((a, b) => {
+        const u1 = a.first_name + ' ' + a.last_name;
+        const u2 = b.first_name + ' ' + b.last_name;
+        return u1.localeCompare(u2);
+      });
+    },
+    sortedCurrentChatNewUsers() {
+      const temp = this.currentChatNewUsers;
+      // const temp = this.chats.find(c => c.id === this.currentChat.id).users.splice(0);
       return temp.sort((a, b) => {
         const u1 = a.first_name + ' ' + a.last_name;
         const u2 = b.first_name + ' ' + b.last_name;
@@ -222,9 +254,9 @@ export default {
       this.resetCurrentChat();
       this.hideModal("#chat-settings-modal");
     },
-    addUserToChat(chat, user, index) {
-      this.userHits.splice(index, 1);
-      this.$store.dispatch('addChatUser', { chat, user });
+    addUsersToCurrentChat() {
+      this.$store.dispatch('addChatUsers', { chat: this.currentChat, users: this.currentChatNewUsers });
+      this.resetCurrentChatNewUsers();
     },
     removeUserFromChat(chat, user, index) {
       chat.users.splice(index, 1);
@@ -233,13 +265,19 @@ export default {
     },
     addUserToNewChat(user, index) {
       this.userHits.splice(index, 1);
-      // this.$store.dispatch('addChatUser', { chat, user });
       this.newChat.users.push(user);
+    },
+    addUserToNewCurrentChatNewUsers(user, index) {
+      this.userHits.splice(index, 1);
+      this.currentChatNewUsers.push(user);
     },
     removeUserFromNewChat(user, index) {
       this.newChat.users.splice(index, 1);
       this.search("userHits", this.userQuery);
-      // this.$store.dispatch('removeChatUser', { chat, user });
+    },
+    removeUserFromCurrentChatNewUsers(user, index) {
+      this.currentChatNewUsers.splice(index, 1);
+      this.search("userHits", this.userQuery);
     },
     sendMessage(chat) {
       if (!this.currentMsg[chat.id] || this.currentMsg[chat.id] === '') {
@@ -264,7 +302,7 @@ export default {
       this.hideModal('#chat-settings-modal');
       this.$router.push(`/profile/${id}`);
     },
-    search(hits, query) {
+    search(hits, query, chat) {
       if (!query) {
         this[hits] = [];
         return false;
@@ -272,7 +310,7 @@ export default {
       userIndex.search(query, {
         hitsPerPage: 5
       }, (error, results) => {
-        const filteredHits = results.hits.filter(el => this.user.id != el.objectID && !this.newChat.users.some(u => u.id === el.objectID));
+        const filteredHits = results.hits.filter(el => this.user.id != el.objectID && !chat.users.some(u => u.id === el.objectID));
         filteredHits.forEach((el) => {
           el.id = el.objectID;
           delete el.objectID;
@@ -291,14 +329,13 @@ export default {
           this[v] = '';
         }
       });
-      this.resetNewChat();
     },
     handleScroll() {
       this.hasScrolled = true;
     },
     scrollMessagesToBottom() {
       const messages = $('#messages-list')[0];
-      if (messages.scrollHeight) {
+      if (messages) {
         messages.scrollTop = messages.scrollHeight;
       }
     },
@@ -335,14 +372,6 @@ export default {
       this.newChat = null;
       this.isCurrentChatNew = false;
     },
-    resetCurrentChat(isNewChat) {
-      if (!isNewChat && this.sortedChats.length > 0) {
-        this.currentChat = this.sortedChats[0];
-        this.isCurrentChatNew = false;
-      } else {
-        this.currentChat = null;
-      }
-    },
     setCurrentChat(chat, isNewChat) {
       this.currentChat = chat;
       if (isNewChat) {
@@ -361,6 +390,17 @@ export default {
       this.currentChat = this.newChat;
       this.isCurrentChatNew = true;
       this.hasScrolled = false;
+    },
+    resetCurrentChat(isNewChat) {
+      if (!isNewChat && this.sortedChats.length > 0) {
+        this.currentChat = this.sortedChats[0];
+        this.isCurrentChatNew = false;
+      } else {
+        this.currentChat = null;
+      }
+    },
+    resetCurrentChatNewUsers() {
+      this.currentChatNewUsers = [];
     },
     hasChatUsers(chat) {
       return typeof chat.users !== 'undefined' && chat.users.length > 0;
@@ -421,10 +461,6 @@ export default {
   border-top: 1px solid $grid-border-color;
   border-radius: 0;
   overflow-y: scroll;
-
-  .list-group {
-    overflow-y: scroll;
-  }
 }
 
 .subtitle {

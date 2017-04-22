@@ -33,7 +33,7 @@
             input.form-control(type='text', name='major', placeholder='Major', v-model.lazy='userModel.major')
             field-messages.form-control-feedback(auto-label, name='major', show='$touched || $submitted')
         .py-2.text-center
-          button.btn.btn-primary(v-on:click='updateAccount("profile")')
+          button.btn.btn-primary(@click='updateAccount("profile")')
             i.fa.fa-pencil
             | Update
 
@@ -53,7 +53,7 @@
         .col-md-5.text-center
           b-form-checkbox(v-model.lazy='userModel.privacy_show_profile_picture_url', value='1', unchecked-value='0')
     .py-2.text-center
-      button.btn.btn-primary(v-on:click='updateAccount("privacy")')
+      button.btn.btn-primary(@click='updateAccount("privacy")')
         i.fa.fa-pencil
         | Update
 
@@ -75,7 +75,7 @@
             field-messages.form-control-feedback(name='confirm_password', show='$touched || $submitted')
               div(slot='pattern') Passwords do not match.
         .py-2.text-center
-          button.btn.btn-primary(v-on:click='updateAccount("password")')
+          button.btn.btn-primary(@click='updateAccount("password")')
             i.fa.fa-lock
             | Change password
 
@@ -84,7 +84,7 @@
     .offset-md-1.col-md-10
       p You can delete your account, but keep in mind this action is irreversible.
       .py-2.text-center
-        button.btn.btn-danger(v-on:click='deleteAccount()')
+        button.btn.btn-danger(@click='deleteAccount()')
           i.fa.fa-trash
           | Delete my account
   //- pre.
