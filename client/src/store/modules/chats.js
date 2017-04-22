@@ -90,14 +90,12 @@ const actions = {
   addMessage({ commit }, { message }) {
     message = Object.assign({}, message, { new: true });
     commit(types.ADD_MESSAGE, {
-      update: false,
       message
     });
   },
   sendMessage({ commit }, { message }) {
     message = Object.assign({}, message, { new: true });
     commit(types.ADD_MESSAGE, {
-      update: true,
       message
     });
     return Vue.axios.post(`/chats/send`, { message })
@@ -148,27 +146,24 @@ const mutations = {
     const users = state.chats[index].users.filter(u => u.id !== user.id);
     Vue.set(state.chats[index], 'users', users);
   },
-  [types.ADD_MESSAGE](state, { message, update }) {
+  [types.ADD_MESSAGE](state, { message }) {
     const index = state.chats.findIndex(c => c.id === message.chat_id);
     if (index === -1) {
       return;
     }
-    // TODO: refactor update
-    if (update) {
-      const displayedMessage = {
-        id: message.chat_id,
-        sender_id: message.sender_id,
-        sender_first_name: message.sender_first_name,
-        sender_last_name: message.sender_last_name,
-        body: message.body,
-        time_sent: message.time_sent,
-        new: message.new
-      };
-      if (!state.chats[index].messages) {
-        state.chats[index].messages = [];
-      }
-      state.chats[index].messages.push(displayedMessage);
+    const displayedMessage = {
+      id: message.chat_id,
+      sender_id: message.sender_id,
+      sender_first_name: message.sender_first_name,
+      sender_last_name: message.sender_last_name,
+      body: message.body,
+      time_sent: message.time_sent,
+      new: message.new
+    };
+    if (!state.chats[index].messages) {
+      state.chats[index].messages = [];
     }
+    state.chats[index].messages.push(displayedMessage);
     Vue.set(state.chats[index], 'sender_first_name', message.sender_first_name);
     Vue.set(state.chats[index], 'sender_last_name', message.sender_last_name);
     Vue.set(state.chats[index], 'last_message_body', message.body);
