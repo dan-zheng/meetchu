@@ -5,10 +5,10 @@ const Maybe = monet.Maybe;
 const Either = monet.Either;
 
 module.exports = models => ({
-  create(meeting) {
+  create(person, meeting) {
     return models.pool.query(
-      'INSERT INTO meeting (name, location, description) VALUES (?, ?, ?)',
-        [meeting.name, meeting.location, meeting.description])
+      'INSERT INTO meeting (name, location, description, creator_id) VALUES (?, ?, ?, ?)',
+        [meeting.name, meeting.location, meeting.description, person.id])
       .then(result => Either.Right(
         Object.assign(meeting, { id: result.insertId })))
       .errorToLeft();
@@ -26,6 +26,21 @@ module.exports = models => ({
     return models.pool.query(query, [...values, meeting.id])
       .then(result => Either.Right(result.affectedRows))
       .errorToLeft();
+  },
+  leave(meeting, person) {
+    const isCreator = meeting.creator_id === person.id;
+    const leaveMeeting = models.pool.query(
+      `DELETE FROM person_meeting WHERE person_id = ? AND meeting_id`,
+        [person.id, meeting.id])
+        .then(result => result.affectedRows === 0 ?
+          Either.Left('User was not a part of the meeting.') :
+          Either.Right(result.affectedRows));
+    if (isCreator) {
+      return leaveMeeting.then(result =>
+        result.flatMap(() => this.erase(meeting)))
+      .errorToLeft();
+    }
+    return leaveMeeting.errorToLeft();
   },
   addPerson(meeting, person) {
     return models.pool.query(
@@ -52,7 +67,7 @@ module.exports = models => ({
   },
   setPersonTimes(meeting, person, times) {
     return models.pool.query(
-      'REPLACE INTO person_meeting_time (person_id, meeting_id, time) VALUES (?, ?, ?)',
+      'REPLACE INTO person_meeting (person_id, meeting_id, time) VALUES (?, ?, ?)',
         [person.id, meeting.id, times])
       .then(result => Either.Right(result.affectedRows))
       .errorToLeft();

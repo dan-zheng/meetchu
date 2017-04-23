@@ -9,38 +9,7 @@ const models = require('../models');
  * Meetings home page.
  */
 exports.getMeetings = (req, res) => {
-  models.Meeting.findAll({
-    include: [
-      {
-        model: models.User,
-        where: {
-          id: req.user.dataValues.id
-        }
-      },
-      {
-        model: models.DateTime,
-        attributes: ['dateTime'],
-        as: 'finalTime'
-      }
-    ],
-    order: [['updatedAt', 'DESC']]
-  }).then((meetings) => {
-    console.log(JSON.stringify(meetings, null, 2));
-    if (meetings) {
-      meetings = meetings.map((meeting) => {
-        return meeting.dataValues;
-      });
-      return res.render('meetings/index', {
-        title: 'Meetings',
-        tag: 'Meeting',
-        meetings
-      });
-    }
-    return res.render('meetings/index', {
-      title: 'Meetings',
-      tag: 'Meeting',
-    });
-  });
+
 };
 
 /**
@@ -49,85 +18,7 @@ exports.getMeetings = (req, res) => {
  */
 exports.getMeeting = (req, res) => {
   const meetingId = req.params.id;
-  models.Meeting.findOne({
-    where: {
-      id: meetingId
-    },
-    include: [
-      {
-        model: models.User
-      },
-      {
-        model: models.DateTime,
-        attributes: ['dateTime'],
-        as: 'finalTime'
-      },
-      {
-        model: models.DateTime,
-        attributes: ['dateTime'],
-        include: [
-          {
-            model: models.User
-          }
-        ]
-      }
-    ],
-    order: [
-      [models.User, models.UserMeeting, 'createdAt', 'ASC'],
-      [models.DateTime, 'dateTime', 'ASC']
-    ]
-  }).then((meeting) => {
-    if (!meeting) {
-      req.flash('error', 'No meeting with the specified id exists.');
-      return res.redirect('/meetings');
-    }
-    meeting = meeting.dataValues;
 
-    meeting.Users = meeting.Users.map((user) => {
-      return user.dataValues;
-    });
-
-    const isAdmin = meeting.Users[0].id === req.user.id;
-    console.log(isAdmin);
-
-    meeting.DateTimes = meeting.DateTimes.map((datetime) => {
-      return datetime.dataValues;
-    });
-
-    let datetimes = meeting.DateTimes.map((datetime) => {
-      return datetime.dateTime;
-    });
-
-    let dates = datetimes.map((datetime) => {
-      return moment(datetime.toUTCString()).format('dd M/D');
-    });
-    dates = dates.filter((datetime, index) => {
-      return dates.indexOf(datetime) === index;
-    });
-
-    let times = _.groupBy(datetimes, (datetime) => {
-      return moment(datetime).format('h:mm A');
-    });
-    times = _.mapValues(times, (val, key) => {
-      const temp = val.map((datetime) => {
-        return moment(datetime.toUTCString()).format('dd M/D');
-      });
-      return temp;
-    });
-
-    meeting.DateTimes = _.groupBy(meeting.DateTimes, (datetime) => {
-      // return moment(datetime).startOf('day').format();
-      return moment(datetime.dateTime).format('h:mm A');
-    });
-    datetimes = _.groupBy(datetimes, (datetime) => {
-      // return moment(datetime).startOf('day').format();
-      return moment(datetime).format('h:mm A');
-    });
-
-    // console.log(meeting.DateTimes);
-    console.log(datetimes);
-    console.log(times);
-    console.log(dates);
     return res.render('meetings/meeting', {
       title: meeting.name,
       tag: 'Meeting',
@@ -290,46 +181,6 @@ exports.postRsvpMeeting = (req, res) => {
 exports.postFinalizeMeeting = (req, res) => {
   const id = req.params.id;
 
-  req.assert('finalTime', 'A final time was not selected.').notEmpty();
-
-  const errors = req.validationErrors();
-  if (errors) {
-    req.flash('error', errors);
-    return res.redirect(`/meetings/${id}`);
-  }
-
-  const finalTime = new Date(req.body.finalTime);
-
-  models.Meeting.findOne({
-    where: {
-      id
-    },
-    include: [{
-      model: models.DateTime,
-      where: {
-        dateTime: finalTime
-      }
-    }]
-  }).then((meeting) => {
-    async.eachOfLimit(meeting.Users, 1, (user, index, callback) => {
-      models.Notification.create({
-        message: `${meeting.name} has been finalized`
-      }).then((notification) => {
-        user.addNotification(notification).then(() => {
-          callback();
-        });
-      }).catch((err) => {
-        callback(err);
-      });
-    }, (err) => {
-      console.log(err);
-    });
-    meeting.finalTimeId = meeting.DateTimes[0].id;
-    meeting.save().then(() => {
-      req.flash('success', 'Your meeting time has been finalized.');
-      return res.redirect(`/meetings/${id}`);
-    });
-  });
 };
 
 /**
@@ -338,69 +189,7 @@ exports.postFinalizeMeeting = (req, res) => {
  */
 exports.postUnfinalizeMeeting = (req, res) => {
   const id = req.params.id;
-  models.Meeting.findById(id).then((meeting) => {
-    meeting.finalTimeId = null;
-    meeting.save().then(() => {
-      req.flash('success', 'Your meeting time has been unfinalized.');
-      return res.redirect(`/meetings/${id}`);
-    });
-  });
-};
 
-/**
- * POST /meetings/:id/invite
- * Invite a user to a meeting.
- */
-exports.postInviteMeeting = (req, res) => {
-  const id = req.params.id;
-
-  req.assert('email', 'Invitee field is not an email.').isEmail();
-
-  const errors = req.validationErrors();
-  if (errors) {
-    req.flash('error', errors);
-    return res.redirect(`/meetings/${id}`);
-  }
-
-  const userEmail = req.body.email;
-
-  models.Meeting.findOne({
-    where: {
-      id
-    },
-    include: [{
-      model: models.User
-    }]
-  }).then((meeting) => {
-    if (!meeting) {
-      req.flash('error', 'The meeting does not exist.');
-      return res.redirect('/meetings');
-    }
-    models.User.findOne({
-      where: {
-        email: userEmail
-      }
-    }).then((user) => {
-      if (!user) {
-        req.flash('error', 'No user with that email exists.');
-        return res.redirect(`/meetings/${id}`);
-      }
-      meeting.hasUser(user).then((exists) => {
-        if (exists) {
-          req.flash('error', 'The user you tried to invite is already in the meeting.');
-          return res.redirect(`/meetings/${id}`);
-        }
-        models.Notification.create({
-          message: `You have been invited to the meeting ${meeting.name}.`
-        }).then((notification) => {
-          user.addNotification(notification);
-        });
-        meeting.addUser(user);
-        req.flash('success', `${user.first_name} has been invited.`);
-        return res.redirect(`/meetings/${id}`);
-      });
-    });
-  });
 };
 
 
@@ -410,37 +199,7 @@ exports.postInviteMeeting = (req, res) => {
  */
 exports.postLeaveChatGroup = (req, res) => {
   const id = req.params.id;
-  models.Meeting.findOne({
-    where: {
-      id
-    },
-    include: [{
-      model: models.User
-    }]
-  }).then((meeting) => {
-    if (!meeting) {
-      req.flash('error', 'The meeting does not exist.');
-      return res.redirect('/meetings');
-    }
-    meeting.hasUser(req.user).then((exists) => {
-      if (!exists) {
-        req.flash('error', 'You are not in the meeting.');
-        return res.redirect('/meetings');
-      }
 
-      if (meeting.Users.length > 1) {
-        meeting.removeUser(req.user).then(() => {
-          req.flash('info', 'You have left the meeting.');
-          return res.redirect('/meetings');
-        });
-      } else {
-        meeting.destroy().then(() => {
-          req.flash('info', 'Your meeting has been deleted.');
-          return res.redirect('/meetings');
-        });
-      }
-    });
-  });
 };
 
 /**
@@ -449,77 +208,5 @@ exports.postLeaveChatGroup = (req, res) => {
  */
 exports.postDeleteMeeting = (req, res) => {
   const id = req.params.id;
-  models.Meeting.findOne({
-    where: {
-      id
-    },
-    include: [{
-      model: models.User
-    }]
-  }).then((meeting) => {
-    if (!meeting) {
-      req.flash('error', 'The meeting does not exist.');
-      return res.redirect('/meetings');
-    }
-    async.eachOfLimit(meeting.Users, 1, (user, index, callback) => {
-      models.Notification.create({
-        message: `The meeting ${meeting.name} has been cancelled.`
-      }).then((notification) => {
-        user.addNotification(notification).then(() => {
-          callback();
-        });
-      }).catch((err) => {
-        callback(err);
-      });
-    }, (err) => {
-      meeting.destroy().then(() => {
-        req.flash('info', 'Your meeting has been deleted.');
-        return res.redirect('/meetings');
-      });
-    });
-  });
-};
 
-const getDateTimes = (dates, times) => {
-  const datetimes = [];
-  const morning = times.indexOf('morning') !== -1;
-  const afternoon = times.indexOf('afternoon') !== -1;
-  const evening = times.indexOf('evening') !== -1;
-
-  for (let i = 0; i < dates.length; i += 1) {
-    if (morning) {
-      for (let j = 8; j <= 11; j += 1) {
-        const date = new Date(dates[i]);
-        date.setHours(j);
-        date.setMinutes(0);
-        datetimes.push(date);
-        const date2 = new Date(date);
-        date2.setMinutes(30);
-        datetimes.push(date2);
-      }
-    }
-    if (afternoon) {
-      for (let j = 13; j <= 16; j += 1) {
-        const date = new Date(dates[i]);
-        date.setHours(j);
-        date.setMinutes(0);
-        datetimes.push(date);
-        const date2 = new Date(date);
-        date2.setMinutes(30);
-        datetimes.push(date2);
-      }
-    }
-    if (evening) {
-      for (let j = 18; j <= 21; j += 1) {
-        const date = new Date(dates[i]);
-        date.setHours(j);
-        date.setMinutes(0);
-        datetimes.push(date);
-        const date2 = new Date(date);
-        date2.setMinutes(30);
-        datetimes.push(date2);
-      }
-    }
-  }
-  return datetimes;
 };

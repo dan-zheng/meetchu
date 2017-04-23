@@ -5,9 +5,13 @@ module.exports = {
       name VARCHAR(255) NOT NULL,
       location VARCHAR(255),
       description VARCHAR(255),
-      last_updated DATETIME DEFAULT CURRENT_TIMESTAMP,
+      creator_id INT NOT NULL,
       final_time DATETIME,
-      PRIMARY KEY (id)
+      last_updated DATETIME DEFAULT CURRENT_TIMESTAMP,
+      PRIMARY KEY (id),
+      FOREIGN KEY (creator_id)
+        REFERENCES person(id)
+        ON DELETE CASCADE
     )`,
     `CREATE TABLE IF NOT EXISTS meeting_time (
       meeting_id INT NOT NULL,
