@@ -80,8 +80,8 @@ module.exports = {
         ON DELETE CASCADE
     )`,
     `CREATE TABLE IF NOT EXISTS person_chat (
-      chat_id INT NOT NULL,
       person_id INT NOT NULL,
+      chat_id INT NOT NULL,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       PRIMARY KEY (chat_id, person_id),
       FOREIGN KEY (chat_id)
@@ -92,8 +92,8 @@ module.exports = {
         ON DELETE CASCADE
     )`,
     `CREATE TABLE IF NOT EXISTS person_notification (
-      notification_id INT NOT NULL,
       person_id INT NOT NULL,
+      notification_id INT NOT NULL,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       PRIMARY KEY (notification_id, person_id),
       FOREIGN KEY (notification_id)
@@ -104,9 +104,13 @@ module.exports = {
         ON DELETE CASCADE
     )`,
     `CREATE TABLE IF NOT EXISTS person_meeting_time (
+      person_id INT NOT NULL,
       meeting_id INT NOT NULL,
-      times JSON NOT NULL,
+      time JSON NOT NULL,
       PRIMARY KEY (meeting_id),
+      FOREIGN KEY (person_id)
+        REFERENCES person(id)
+        ON DELETE CASCADE,
       FOREIGN KEY (meeting_id)
         REFERENCES meeting(id)
         ON DELETE CASCADE

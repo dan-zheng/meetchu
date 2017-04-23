@@ -27,8 +27,8 @@ module.exports = models => ({
   /**
    * @return Promise[Either[String, Integer]]
    */
-  addPersonBulk(courses, person) {
-    const values = courses.map(course => [person.id, course.id]);
+  addPersonBulk(courseIds, person) {
+    const values = courseIds.map(id => [person.id, id]);
     return models.pool.query(
       'INSERT IGNORE INTO person_course (person_id, course_id) VALUES ?', [values])
       .then(result => Either.Right(result.affectedRows))

@@ -76,15 +76,16 @@ function getSchedule(username, password) {
     );
 }
 
-function getCourseId(sectionId) {
+function getCourseIds(sectionIds) {
+  const filterBySectionId = sectionIds.map(id => `SectionId eq ${id}`).join(' or ');
   return request.get('https://api.purdue.io/odata/Sections')
     .query({
-      $filter: `SectionId eq ${sectionId}`,
+      $filter: filterBySectionId,
       $expand: 'Class($expand=Course)'
     })
     .then(
-      res => Promise.resolve({ id: res.body.value[0].Class.Course.CourseId }),
-      err => Promise.reject('Error finding course id from section id.')
+      res => Either.Right(res.body.value.map(found => found.Class.Course.CourseId)),
+      err => Either.Left('Error finding course id from section id.')
     );
 }
 
@@ -105,9 +106,7 @@ exports.postCoursesSyncUser = async (req, res) => {
     Either.Right(schedule.right()[term])
   );
   const courseIds = await sectionIds.flatMap(
-    ids => Promise.all(ids.map(id => getCourseId(id)))
-      .then(arr => Either.Right(arr),
-            err => Either.Left(err))
+    ids => getCourseIds(ids)
   );
   const nonEmptyCourseIds = courseIds.flatMap(ids =>
     ids.length > 0 ?

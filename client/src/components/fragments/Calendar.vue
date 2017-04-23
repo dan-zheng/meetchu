@@ -100,32 +100,9 @@ export default {
               selected: false
             };
           });
-          console.log(_days);
           this.$set(this.days, this.now, _days);
-          /*
-          this.days[this.now] = _.map(days, (d) => {
-            return {
-              day: d,
-              selected: false
-            };
-          });
-          */
         }
         this.weeks = _chunk(this.days[this.now], 7);
-        /*
-        if (!this.store[key]) {
-          this.days = _.map(days, (d) => {
-            return {
-              day: d,
-              selected: false
-            };
-          });
-          this.store[key] = this.days;
-        } else {
-          this.days = this.store[key];
-        }
-        this.weeks = _chunk(this.days, 7);
-        */
     },
     style(day) {
       if (day.selected) {
