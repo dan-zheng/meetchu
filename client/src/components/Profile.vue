@@ -82,9 +82,6 @@ export default {
         .catch(swal.noop);
       });
     },
-    onSubmit(type) {
-      console.log(this.formstate[type].$valid);
-    },
     validationStyle
   }
 }

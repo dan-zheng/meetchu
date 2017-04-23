@@ -69,7 +69,7 @@ export default {
         .catch(swal.noop);
       }).catch((e) => {
         console.log('Local login fail.');
-        resetForm(this.formstate[type]);
+        resetForm(this.formstate);
         // Alert message
         swal({
           type: 'error',
