@@ -11,7 +11,7 @@ module.exports = {
     )`,
     `CREATE TABLE IF NOT EXISTS meeting_time (
       meeting_id INT NOT NULL,
-      times JSON NOT NULL,
+      time JSON NOT NULL,
       PRIMARY KEY (meeting_id),
       FOREIGN KEY (meeting_id)
         REFERENCES meeting(id)

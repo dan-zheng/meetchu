@@ -46,13 +46,14 @@ module.exports = models => ({
   },
   setMeetingTimes(meeting, times) {
     return models.pool.query(
-      'REPLACE INTO meeting_time (meeting_id, times) VALUES (?, ?)', [meeting.id, times])
+      'REPLACE INTO meeting_time (meeting_id, time) VALUES (?, ?)', [meeting.id, times])
       .then(result => Either.Right(result.affectedRows))
       .errorToLeft();
   },
   setPersonTimes(meeting, person, times) {
     return models.pool.query(
-      'REPLACE INTO person_meeting_time (meeting_id, times) VALUES (?, ?)', [meeting.id, times])
+      'REPLACE INTO person_meeting_time (person_id, meeting_id, time) VALUES (?, ?, ?)',
+        [person.id, meeting.id, times])
       .then(result => Either.Right(result.affectedRows))
       .errorToLeft();
   }

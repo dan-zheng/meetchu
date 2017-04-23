@@ -51,7 +51,7 @@ const sessionStore = new MySQLStore({
   password: process.env.DB_PASS,
   database: process.env.DB_NAME,
   schema: {
-    tableName: 'sessions'
+    tableName: 'session'
   }
 });
 
