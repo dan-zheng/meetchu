@@ -72,8 +72,6 @@ app.use(cors());
 app.use(validator({
   customValidators: {
     isArray(value) {
-      console.log('value: ' + value);
-      console.log('isArray: ' + Array.isArray(value));
       return Array.isArray(value);
     },
     notEmptyArray(value) {
@@ -156,8 +154,8 @@ app.post('/course/add', courseController.postCourseAddUser);
 app.post('/course/remove/', courseController.postCourseRemoveUser);
 app.post('/courses/sync', courseController.postCoursesSyncUser);
 
-app.get('/meetings', meetingController.getMeetings);
-app.get('/meetings/:id', meetingController.getMeeting);
+app.get('/meetings', meetingController.postMeetings);
+app.get('/meetings/:id', meetingController.postMeeting);
 app.post('/meetings/create', meetingController.postCreateMeeting);
 app.post('/meetings/:id/invite', meetingController.postInviteMeeting);
 app.post('/meetings/:id/update', meetingController.postUpdateMeeting);

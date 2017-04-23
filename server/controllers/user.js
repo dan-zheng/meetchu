@@ -61,6 +61,7 @@ exports.postSignup = (req, res, next) => {
   req.assert('password', 'Password must be at least 4 characters long.').len(4);
   req.assert('confirm_password', 'Passwords do not match.').equals(req.body.password);
   req.sanitize('email').normalizeEmail({ remove_dots: false });
+  // TODO handle validation errors and update them to check the body not params
 
   passport.authenticate('signup', (err, person) => {
     if (err) {
@@ -104,7 +105,7 @@ exports.postUpdateAccount = (req, res) => {
   personDao.update(person, fields).tap(result =>
     result.cata(
       err => res.status(401).json(err),
-      wasUpdated => res.status(200).json(person)
+      () => res.status(200).json(person)
     )
   );
 };

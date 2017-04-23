@@ -5,6 +5,20 @@ const Maybe = monet.Maybe;
 const Either = monet.Either;
 
 module.exports = models => ({
+  findByPerson(person) {
+    return models.pool.query(`
+      SELECT meeting.* FROM meeting
+      JOIN person_meeting
+      ON meeting_id = id AND person_id = ?`, [person.id])
+      .then(result => Either.Right(result.list()))
+      .errorToLeft();
+  },
+  findById(id) {
+    return models.pool.query('SELECT * FROM meeting WHERE id = ? LIMIT 1', [id])
+      .then(rows => rows.list().headMaybe())
+      .then(maybeMeeting => maybeMeeting.toEither('Meeting not found.'))
+      .errorToLeft();
+  },
   create(person, meeting) {
     return models.pool.query(
       'INSERT INTO meeting (name, location, description, creator_id) VALUES (?, ?, ?, ?)',
