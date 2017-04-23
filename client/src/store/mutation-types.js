@@ -18,3 +18,12 @@ export const SET_COURSES = 'SET_COURSES';
 export const SET_COURSE_USERS = 'SET_COURSE_USERS';
 export const ADD_COURSE = 'ADD_COURSE';
 export const REMOVE_COURSE = 'REMOVE_COURSE';
+
+// Meeting related mutations
+export const SET_MEETINGS = 'SET_MEETINGS';
+export const SET_MEETING_USERS = 'SET_MEETING_USERS';
+export const SET_MEETING_TIMES = 'SET_MEETING_TIMES';
+export const ADD_MEETING = 'ADD_MEETING';
+export const REMOVE_MEETING = 'REMOVE_MEETING';
+export const ADD_MEETING_USERS = 'ADD_MEETING_USERS';
+export const REMOVE_MEETING_USER = 'REMOVE_MEETING_USER';

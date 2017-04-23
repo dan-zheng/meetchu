@@ -1,20 +1,26 @@
 @import '_fonts';
 @import '_variables';
 
-// Scaffolding
+// General
 
-html {
-  font-size: 16px;
-  min-width: 100%;
-  min-height: 100%;
-  overflow-y: scroll;
+[v-cloak] {
+  display: none;
 }
 
-body {
+// Scaffolding
+
+html, body, #app {
   font-family: $font-family-base;
-  position: relative;
-  min-width: 100%;
-  min-height: 100%;
+  width: 100%;
+  height: 100%;
+}
+
+html, body {
+  overflow: hidden;
+}
+
+#app {
+  overflow-y: scroll;
 }
 
 // Typography
@@ -33,6 +39,17 @@ a[role='button'] {
   }
 }
 
+a.no-link-style {
+  transition: none;
+  color: inherit;
+
+  &:hover,
+  &:focus {
+    text-decoration: none;
+    color: inherit;
+  }
+}
+
 button,
 input,
 optgroup,
@@ -41,7 +58,47 @@ textarea {
   font-family: $font-family-base;
 }
 
-// Font Icons
+::-webkit-input-placeholder { /* WebKit, Blink, Edge */
+  color: $gray-light;
+}
+:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+  color: $gray-light;
+  opacity:  1;
+}
+::-moz-placeholder { /* Mozilla Firefox 19+ */
+  color: $gray-light;
+  opacity:  1;
+}
+:-ms-input-placeholder { /* Internet Explorer 10-11 */
+  color: $gray-light;
+}
+
+.v-select {
+  font-family: $font-family-base;
+}
+
+.word-wrap {
+  max-width: 100%;
+  word-wrap: break-word;
+  overflow-x: hidden;
+}
+
+// List groups
+
+.list-group-item {
+  &.active {
+    background-color: $brand-primary;
+    border-color: $brand-primary;
+  }
+}
+
+// Modal
+
+.modal.show {
+  display: block;
+}
+
+// Font icons
 
 .fa {
   margin-right: 6px;

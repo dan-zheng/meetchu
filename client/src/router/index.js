@@ -11,8 +11,8 @@ import Dashboard from '../components/Dashboard';
 import Account from '../components/Account';
 import Profile from '../components/Profile';
 import Chats from '../components/Chats';
-import Meetings from '../components/Meetings';
 import Courses from '../components/Courses';
+import Meetings from '../components/Meetings';
 // Test view
 import Test from '../components/Test';
 
@@ -57,14 +57,14 @@ const router = new Router({
       meta: { auth: true, sidebar: '/chats' }
     },
     {
-      path: '/meetings',
-      component: Meetings,
-      meta: { auth: true, sidebar: '/meetings' }
-    },
-    {
       path: '/courses',
       component: Courses,
       meta: { auth: true, sidebar: '/courses' }
+    },
+    {
+      path: '/meetings',
+      component: Meetings,
+      meta: { auth: true, sidebar: '/meetings' }
     },
     {
       path: '/test',
@@ -82,8 +82,12 @@ router.beforeEach((to, from, next) => {
     const loggedIn = router.app.$store.getters.isLoggedIn;
     // console.log(`${loggedIn ? 'Logged in.' : 'Not logged in.'}`);
 
-    if (to.matched.some(record => record.meta.auth)) {
-      // Check if route requires auth
+    // Check if route is independent of auth
+    if (typeof to.meta.auth === 'undefined') {
+      next();
+    }
+    // Check if route requires auth
+    else if (to.matched.some(record => record.meta.auth)) {
       if (!loggedIn) {
         next({
           path: '/login',
@@ -92,8 +96,9 @@ router.beforeEach((to, from, next) => {
       } else {
         next();
       }
-    } else if (to.matched.some(record => !record.meta.auth)) {
-      // Check if route requires un-auth
+    }
+    // Check if route requires un-auth
+    else if (to.matched.some(record => !record.meta.auth)) {
       if (loggedIn) {
         next({
           path: '/dashboard',

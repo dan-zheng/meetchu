@@ -4,6 +4,7 @@ import Vuex from 'vuex';
 import user from './modules/user';
 import chats from './modules/chats';
 import courses from './modules/courses';
+import meetings from './modules/meetings';
 
 Vue.use(Vuex);
 
@@ -13,7 +14,8 @@ export default new Vuex.Store({
   modules: {
     user,
     chats,
-    courses
+    courses,
+    meetings
   },
   strict: process.env.NODE_ENV !== 'production'
 });

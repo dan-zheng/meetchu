@@ -6,66 +6,25 @@ body {
   padding-top: 0px;
 }
 
+#sidebar {
+  min-width: 60px;
+}
+
 // Sidebar
 
 @mixin styling($sidebar-width, $icon-padding) {
   #wrapper {
-    position: absolute;
-    left: 0;
-    overflow-x: hidden;
-    padding-left: $sidebar-width;
-    width: 100vw;
-    height: 100vh;
-
-    &.toggled {
-      #sidebar {
-        width: 0;
-      }
-
-      #content {
-        position: absolute;
-        left: 0;
-        width: 100vw;
-        margin-right: 0;
-      }
-    }
+    width: 100%;
+    height: 100%;
   }
 
   #sidebar {
-    position: fixed;
-    left: $sidebar-width;
+    // left: $sidebar-width;
     width: $sidebar-width;
-    height: 100vh;
-    margin-left: -$sidebar-width;
-    overflow-y: auto;
+    border-right: 1px solid $grid-border-color;
     background: #EBEBEB;
-    // transition: all 0.4s ease;
-  }
-
-  #content {
-    z-index: 2;
-    position: absolute;
-    left: $sidebar-width;
-    padding: 20px;
-    width: calc(100vw - #{$sidebar-width});
-  }
-
-  .sidebar-nav {
-    flex-direction: column;
-    list-style: none;
-    font-size: 48px;
-
-    li {
-      width: $sidebar-width;
-      height: $sidebar-width;
-    }
 
     a {
-      display: flex;
-      flex: 1 0 100%;
-      height: 100%;
-      padding-top: $icon-padding;
-      padding-bottom: $icon-padding;
       transition: background 0.2s ease;
 
       &:hover {
@@ -74,17 +33,19 @@ body {
         background: #dbd9fa;
       }
 
-      &:active {
-        text-decoration: none;
+      &.router-link-active {
+        background: #c5c2f9;
       }
 
+      &:active,
       &:focus {
         text-decoration: none;
       }
-    }
 
-    img {
-      width: 100%;
+      img {
+        padding: $icon-padding;
+        width: 100%;
+      }
     }
   }
 }
@@ -93,6 +54,10 @@ body {
   @include styling($sidebar-width: 60px, $icon-padding: 3px);
 }
 
-@include media-breakpoint-up(sm) {
+@include media-breakpoint-up(md) {
+  @include styling($sidebar-width: 80px, $icon-padding: 4px);
+}
+
+@include media-breakpoint-up(lg) {
   @include styling($sidebar-width: 100px, $icon-padding: 5px);
 }

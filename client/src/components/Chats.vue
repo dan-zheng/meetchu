@@ -43,7 +43,8 @@
           input#user-search-input.px-2(v-model='userQuery', placeholder='Search for users...', @keyup='search("userHits", userQuery, newChat)')
 
         .card.m-3.p-2
-          small.text-info(v-if='userHits.length > 0') Matches
+          small(v-if='userQuery.length === 0') Enter a query. You can search by user first name, last name, or email.
+          small.text-info(v-else-if='userHits.length > 0') Matches
           small.text-warning(v-else-if='userQuery.length > 0 && typeof newChat !== "undefined"') No matches.
           .list-group
             .list-group-item.list-group-item-action.rounded-0.border(v-for='(user, index) in sortedHitUsers', :key='user.objectId', @click='addUserToNewChat(user, index)')
@@ -124,7 +125,7 @@
 
 <script>
 import { mapGetters } from 'vuex';
-import * as moment from 'moment';
+import moment from 'moment';
 import { default as swal } from 'sweetalert2';
 import resize from 'vue-resize-directive'
 import { userIndex } from '../common/algolia';
@@ -141,7 +142,7 @@ export default {
   data() {
     return {
       newChat: null,
-      currentChat: {},
+      currentChat: null,
       isCurrentChatNew: false,
       hasScrolled: false,
       formstate: {
@@ -185,7 +186,6 @@ export default {
     },
     sortedCurrentChatNewUsers() {
       const temp = this.currentChatNewUsers;
-      // const temp = this.chats.find(c => c.id === this.currentChat.id).users.splice(0);
       return temp.sort((a, b) => {
         const u1 = a.first_name + ' ' + a.last_name;
         const u2 = b.first_name + ' ' + b.last_name;
@@ -368,10 +368,6 @@ export default {
         return date.format('LL');
       }
     },
-    resetNewChat() {
-      this.newChat = null;
-      this.isCurrentChatNew = false;
-    },
     setCurrentChat(chat, isNewChat) {
       this.currentChat = chat;
       if (isNewChat) {
@@ -390,6 +386,10 @@ export default {
       this.currentChat = this.newChat;
       this.isCurrentChatNew = true;
       this.hasScrolled = false;
+    },
+    resetNewChat() {
+      this.newChat = null;
+      this.isCurrentChatNew = false;
     },
     resetCurrentChat(isNewChat) {
       if (!isNewChat && this.sortedChats.length > 0) {

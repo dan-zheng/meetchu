@@ -3,7 +3,7 @@
 // Colors
 
 $gray-lighter: #f5f5f5;
-$gray-light: #e0e0e0;
+$gray-light: #b5b5b5;
 $gray: #737373;
 $gray-dark: #404040;
 $gray-darker: #121212;
@@ -28,3 +28,7 @@ $btn-primary-border: darken($btn-primary-bg, 7%);
 $link-color: $brand-primary;
 $link-decoration: none;
 $link-hover-color: darken($link-color, 15%);
+
+// Grid
+
+$grid-border-color: rgba($list-group-border-color, .5);

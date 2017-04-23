@@ -1,8 +1,9 @@
 <template lang='pug'>
 #content.ml-2
+  h2 User Profile
+  hr
   div(v-if='isProfileLoaded')
-    h2 {{ fullName }}
-
+    h3 {{ fullName }}
     h5 Email:
       span(v-if='profile.privacy_show_email && profile.email')  {{ profile.email }}
       i.text-muted(v-else-if='profile.privacy_show_email && !profile.email')  unspecificied
