@@ -130,6 +130,8 @@ export default {
     delete this.userModel.confirm_password;
     fields.privacy.forEach((field) => {
       this.userModel[field] = this.userModel[field].toString();
+      // TODO: Fix privacy settings
+      // console.log(this.userModel[field] + ': ' + typeof this.userModel[field]);
     })
     // resetForm(this.formstate.password);
   },

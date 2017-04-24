@@ -4,7 +4,10 @@
     .d-flex.text-center.px-4.align-items-stretch
       h2.my-2 Meetings
       span.d-flex.px-0.ml-auto.align-items-center
-        a.text-primary.d-flex.align-items-center(@click='resetNewMeeting(); clear(["userHits", "userQuery"]); startNewMeeting();')
+        //- router-link.text-primary.d-flex.align-items-center(to='/meetings/create')
+          i.fa.fa-lg.fa-plus-square
+        // a.text-primary.d-flex.align-items-center(@click='resetNewMeeting(); clear(["userHits", "userQuery"]); startNewMeeting();')
+        a.text-primary.d-flex.align-items-center(@click='clear(["userHits", "userQuery"]); startNewMeeting();')
           i.fa.fa-lg.fa-plus-square
     #meetings-list
       p.text-muted.px-3.py-2.my-0(v-if='!hasNewMeeting && !hasMeetings') You are not in any meetings.
@@ -32,6 +35,7 @@
         span(v-else) Meeting Info
     #users-list
       div(v-if='isCurrentMeetingNew')
+      //-
         #new-meeting-input.d-flex.align-items-center
           span.mx-2 To:
           input#user-search-input.px-2(v-model='userQuery', placeholder='Search for users...', @keyup='search("userHits", userQuery, newMeeting)')
@@ -56,7 +60,7 @@
             button.btn.btn-primary(@click='createMeeting(newMeeting)')
               i.fa.fa-plus-circle
               | Create meeting
-
+    //-
       p.text-muted.px-3.py-2.my-0(v-else-if='!hasMeetings') Create a meeting!
       p.text-muted.px-3.py-2.my-0(v-else-if='!hasCurrentMeeting') Click on a meeting to see meeting information!
       h4.subtitle.px-2.py-2.my-0(v-else) Participants
@@ -67,31 +71,111 @@
             .d-flex.w-100.mx-1.justify-content-between.align-items-center
               h5.mb-0 {{ user.first_name + ' ' + user.last_name }}
               small.text-right {{ user.email }}
+
+  //- Modals
+  .modal.fade#new-meeting-modal(tabindex='-1', role='dialog', aria-labelledby='newMeetingModalLabel', aria-hidden='true')
+    .modal-dialog.modal-lg
+      .modal-content
+        .modal-header
+          h5.modal-title Create a meeting
+          button.close(type='button', data-dismiss='modal', aria-label='Close')
+            span(aria-hidden='true') ×
+        .modal-body
+          //- Nav tabs
+          ul.nav.nav-pills.nav-justified#new-meeting-tabs
+            li.nav-item
+              a.nav-link.active(href='#new-meeting-modal-dates', role='tab', data-toggle='tab') Pick Dates
+            li.nav-item
+              a.nav-link(href='#new-meeting-modal-times', role='tab', data-toggle='tab', :class='tabValid[0] ? "" : "disabled"') Pick Times
+            li.nav-item
+              a.nav-link(href='#new-meeting-modal-users', role='tab', data-toggle='tab', :class='tabValid[1] ? "" : "disabled"') Invite People
+          //- Tab content
+          .tab-content.mt-3(v-if='hasNewMeeting')
+            .tab-pane.active#new-meeting-modal-dates
+              .offset-md-1.col-md-10
+                calendar(title='Dates', ref='calendar-create')
+                p.mt-2
+                  strong Times:
+                  span  You can select more specific times later.
+                form.form-inline.justify-content-center
+                  .form-check.mb-2.mr-sm-2.mb-sm-0
+                    label.form-check-label.mr-2 Morning
+                    input(type='checkbox', v-model='timesOfDay.morning', @click='recalculateTimes')
+                  .form-check.mb-2.mr-sm-2.mb-sm-0
+                    label.form-check-label.mr-2 Afternoon
+                    input(type='checkbox', v-model='timesOfDay.afternoon', @click='recalculateTimes')
+                  .form-check.mb-2.mr-sm-2.mb-sm-0
+                    label.form-check-label.mr-2 Evening
+                    input(type='checkbox', v-model='timesOfDay.evening', @click='recalculateTimes')
+              .py-2.mt-2.text-center
+                button.btn.btn-primary(@click='newMeetingSubmitTab(0)')
+                  i.fa.fa-calendar
+                  | Select times
+            .tab-pane#new-meeting-modal-times
+              meeting-time-grid(title='Times', :days='getSelectedDates()', :times='times', ref='meeting-time-grid-create')
+              .py-2.mt-2.text-center
+                button.btn.btn-primary(@click='getSelectedDatetimes(); newMeetingSubmitTab(1)')
+                  i.fa.fa-user-plus
+                  | Invite users
+            .tab-pane#new-meeting-modal-users
+              #new-meeting-input.d-flex.align-items-center
+                span.mx-2 To:
+                input#user-search-input.px-2(v-model='userQuery', placeholder='Search for users...', @keyup='search("userHits", userQuery, newMeeting)')
+
+              .card.m-3.p-2
+                small(v-if='userQuery.length === 0') Enter a query. You can search by user first name, last name, or email.
+                small.text-info(v-else-if='userHits.length > 0') Matches
+                small.text-warning(v-else-if='userQuery.length > 0 && typeof newMeeting !== "undefined"') No matches.
+                .list-group
+                  .list-group-item.list-group-item-action.rounded-0.border(v-for='(user, index) in sortedHitUsers', :key='user.objectId', @click='addUserToNewMeeting(user, index)')
+                    .d-flex.w-100.mx-1.justify-content-between.align-items-center
+                      h5.m-0 {{ user.first_name + ' ' + user.last_name }}
+                      small.text-right(style='min-width: 80px;') {{ user.email }}
+                small.text-success(v-if='newMeeting.users.length > 0') Selected
+                .list-group
+                  .list-group-item.list-group-item-action.rounded-0.border(v-for='(user, index) in sortedNewMeetingUsers', :key='user.id', @click='removeUserFromNewMeeting(user, index)')
+                    .d-flex.w-100.mx-1.justify-content-between.align-items-center
+                      i.fa.fa-check.text-success
+                      h5.m-0 {{ user.first_name + ' ' + user.last_name }}
+                      small.text-right(style='min-width: 80px;') {{ user.email }}
+                .py-2.mt-2.text-center
+                  button.btn.btn-primary(@click='newMeetingSubmitTab(2)')
+                    i.fa.fa-calendar-plus
+                    | Create meeting
 </template>
 
 <script>
 import { mapGetters } from 'vuex';
 import * as moment from 'moment';
-import { map as _map, groupBy as _groupBy } from 'lodash';
+import { map as _map, groupBy as _groupBy, range as _range } from 'lodash';
 import { default as swal } from 'sweetalert2';
-import { userIndex } from '../common/algolia';
-import { validationStyle } from '../common/form';
+import { userIndex } from '../../common/algolia';
+import { validationStyle } from '../../common/form';
 
-const meeting = {
-  createdAt: moment().subtract('2', 'days'),
+import Calendar from '../fragments/Calendar';
+import MeetingTimeGrid from '../fragments/MeetingTimeGrid';
+
+const timesLegend = {
+  morning: _range(8, 11, 1),
+  afternoon: _range(12, 16, 1),
+  evening: _range(17, 21, 1)
 };
-
-// console.log(JSON.stringify(meeting, null, 2));
-
-const meetings = Array(1).fill(meeting);
 
 export default {
   name: 'meetings',
   metaInfo: {
     title: 'Meetings'
   },
+  components: {
+    'calendar': Calendar,
+    'meeting-time-grid': MeetingTimeGrid
+  },
   data() {
     return {
+      tabIndex: 0,
+      tabValid: [false, false, false],
+      timesOfDay: {},
+      times: [],
       newMeeting: null,
       currentMeeting: null,
       isCurrentMeetingNew: false,
@@ -142,7 +226,70 @@ export default {
       return typeof this.currentMeeting.users !== 'undefined' && this.currentMeeting.users.length > 1;
     }
   },
+  created() {
+    this.resetNewMeeting();
+  },
   methods: {
+    newMeetingSubmitTab(tabIndex) {
+      if (tabIndex === 0) {
+        if (this.getSelectedDates().length === 0 || this.times.length === 0) {
+          this.tabValid[tabIndex] = false;
+          swal({
+            type: 'error',
+            title: 'Oops.',
+            text: 'Please select some dates and at least one time of day for your meeting.'
+          })
+          .catch(swal.noop);
+          return;
+        }
+      } else if (tabIndex === 1) {
+        if (this.getSelectedDatetimes().length === 0) {
+          this.tabValid[tabIndex] = false;
+          swal({
+            type: 'error',
+            title: 'Oops.',
+            text: 'Please select some times for your meeting.'
+          })
+          .catch(swal.noop);
+          return;
+        }
+      } else if (tabIndex === 2) {
+
+      }
+      // Set tab to be valid and go to next tab, or next option
+      this.$set(this.tabValid, tabIndex, true);
+      $(`#new-meeting-tabs li:eq(${tabIndex + 1}) a`).removeClass('disabled');
+      if (tabIndex < 2) {
+        $(`#new-meeting-tabs li:eq(${tabIndex + 1}) a`).tab('show');
+        return;
+      } else {
+        console.log('Create meeting');
+        swal({
+          type: 'succcess',
+          title: 'Woohoo!',
+          text: 'Your meeting has been created!'
+        })
+        .catch(swal.noop);
+        this.hideModal('#new-meeting-modal');
+        this.resetNewMeeting();
+      }
+    },
+    recalculateTimes() {
+      let times = [];
+      Object.keys(this.timesOfDay).forEach((key) => {
+        if (this.timesOfDay[key]) {
+          times = times.concat(timesLegend[key]);
+        }
+      });
+      const temp = moment();
+      times = times.reduce((acc, time) => {
+        const t1 = moment(temp).hour(time).minute(0);
+        const t2 = moment(t1).minute(30);
+        acc = acc.concat([t1, t2]);
+        return acc;
+      }, []);
+      this.times = times;
+    },
     startNewMeeting() {
       this.setCurrentMeetingToNew();
       if (!this.newMeeting || !this.newMeeting.users) {
@@ -151,6 +298,8 @@ export default {
           users: []
         };
       }
+      // Show create meeting modal
+      this.showModal('#new-meeting-modal');
     },
     setCurrentMeeting(meeting, isNewMeeting) {
       this.currentMeeting = meeting;
@@ -167,8 +316,25 @@ export default {
       this.isCurrentMeetingNew = true;
     },
     resetNewMeeting() {
+      // Old
       this.newMeeting = null;
       this.isCurrentMeetingNew = false;
+      // New
+      this.tabIndex = 0;
+      this.tabValid = [false, false, false];
+      this.timesOfDay = {
+        morning: false,
+        afternoon: false,
+        evening: false
+      };
+    },
+    addUserToNewMeeting(user, index) {
+      this.userHits.splice(index, 1);
+      this.newMeeting.users.push(user);
+    },
+    removeUserFromNewMeeting(user, index) {
+      this.newMeeting.users.splice(index, 1);
+      this.search("userHits", this.userQuery, this.newMeeting);
     },
     resetCurrentMeeting(isNewMeeting) {
       if (!isNewMeeting && this.sortedMeetings.length > 0) {
@@ -177,6 +343,19 @@ export default {
       } else {
         this.currentMeeting = null;
       }
+    },
+    getSelectedDates() {
+      if (!this.$refs['calendar-create']) {
+        return [];
+      }
+      return this.$refs['calendar-create'].selectedDays.map(d => d.day.format());
+    },
+    getSelectedDatetimes() {
+      if (!this.$refs['meeting-time-grid-create']) {
+        return [];
+      }
+      return this.$refs['meeting-time-grid-create'].selectedDatetimes;
+      // return this.$refs['meeting-time-grid-create'].selectedDays.map(d => d.day.format());
     },
     search(hits, query, meeting) {
       if (!query) {
@@ -205,6 +384,12 @@ export default {
           this[v] = '';
         }
       });
+    },
+    showTab(tabId) {
+      $(tabId).tab('show');
+    },
+    hideTab(tabId) {
+      $(tabId).tab('hide');
     },
     showModal(modalId) {
       $(modalId).modal('show');
@@ -236,6 +421,10 @@ export default {
   }
 }
 
+.nav-link.active {
+  background-color: $brand-primary !important;
+}
+
 #current-meeting {
   border-left: 1px solid $grid-border-color;
 }
@@ -250,7 +439,7 @@ export default {
 
 #new-meeting-input {
   border: none;
-  border-bottom: 1px solid $grid-border-color;
+  border: 1px solid $grid-border-color;
   width: 100%;
   height: 40px;
 

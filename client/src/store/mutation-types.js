@@ -20,6 +20,7 @@ export const ADD_COURSE = 'ADD_COURSE';
 export const REMOVE_COURSE = 'REMOVE_COURSE';
 
 // Meeting related mutations
+export const SET_NEW_MEETING = 'SET_NEW_MEETING';
 export const SET_MEETINGS = 'SET_MEETINGS';
 export const SET_MEETING_USERS = 'SET_MEETING_USERS';
 export const SET_MEETING_TIMES = 'SET_MEETING_TIMES';
