@@ -19,6 +19,15 @@ module.exports = models => ({
       .then(maybeMeeting => maybeMeeting.toEither('Meeting not found.'))
       .errorToLeft();
   },
+  getPeopleByMeeting(meeting) {
+    return models.pool.query(
+      `SELECT person.* FROM person
+        JOIN person_meeting
+        ON person_id = person.id
+        WHERE meeting_id = ?`, [meeting.id])
+      .then(rows => Either.Right(rows.list().map(person => new models.Person(person))))
+      .errorToLeft();
+  },
   create(person, meeting) {
     return models.pool.query(
       'INSERT INTO meeting (name, location, description, creator_id, time) VALUES (?, ?, ?, ?, ?)',

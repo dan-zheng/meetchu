@@ -1,5 +1,6 @@
 const models = require('../models');
 const meetingDao = require('../dao/meeting')(models);
+const Either = require('monet').Either;
 
 /**
  * GET /meetings
@@ -44,12 +45,27 @@ exports.postMeeting = async (req, res) => {
 };
 
 /**
+ * POST /meeting/users
+ * Get a meeting's users.
+ */
+exports.postMeetingUsers = (req, res) => {
+  const meeting = req.body.meeting;
+
+  meetingDao.getPeopleByMeeting(meeting).then(result =>
+    result.cata(
+      err => res.status(401).json(err),
+      people => res.status(200).json(people.toArray())
+    )
+  );
+};
+
+/**
  * POST /meetings/create
  * Create a meeting.
  */
 exports.postCreateMeeting = async (req, res) => {
   req.checkBody('meeting', 'Meeting was not specified');
-  req.checkBody('meeting.times', 'Meeting times were not specified.');
+  req.checkBody('meeting.time', 'Meeting times were not specified.');
   req.checkBody('creator', 'Meeting creator was not specified.');
   const errors = await req.getValidationResult();
   if (!errors.isEmpty()) {
@@ -59,16 +75,19 @@ exports.postCreateMeeting = async (req, res) => {
   const creator = req.body.creator;
   const people = req.body.users || [];
   const meeting = req.body.meeting;
+  console.log(meeting.time);
   const createMeeting = await meetingDao.create(creator, meeting);
   const addPeople = await createMeeting.flatMap((createdMeeting) => {
-    if (people.isEmpty()) {
-      return 0;
+    if (people.length === 0) {
+      return Either.Right(0);
     }
     return meetingDao.addPeople(createdMeeting, people);
   });
   addPeople.cata(
     err => res.status(401).json(err),
-    () => res.status(200).json(createMeeting.right())
+    () => {
+      console.log('hi');
+      return res.status(200).json(createMeeting.right())}
   );
 };
 
@@ -191,7 +210,7 @@ exports.postInviteMeeting = async (req, res) => {
  * POST /meetings/:id/leave
  * Leave a meeting.
  */
-exports.postLeaveChatGroup = async (req, res) => {
+exports.postLeaveMeetingGroup = async (req, res) => {
   req.checkBody('meeting', 'Meeting was not specified.');
   req.checkBody('meeting.id', 'Meeting id was not specified.');
   req.checkBody('meeting.creator_id', 'Meeting creator id was not specified.');

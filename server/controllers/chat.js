@@ -1,3 +1,5 @@
+const algolia = require('../services/algolia');
+
 const models = require('../models');
 const personDao = require('../dao/person')(models);
 const chatDao = require('../dao/chat')(models);
@@ -55,13 +57,14 @@ exports.postChatMessages = (req, res) => {
  * Create a chat.
  */
 exports.postCreateChat = async (req, res) => {
-  const chat = req.body.chat;
+  const chat = new models.Chat(req.body.chat);
   const people = req.body.users ? req.body.users : [req.body.user];
 
   const createChat = await chatDao.create(chat);
   const addPeople = await createChat.flatMap(
     found => chatDao.addPeople(createChat.right(), people)
   );
+  algolia.add(algolia.index.chats, chat.algoliaView());
   addPeople.cata(
     err => res.status(401).json(err),
     affectedRows => res.status(200).json(createChat.right())
@@ -125,7 +128,10 @@ exports.postDeleteChat = (req, res) => {
   chatDao.erase(chat).tap(result =>
     result.cata(
       err => res.status(401).json(err),
-      affectedRows => res.status(200).json(true)
+      (affectedRows) => {
+        algolia.remove(algolia.index.chats, chat.id);
+        res.status(200).json(true);
+      }
     )
   );
 };

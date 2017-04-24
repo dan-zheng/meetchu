@@ -21,9 +21,21 @@ import { default as swal } from 'sweetalert2';
 
 const selectClass = 'selected';
 
+const selectStyle = {
+  create: 'removed',
+  rsvp: 'selected',
+  finalize: 'final'
+};
+
 export default {
   name: 'meeting-time-grid',
-  props: ['title', 'times', 'days', 'select'],
+  props: ['title', 'times', 'days', 'select', 'type'],
+  created() {
+    console.log(this.type);
+    if (!this.type) {
+      throw Error('No type was specified for MeetingTimeGrid. Pick [create/rsvp/finalize].');
+    }
+  },
   data() {
     return {
       datetimes: [],
@@ -35,10 +47,10 @@ export default {
     selectedDatetimes() {
       let selected = [];
       this.datetimes.forEach((date, index) => {
-        selected = selected.concat(this.datetimes[index].filter(dt => dt.selected));
+        selected = selected.concat(this.datetimes[index].filter(dt => dt.selected).map(dt => dt.datetime));
       });
       selected.sort((a, b) => {
-        return a.datetime - b.datetime;
+        return a - b;
       });
       return selected;
     }
@@ -106,7 +118,7 @@ export default {
     style(dt) {
       let classes = '';
       if (dt.selected) {
-        classes += 'selected ';
+        classes += selectStyle[this.type] + ' ';
       }
       return classes;
     }
@@ -167,6 +179,10 @@ $time-grid-border: 1px solid $gray-dark;
   border-top: $time-grid-border;
   border-left: $time-grid-border;
 
+  &.removed {
+    color: #000;
+    background-color: #737373 !important;
+  }
   &.selected {
     color: #000;
     background-color: #69ff73 !important;

@@ -24,6 +24,7 @@
     "interval-tree-1d": "^1.0.3",
     "jquery": "^3.2.1",
     "lodash": "^4.17.4",
+    "merge-ranges": "^1.0.2",
     "moment-range": "^3.0.3",
     "sass-loader": "^6.0.3",
     "sweetalert2": "^6.6.0",

@@ -64,10 +64,10 @@ export default {
     selectedDays() {
       let selected = [];
       Object.keys(this.days).forEach((key) => {
-        selected = selected.concat(this.days[key].filter(d => d.selected));
+        selected = selected.concat(this.days[key].filter(d => d.selected).map(d => d.day));
       });
       selected.sort((a, b) => {
-        return a.day - b.day;
+        return a - b;
       });
       return selected;
     }

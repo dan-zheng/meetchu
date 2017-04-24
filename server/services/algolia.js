@@ -8,8 +8,9 @@ const client = algoliasearch(
 
 module.exports.client = client;
 module.exports.index = {};
-module.exports.index.course = client.initIndex('courses');
-module.exports.index.user = client.initIndex('user');
+module.exports.index.courses = client.initIndex('courses');
+module.exports.index.chats = client.initIndex('chats');
+module.exports.index.users = client.initIndex('users');
 
 const handleError = (err) => {
   console.error(err.message, err.stack);

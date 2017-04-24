@@ -46,7 +46,7 @@ exports.postSignup = (req, res, next) => {
       req.flash('error', err);
       return res.status(401).json(err);
     }
-    algolia.add(algolia.index.user, person.algoliaView());
+    algolia.add(algolia.index.users, person.algoliaView());
     return res.status(200).json(person.hide());
   })(req, res, next);
 };
@@ -85,7 +85,7 @@ exports.postUpdateAccount = (req, res) => {
     result.cata(
       err => res.status(401).json(err),
       () => {
-        algolia.update(algolia.index.user, person.algoliaView());
+        algolia.update(algolia.index.users, person.algoliaView());
         return res.status(200).json(person)
       }
     )
@@ -118,8 +118,8 @@ exports.postDeleteAccount = (req, res, next) => {
     result.cata(
       err => res.status(401).json(err),
       (rowsChanged) => {
-        algolia.remove(algolia.index.user, person.id);
-        return res.status(200).json(rowsChanged)
+        algolia.remove(algolia.index.users, person.id);
+        return res.status(200).json(rowsChanged);
       }
     )
   );

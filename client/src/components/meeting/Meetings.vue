@@ -68,6 +68,9 @@
           .tab-content.mt-3(v-if='hasNewMeeting')
             .tab-pane.active#new-meeting-modal-dates
               .offset-md-1.col-md-10
+                //- form.form-inline.justify-content-center.mb-2
+                  label.form-check-label.mr-2 Meeting Name
+                  input(type='text', v-model='newMeeting.name')
                 calendar(title='Dates', ref='calendar-create')
                 p.mt-2
                   strong Times:
@@ -87,7 +90,7 @@
                   i.fa.fa-calendar
                   | Select times
             .tab-pane#new-meeting-modal-times
-              meeting-time-grid(title='Times', :days='getSelectedDates()', :times='times', :select='true', ref='meeting-time-grid-create')
+              meeting-time-grid(title='Times', type='create', :days='getSelectedDates()', :times='times', ref='meeting-time-grid-create')
               .py-2.mt-2.text-center
                 button.btn.btn-primary(@click='getSelectedDatetimes(); newMeetingSubmitTab(1)')
                   i.fa.fa-user-plus
@@ -122,6 +125,7 @@
 <script>
 import { mapGetters } from 'vuex';
 import * as moment from 'moment';
+import mergeRanges from 'merge-ranges';
 import createIntervalTree from 'interval-tree-1d';
 import { map as _map, groupBy as _groupBy, range as _range } from 'lodash';
 import { default as swal } from 'sweetalert2';
@@ -230,7 +234,7 @@ export default {
           return;
         }
       } else if (tabIndex === 2) {
-
+        this.getIntervalTree();
       }
       // Set tab to be valid and go to next tab, or next option
       this.$set(this.tabValid, tabIndex, true);
@@ -240,12 +244,7 @@ export default {
         return;
       } else {
         console.log('Create meeting');
-        swal({
-          type: 'success',
-          title: 'Woohoo!',
-          text: 'Your meeting has been created!'
-        })
-        .catch(swal.noop);
+        this.createMeeting();
         this.hideModal('#new-meeting-modal');
         this.resetNewMeeting();
       }
@@ -271,7 +270,8 @@ export default {
       if (!this.newMeeting || !this.newMeeting.users) {
         this.newMeeting = {
           name: 'New Meeting',
-          users: []
+          users: [],
+          time: []
         };
       }
       // Show create meeting modal
@@ -285,7 +285,6 @@ export default {
       }
       this.isCurrentMeetingNew = false;
       this.$store.dispatch('getMeetingUsers', { meeting: this.currentMeeting });
-      this.$store.dispatch('getMeetingMessages', { meeting: this.currentMeeting });
     },
     setCurrentMeetingToNew() {
       this.currentMeeting = this.newMeeting;
@@ -303,6 +302,29 @@ export default {
         afternoon: false,
         evening: false
       };
+      this.timeRanges = null;
+    },
+    createMeeting() {
+      this.newMeeting.name = [this.user.first_name].concat(this.newMeeting.users.map(u => u.first_name)).join(', ');
+      this.newMeeting.time = JSON.stringify(this.newMeeting.time);
+      this.$store.dispatch('createMeeting', {
+        meeting: this.newMeeting,
+        users: this.newMeeting.users
+      }).then(() => {
+        swal({
+          type: 'success',
+          title: 'Woohoo!',
+          text: 'Your meeting has been created!'
+        })
+        .catch(swal.noop);
+      }).catch((e) => {
+        swal({
+          type: 'error',
+          title: 'Oops.',
+          text: e.response.data
+        })
+        .catch(swal.noop);
+      });
     },
     addUserToNewMeeting(user, index) {
       this.userHits.splice(index, 1);
@@ -324,14 +346,23 @@ export default {
       if (!this.$refs['calendar-create']) {
         return [];
       }
-      return this.$refs['calendar-create'].selectedDays.map(d => d.day.format());
+      return this.$refs['calendar-create'].selectedDays;
     },
     getSelectedDatetimes() {
       if (!this.$refs['meeting-time-grid-create']) {
         return [];
       }
       return this.$refs['meeting-time-grid-create'].selectedDatetimes;
-      // return this.$refs['meeting-time-grid-create'].selectedDays.map(d => d.day.format());
+    },
+    getIntervalTree() {
+      const datetimes = this.getSelectedDatetimes();
+      const intervals = datetimes.reduce((acc, dt) => {
+        const start = dt.unix();
+        const end = moment(dt).add(30, 'minutes').unix();
+        return acc.concat([[start, end]]);
+      }, []);
+      const tree = createIntervalTree(intervals);
+      this.newMeeting.time = mergeRanges(tree.intervals);
     },
     search(hits, query, meeting) {
       if (!query) {

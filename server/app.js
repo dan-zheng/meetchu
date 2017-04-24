@@ -156,6 +156,7 @@ app.post('/courses/sync', courseController.postCoursesSyncUser);
 
 app.get('/meetings', meetingController.postMeetings);
 app.get('/meetings/:id', meetingController.postMeeting);
+app.post('/meeting/users', meetingController.postMeetingUsers);
 app.post('/meetings/create', meetingController.postCreateMeeting);
 app.post('/meetings/:id/invite', meetingController.postInviteMeeting);
 app.post('/meetings/:id/update', meetingController.postUpdateMeeting);
