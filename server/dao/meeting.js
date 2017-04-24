@@ -21,8 +21,8 @@ module.exports = models => ({
   },
   create(person, meeting) {
     return models.pool.query(
-      'INSERT INTO meeting (name, location, description, creator_id) VALUES (?, ?, ?, ?)',
-        [meeting.name, meeting.location, meeting.description, person.id])
+      'INSERT INTO meeting (name, location, description, creator_id, time) VALUES (?, ?, ?, ?, ?)',
+        [meeting.name, meeting.location, meeting.description, person.id, meeting.time])
       .then(result => Either.Right(
         Object.assign(meeting, { id: result.insertId })))
       .errorToLeft();
@@ -75,7 +75,7 @@ module.exports = models => ({
   },
   setMeetingTimes(meeting, times) {
     return models.pool.query(
-      'REPLACE INTO meeting_time (meeting_id, time) VALUES (?, ?)', [meeting.id, times])
+      'UPDATE meeting SET time = ? WHERE id = ?', [times, meeting.id])
       .then(result => Either.Right(result.affectedRows))
       .errorToLeft();
   },

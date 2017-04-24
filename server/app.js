@@ -199,28 +199,46 @@ async function run() {
   const personDao = require('./dao/person')(models);
   const courseDao = require('./dao/course')(models);
   const chatDao = require('./dao/chat')(models);
+  const meetingDao = require('./dao/meeting')(models);
   const Either = require('monet').Either;
+  const moment = require('moment');
+  const IntervalTree = require('interval-tree-1d');
 
-  /*
+/*
+  const now = moment();
+  const start = now.unix();
+  const end = now.add(1, 'hours').unix();
+  const ranges = [[start, end]];
+  const tree = IntervalTree(ranges);
+
   const findPerson = await personDao.findByEmail('era878@gmail.com');
-  const createChat = await findPerson.flatMap(
-    found => chatDao.create({ name: 'HELLO', description: 'WORLD' })
+  const createMeeting = await findPerson.flatMap((person) => {
+    const meeting = {
+      name: 'MyMeeting',
+      location: 'Lawson',
+      description: 'Cool',
+      creator_id: findPerson.right().id,
+      time: JSON.stringify(tree.intervals)
+    };
+    return meetingDao.create(person, meeting);
+  });
+  const findMeeting = await createMeeting.flatMap(
+    createdMeeting => meetingDao.findById(createdMeeting.id)
   );
-  const addPerson = await createChat.flatMap(
-    found => chatDao.addPerson(createChat.right(), findPerson.right())
-  );
-  const addMessage = await addPerson.flatMap(
-    found => chatDao.addMessage({
-      sender_id: findPerson.right().id,
-      chat_id: createChat.right().id,
-      message: 'LOL'
-    }));
-  */
+  const time = findMeeting.map((meeting) => {
+    const parsedTree = IntervalTree(JSON.parse(meeting.time));
+    parsedTree.queryPoint(start, (interval) => {
+      console.log(interval);
+    });
+    return parsedTree;
+  });
+
+*/
 
   http.listen(app.get('port'), () => {
     console.log('Express server listening on port %d in %s mode', app.get('port'), app.get('env'));
   });
 }
 
-run();
+run().catch(err => console.error(err));
 module.exports = app;
