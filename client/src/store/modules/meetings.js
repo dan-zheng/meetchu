@@ -73,7 +73,7 @@ const actions = {
   },
   unfinalizeMeeting({ commit, rootState }, { meeting }) {
     commit(types.UNFINALIZE_MEETING, { meeting, user: rootState.user.user });
-    return Vue.axios.post('/meetings/rsvp', { meeting, user: rootState.user.user })
+    return Vue.axios.post('/meetings/unfinalize', { meeting, user: rootState.user.user })
       .then((res) => {
         return res.data;
       })
