@@ -117,5 +117,14 @@ module.exports = models => ({
       WHERE id = ?`, [person.id])
     .then(result => Either.Right(result.affectedRows))
     .errorToLeft();
+  },
+  setNotification(person, notification) {
+    return null;
+    /*
+    return models.pool.query(
+      'REPLACE INTO person_notification (body, seen) VALUES (?, ?)',
+      [notification.body, notification.seen, ]
+    )
+    */
   }
 });
