@@ -94,5 +94,11 @@ module.exports = models => ({
         [person.id, meeting.id, times])
       .then(result => Either.Right(result.affectedRows))
       .errorToLeft();
+  },
+  getPersonTimes(meeting, person) {
+    return models.pool.query(
+      'SELECT time FROM person_meeting WHERE person_id = ?', [person.id])
+      .then(times => Either.Right(times))
+      .errorToLeft();
   }
 });

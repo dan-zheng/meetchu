@@ -38,7 +38,6 @@ const authController = require('./controllers/auth');
 const chatController = require('./controllers/chat');
 const meetingController = require('./controllers/meeting');
 const courseController = require('./controllers/course');
-const notificationController = require('./controllers/notification');
 
 /**
  * Passport configuration.
@@ -136,6 +135,8 @@ app.post('/login', userController.postLogin);
 app.get('/logout', userController.getLogout);
 app.post('/account/update', userController.postUpdateAccount);
 app.post('/account/delete', userController.postDeleteAccount);
+app.post('/account/notification/add', userController.postAddNotification);
+app.post('/account/notification/delete', userController.postDeleteNotification);
 
 app.get('/profile/:id', userController.getProfile);
 
@@ -164,8 +165,6 @@ app.post('/meetings/:id/rsvp', meetingController.postRsvpMeeting);
 app.post('/meetings/:id/finalize', meetingController.postFinalizeMeeting);
 app.post('/meetings/:id/unfinalize', meetingController.postUnfinalizeMeeting);
 app.post('/meetings/:id/delete', meetingController.postDeleteMeeting);
-
-app.post('/notifications/create', notificationController.createNotification);
 
 /**
  * OAuth authentication routes.
