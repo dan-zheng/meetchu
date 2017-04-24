@@ -151,7 +151,6 @@ export default {
     getSelectedUsers(dt) {
       if (this.rsvpTimes) {
         const users = this.rsvpTimes[moment(dt.datetime).unix()];
-        console.log(users);
         if (!users) {
           return '';
         }

@@ -157,9 +157,15 @@
           button.close(type='button', data-dismiss='modal', aria-label='Close')
             span(aria-hidden='true') ×
         .modal-body
+          h6 Creator
+          .list-group.mb-3(v-if='hasCurrentMeeting')
+            router-link.list-group-item.list-group-item-action.user.rounded-0.border(:to='"/profile/" + currentMeeting.creator_id', @click='$(".modal").modal("hide")')
+              .d-flex.w-100.mx-1.justify-content-between.align-items-center
+                h5.mb-0 {{ currentMeetingCreator.first_name + ' ' + currentMeetingCreator.last_name }}
+                small.text-right {{ currentMeetingCreator.email }}
           h6 Participants
           .list-group.mb-3(v-if='hasCurrentMeeting')
-            div(v-for='user in currentMeeting.users', :key='user.email')
+            div(v-for='user in sortedCurrentMeetingUsers', :key='user.email')
               router-link.list-group-item.list-group-item-action.user.rounded-0.border(:to='"/profile/" + user.id', @click='$(".modal").modal("hide")')
                 .d-flex.w-100.mx-1.justify-content-between.align-items-center
                   h5.mb-0 {{ user.first_name + ' ' + user.last_name }}
@@ -231,12 +237,15 @@ export default {
       });
     },
     sortedCurrentMeetingUsers() {
-      const temp = this.currentMeeting.users;
+      const temp = this.currentMeeting.users.filter(u => u.id !== this.currentMeeting.creator_id);
       return temp.sort((a, b) => {
         const u1 = a.first_name + ' ' + a.last_name;
         const u2 = b.first_name + ' ' + b.last_name;
         return u1.localeCompare(u2);
       });
+    },
+    currentMeetingCreator() {
+      return this.currentMeeting.users.filter(u => u.id === this.currentMeeting.creator_id)[0];
     },
     currentMeetingDays() {
       const days = _uniqBy(_.flattenDeep(this.intervalToDatetimes(this.currentMeeting.time)),
@@ -428,9 +437,10 @@ export default {
         times
       }).then(() => {
         console.log('RSVP success.');
+        this.hideModal('#rsvp-meeting-modal');
         swal({
           type: 'success',
-          title: 'Yay!',
+          title: 'Nice!',
           text: 'You have RSVP\'d successfully.'
         })
         .catch(swal.noop);
@@ -484,7 +494,6 @@ export default {
         console.log('Unfinalize success.');
         swal({
           type: 'success',
-          title: 'Yay!',
           text: 'You have unfinalized the meeting.'
         })
         .catch(swal.noop);

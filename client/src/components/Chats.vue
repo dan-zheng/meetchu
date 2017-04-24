@@ -70,8 +70,16 @@
       p.text-muted.px-3.py-2.my-0(v-else-if='!hasChatMessages(currentChat)') Send a message!
       .list-group(v-else, v-resize='onMessageListResize', @scroll='handleScroll')
         .list-group-item.message.rounded-0.border.mt-auto(v-for='msg in currentChat.messages', :key='msg.id', :class='{ "message-new": msg.new }')
-          span.text-primary(v-if='msg.sender_id === user.id') {{ msg }}
-          span.text-success(v-else) {{ msg }}
+          span.d-flex.w-100.justify-content-between(v-if='msg.sender_id === user.id')
+            div
+              span.text-primary {{ msg.sender_first_name + ' ' + msg.sender_last_name }}:
+              span  {{ msg.body }}
+            small.text-right {{ formatDate(msg.time_sent) }}
+          span.d-flex.w-100.justify-content-between(v-else)
+            div
+              span.text-info {{ msg.sender_first_name + ' ' + msg.sender_last_name }}:
+              span  {{ msg.body }}
+            small.text-right {{ formatDate(msg.time_sent) }}
     #message-box(v-if='hasChats && !isCurrentChatNew && hasCurrentChat')
       input.px-3(v-model='currentMsg[currentChat.id]', placeholder='Type message...', @keyup.enter='sendMessage(currentChat)')
       //- // NOTE: Save until adding users to chat is completed
