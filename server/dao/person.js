@@ -118,13 +118,17 @@ module.exports = models => ({
     .then(result => Either.Right(result.affectedRows))
     .errorToLeft();
   },
-  setNotification(person, notification) {
-    return null;
-    /*
+  addNotification(person, notification) {
     return models.pool.query(
-      'REPLACE INTO person_notification (body, seen) VALUES (?, ?)',
-      [notification.body, notification.seen, ]
-    )
-    */
+      'REPLACE INTO person_notification (person_id, body, seen) VALUES (?, ?, ?)',
+      [person.id, notification.body, notification.seen])
+    .then(result => Either.Right(result.affectedRows))
+    .errorToLeft();
+  },
+  deleteNotification(person, notification) {
+    return models.pool.query(
+      'DELETE FROM person_notification WHERE id = ?', [notification.id])
+    .then(result => Either.Right(result.affectedRows))
+    .errorToLeft();
   }
 });

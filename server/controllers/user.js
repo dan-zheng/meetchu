@@ -124,3 +124,35 @@ exports.postDeleteAccount = (req, res, next) => {
     )
   );
 };
+
+/**
+ * POST /account/notification/add
+ * Add notification to user.
+ */
+exports.postAddNotification = (req, res, next) => {
+  const person = req.body.user;
+  const notification = req.body.notification;
+
+  personDao.addNotification(person, notification).tap(result =>
+    result.cata(
+      err => res.status(401).json(err),
+      rowsChanged => res.status(200).json(rowsChanged)
+    )
+  );
+};
+
+/**
+ * POST /account/notification/delete
+ * Delete notification from a user.
+ */
+exports.postDeleteNotification = (req, res, next) => {
+  const person = req.body.user;
+  const notification = req.body.notifcation;
+
+  personDao.deleteNotification(person, notification).tap(result =>
+    result.cata(
+      err => res.status(401).json(err),
+      rowsChanged => res.status(200).json(rowsChanged)
+    )
+  );
+};

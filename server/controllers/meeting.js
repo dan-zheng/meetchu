@@ -62,7 +62,7 @@ exports.postCreateMeeting = async (req, res) => {
   const createMeeting = await meetingDao.create(creator, meeting);
   const addPeople = await createMeeting.flatMap((createdMeeting) => {
     if (people.isEmpty()) {
-      return 0;
+      return Either.Right(0);
     }
     return meetingDao.addPeople(createdMeeting, people);
   });
