@@ -3,10 +3,12 @@ import * as types from '../mutation-types';
 import * as moment from 'moment';
 
 const state = {
+  newMeeting: {},
   meetings: []
 };
 
 const getters = {
+  newMeeting: state => state.newMeeting,
   meetings: state => state.meetings,
   sortedMeetings: state => {
     const temp = state.meetings.slice(0);
@@ -30,6 +32,9 @@ const getters = {
 };
 
 const actions = {
+  setNewMeeting({ commit }, { meeting }) {
+    commit(types.SET_NEW_MEETING, { meeting });
+  },
   getMeetings({ commit, rootState }) {
     return Vue.axios.post('/meetings', { user: rootState.user.user })
       .then(res => {
@@ -101,6 +106,9 @@ const actions = {
 };
 
 const mutations = {
+  [types.SET_NEW_MEETING](state, meeting) {
+    state.newMeeting = meeting;
+  },
   [types.SET_MEETINGS](state, meetings) {
     state.meetings = meetings;
   },

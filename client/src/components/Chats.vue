@@ -273,7 +273,7 @@ export default {
     },
     removeUserFromNewChat(user, index) {
       this.newChat.users.splice(index, 1);
-      this.search("userHits", this.userQuery);
+      this.search("userHits", this.userQuery, this.newChat);
     },
     removeUserFromCurrentChatNewUsers(user, index) {
       this.currentChatNewUsers.splice(index, 1);

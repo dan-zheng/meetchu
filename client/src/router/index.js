@@ -12,7 +12,7 @@ import Account from '../components/Account';
 import Profile from '../components/Profile';
 import Chats from '../components/Chats';
 import Courses from '../components/Courses';
-import Meetings from '../components/Meetings';
+import Meetings from '../components/meeting/Meetings';
 // Test view
 import Test from '../components/Test';
 
