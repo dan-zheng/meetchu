@@ -46,6 +46,7 @@
     "express-validator": "^3.1.2",
     "interval-tree-1d": "^1.0.3",
     "lodash": "^4.17.4",
+    "merge-ranges": "^1.0.2",
     "moment": "^2.18.1",
     "moment-range": "^3.0.3",
     "monet": "^0.8.10",

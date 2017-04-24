@@ -21,8 +21,8 @@ module.exports = models => ({
   /**
    * @return Promise[Either[String, Integer]]
    */
-  addPerson(course, person) {
-    return this.addPersonBulk([course], person);
+  addPerson(courseId, person) {
+    return this.addPersonBulk([courseId], person);
   },
   /**
    * @return Promise[Either[String, Integer]]

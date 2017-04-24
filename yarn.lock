@@ -2124,6 +2124,10 @@ merge-descriptors@1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/merge-descriptors/-/merge-descriptors-1.0.1.tgz#b00aaa556dd8b44568150ec9d1b953f3f90cbb61"
 
+merge-ranges@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/merge-ranges/-/merge-ranges-1.0.2.tgz#0e4fcaac77302079c8b30720c2fe9ba9300e535f"
+
 methods@^1.1.1, methods@~1.1.2:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/methods/-/methods-1.1.2.tgz#5529a4d67654134edcc5266656835b0f851afcee"

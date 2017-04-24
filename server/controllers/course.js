@@ -42,9 +42,9 @@ exports.postCourseUsers = (req, res) => {
  * Add a user to a course.
  */
 exports.postCourseAddUser = (req, res) => {
-  const course = req.body.course;
-  const person = new models.Person(req.body.user);
-  courseDao.addPerson(course, person).tap(result =>
+  const courseId = req.body.course.id;
+  const person = req.body.user;
+  courseDao.addPerson(courseId, person).tap(result =>
     result.cata(
       err => res.status(401).json(err),
       () => res.status(200).json(true)
