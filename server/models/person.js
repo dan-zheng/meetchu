@@ -1,46 +1,50 @@
 const bcrypt = require('bcrypt-nodejs');
 
-function Person(data) {
-  Object.assign(this, data);
-}
-
-Person.prototype.verifyPassword = function (password) {
-  return bcrypt.compareSync(password, this.password);
-};
-
-Person.prototype.withPassword = function (password) {
-  const salt = bcrypt.genSaltSync(10);
-  const hash = bcrypt.hashSync(password, salt);
-  return Object.assign(this, { password: hash });
-};
-
 const DEFAULT_HIDDEN_FIELDS = [
   'password',
   'reset_password_token',
   'reset_password_expiration'
 ];
 
-Person.prototype.view = function (fields) {
-  return new Person(
-    Object.assign({}, ...Object.keys(this)
-      .filter(key => fields.includes(key))
-      .map(key => ({ [key]: this[key] }))));
-};
-
-Person.prototype.hide = function (fields = DEFAULT_HIDDEN_FIELDS) {
-  return this.view(
-    Object.keys(this).filter(key => !fields.includes(key))
-  );
-};
-
-Person.prototype.isHidden = function (field) {
-  return this[`privacy_show_${field}`] === 0;
-};
-
-Person.prototype.publicView = function () {
-  return this.view(
-    Object.keys(this).filter(key => !this.isHidden(key))
-  );
+const Person = class Person {
+  constructor(data) {
+    Object.assign(this, data);
+  }
+  verifyPassword(password) {
+    return bcrypt.compareSync(password, this.password);
+  }
+  withPassword(password) {
+    const salt = bcrypt.genSaltSync(10);
+    const hash = bcrypt.hashSync(password, salt);
+    return Object.assign(this, { password: hash });
+  }
+  view(fields) {
+    return new Person(
+      Object.assign({}, ...Object.keys(this)
+        .filter(key => fields.includes(key))
+        .map(key => ({ [key]: this[key] }))));
+  }
+  hide(fields = DEFAULT_HIDDEN_FIELDS) {
+    return this.view(
+      Object.keys(this).filter(key => !fields.includes(key))
+    );
+  }
+  isHidden(field) {
+    return this[`privacy_show_${field}`] === 0;
+  }
+  publicView() {
+    return this.view(
+      Object.keys(this).filter(key => !this.isHidden(key))
+    );
+  }
+  algoliaView() {
+    return {
+      objectID: this.id,
+      first_name: this.first_name,
+      last_name: this.last_name,
+      email: this.email
+    };
+  }
 };
 
 module.exports = {

@@ -17,23 +17,6 @@ const personDao = require('../dao/person')(models);
  */
 dotenv.load({ path: '.env', silent: process.env.NODE_ENV === 'production' });
 
-/**
- * Algolia.
- */
- /*
-const client = algoliasearch(process.env.ALGOLIA_ID, process.env.ALGOLIA_ADMIN_KEY);
-const userIndex = client.initIndex('users');
-const addUserToAlgolia = (user) => {
-  // Add user to Algolia index
-  const userValues = {
-    objectID: user.id,
-    first_name: user.first_name,
-    last_name: user.last_name,
-    email: user.email
-  };
-  return userIndex.addObjects([userValues]);
-};*/
-
 passport.serializeUser = ((user, done) => done(null, user.id));
 
 passport.deserializeUser = ((id, done) =>
@@ -51,6 +34,7 @@ function oauthLogin(oauthId, profile, done) {
     last_name: profile.name.familyName,
     [oauthId]: profile.id
   };
+  // TODO update algolia indexes upon external login
 
   return personDao.externalLogin(identity).tap(result =>
     result.cata(
@@ -74,7 +58,7 @@ passport.use('signup', new LocalStrategy({
   personDao.signup(person).tap(result =>
     result.cata(
       err => done(err, null),
-      person => done(null, person)
+      createdPerson => done(null, createdPerson)
     )
   );
 }));

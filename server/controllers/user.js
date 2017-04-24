@@ -4,7 +4,7 @@ const async = require('async');
 const crypto = require('crypto');
 const dotenv = require('dotenv');
 const nodemailer = require('nodemailer');
-const algoliasearch = require('algoliasearch');
+const algolia = require('../services/algolia');
 const pug = require('pug');
 const Promise = require('bluebird');
 const monet = require('monet');
@@ -31,28 +31,6 @@ const transporter = nodemailer.createTransport({
 });
 
 /**
- * Algolia configuration.
- */
-const client = algoliasearch(process.env.ALGOLIA_ID, process.env.ALGOLIA_ADMIN_KEY);
-const userIndex = client.initIndex('users');
-
-/**
- * Adds a new user to algolia.
- * @param {User} user - a user model.
- * @return {Promise} a bluebird promise.
- */
-function addUserToAlgolia(user) {
-  // Add user to Algolia index
-  const userValues = {
-    objectID: user.dataValues.id,
-    first_name: user.dataValues.first_name,
-    last_name: user.dataValues.last_name,
-    email: user.dataValues.email
-  };
-  return Promise.resolve(userIndex.addObjects([userValues]));
-}
-
-/**
  * POST /signup
  * User signup.
  */
@@ -68,6 +46,7 @@ exports.postSignup = (req, res, next) => {
       req.flash('error', err);
       return res.status(401).json(err);
     }
+    algolia.add(algolia.index.user, person.algoliaView());
     return res.status(200).json(person.hide());
   })(req, res, next);
 };
@@ -105,7 +84,10 @@ exports.postUpdateAccount = (req, res) => {
   personDao.update(person, fields).tap(result =>
     result.cata(
       err => res.status(401).json(err),
-      () => res.status(200).json(person)
+      () => {
+        algolia.update(algolia.index.user, person.algoliaView());
+        return res.status(200).json(person)
+      }
     )
   );
 };
@@ -135,7 +117,10 @@ exports.postDeleteAccount = (req, res, next) => {
   personDao.erase(person).tap(result =>
     result.cata(
       err => res.status(401).json(err),
-      rowsChanged => res.status(200).json(rowsChanged)
+      (rowsChanged) => {
+        algolia.remove(algolia.index.user, person.id);
+        return res.status(200).json(rowsChanged)
+      }
     )
   );
 };
