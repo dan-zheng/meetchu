@@ -239,7 +239,8 @@ $time-grid-border: 1px solid $gray-dark;
 @mixin time-grid-cell {
   font-size: 0.8rem;
   min-width: 110px;
-  line-height: 26px;
+  // line-height: 26px;
+  line-height: 24px;
   height: 30px;
   padding: 3px;
   margin: 1px;
@@ -282,21 +283,24 @@ $time-grid-border: 1px solid $gray-dark;
     background-color: #737373 !important;
   }
   &.selected {
-    padding: 0;
+    padding: 0px;
     border: 3px dashed #1cd078 !important;
   }
   &.final {
-    padding: 0;
-    border: 3px dashed $brand-primary !important;
+    padding: 0px;
+    color: $brand-primary !important;
+    font-weight: bold;
+    border: 3px ridge $brand-primary !important;
   }
   &.finalized {
-    padding: 0;
+    padding: 0px;
     color: #fff;
     background-color: $brand-primary !important;
+    font-weight: bold;
     border: 3px solid darken($brand-primary, 15%) !important;
   }
   &.viewing {
-    padding: 0;
+    padding: 1px;
     border: 2px solid #a079ff !important;
   }
   &.empty {
