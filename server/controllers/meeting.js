@@ -24,7 +24,7 @@ exports.postMeetings = async (req, res) => {
 
 /**
  * GET /meetings/:id
- * Meetings page.
+ * Get meeting by id.
  */
 exports.postMeeting = async (req, res) => {
   req.checkBody('meeting', 'Meeting was not specified.');

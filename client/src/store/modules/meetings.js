@@ -61,8 +61,8 @@ const actions = {
   addMeeting({ commit, rootState }, { meeting }) {
     commit(types.ADD_MEETING, meeting);
   },
-  createMeeting({ commit, rootState }, { meeting, users }) {
-    return Vue.axios.post('/meetings/create', { meeting, users })
+  createMeeting({ commit, rootState }, { meeting, users, times }) {
+    return Vue.axios.post('/meetings/create', { meeting, users, times, creator: rootState.user.user })
       .then((res) => {
         commit(types.ADD_MEETING, res.data);
         return res.data;

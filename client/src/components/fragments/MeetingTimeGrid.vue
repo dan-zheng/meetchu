@@ -68,7 +68,7 @@ export default {
             datetime: moment(day).hour(time.hour()).minute(time.minute()),
             row: timeIndex,
             col: dayIndex,
-            selected: false
+            selected: this.select
           }
           return acc.concat([dt]);
         }, []);

@@ -21,6 +21,7 @@
     "bootstrap-vue": "^0.12.4",
     "dotenv-webpack": "^1.4.3",
     "font-awesome-loader": "^1.0.2",
+    "interval-tree-1d": "^1.0.3",
     "jquery": "^3.2.1",
     "lodash": "^4.17.4",
     "moment-range": "^3.0.3",

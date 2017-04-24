@@ -35,31 +35,6 @@
         span(v-else) Meeting Info
     #users-list
       div(v-if='isCurrentMeetingNew')
-      //-
-        #new-meeting-input.d-flex.align-items-center
-          span.mx-2 To:
-          input#user-search-input.px-2(v-model='userQuery', placeholder='Search for users...', @keyup='search("userHits", userQuery, newMeeting)')
-
-        .card.m-3.p-2
-          small(v-if='userQuery.length === 0') Enter a query. You can search by user first name, last name, or email.
-          small.text-info(v-else-if='userHits.length > 0') Matches
-          small.text-warning(v-else-if='userQuery.length > 0 && typeof newMeeting !== "undefined"') No matches.
-          .list-group
-            .list-group-item.list-group-item-action.rounded-0.border(v-for='(user, index) in sortedHitUsers', :key='user.objectId', @click='addUserToNewMeeting(user, index)')
-              .d-flex.w-100.mx-1.justify-content-between.align-items-center
-                h5.m-0 {{ user.first_name + ' ' + user.last_name }}
-                small.text-right(style='min-width: 80px;') {{ user.email }}
-          small.text-success(v-if='newMeeting.users.length > 0') Selected
-          .list-group
-            .list-group-item.list-group-item-action.rounded-0.border(v-for='(user, index) in sortedNewMeetingUsers', :key='user.id', @click='removeUserFromNewMeeting(user, index)')
-              .d-flex.w-100.mx-1.justify-content-between.align-items-center
-                i.fa.fa-check.text-success
-                h5.m-0 {{ user.first_name + ' ' + user.last_name }}
-                small.text-right(style='min-width: 80px;') {{ user.email }}
-          .py-2.text-center
-            button.btn.btn-primary(@click='createMeeting(newMeeting)')
-              i.fa.fa-plus-circle
-              | Create meeting
     //-
       p.text-muted.px-3.py-2.my-0(v-else-if='!hasMeetings') Create a meeting!
       p.text-muted.px-3.py-2.my-0(v-else-if='!hasCurrentMeeting') Click on a meeting to see meeting information!
@@ -112,7 +87,7 @@
                   i.fa.fa-calendar
                   | Select times
             .tab-pane#new-meeting-modal-times
-              meeting-time-grid(title='Times', :days='getSelectedDates()', :times='times', ref='meeting-time-grid-create')
+              meeting-time-grid(title='Times', :days='getSelectedDates()', :times='times', :select='true', ref='meeting-time-grid-create')
               .py-2.mt-2.text-center
                 button.btn.btn-primary(@click='getSelectedDatetimes(); newMeetingSubmitTab(1)')
                   i.fa.fa-user-plus
@@ -140,13 +115,14 @@
                       small.text-right(style='min-width: 80px;') {{ user.email }}
                 .py-2.mt-2.text-center
                   button.btn.btn-primary(@click='newMeetingSubmitTab(2)')
-                    i.fa.fa-calendar-plus
+                    i.fa.fa-calendar-plus-o
                     | Create meeting
 </template>
 
 <script>
 import { mapGetters } from 'vuex';
 import * as moment from 'moment';
+import createIntervalTree from 'interval-tree-1d';
 import { map as _map, groupBy as _groupBy, range as _range } from 'lodash';
 import { default as swal } from 'sweetalert2';
 import { userIndex } from '../../common/algolia';
@@ -265,7 +241,7 @@ export default {
       } else {
         console.log('Create meeting');
         swal({
-          type: 'succcess',
+          type: 'success',
           title: 'Woohoo!',
           text: 'Your meeting has been created!'
         })
