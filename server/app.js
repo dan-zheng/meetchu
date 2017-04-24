@@ -155,16 +155,16 @@ app.post('/course/add', courseController.postCourseAddUser);
 app.post('/course/remove/', courseController.postCourseRemoveUser);
 app.post('/courses/sync', courseController.postCoursesSyncUser);
 
-app.get('/meetings', meetingController.postMeetings);
-app.get('/meetings/:id', meetingController.postMeeting);
+app.post('/meetings', meetingController.postMeetings);
+app.post('/meeting', meetingController.postMeeting);
 app.post('/meeting/users', meetingController.postMeetingUsers);
 app.post('/meetings/create', meetingController.postCreateMeeting);
-app.post('/meetings/:id/invite', meetingController.postInviteMeeting);
-app.post('/meetings/:id/update', meetingController.postUpdateMeeting);
-app.post('/meetings/:id/rsvp', meetingController.postRsvpMeeting);
-app.post('/meetings/:id/finalize', meetingController.postFinalizeMeeting);
-app.post('/meetings/:id/unfinalize', meetingController.postUnfinalizeMeeting);
-app.post('/meetings/:id/delete', meetingController.postDeleteMeeting);
+app.post('/meetings/invite', meetingController.postInviteMeeting);
+app.post('/meetings/update', meetingController.postUpdateMeeting);
+app.post('/meetings/rsvp', meetingController.postRsvpMeeting);
+app.post('/meetings/finalize', meetingController.postFinalizeMeeting);
+app.post('/meetings/unfinalize', meetingController.postUnfinalizeMeeting);
+app.post('/meetings/delete', meetingController.postDeleteMeeting);
 
 /**
  * OAuth authentication routes.

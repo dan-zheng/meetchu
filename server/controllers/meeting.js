@@ -3,7 +3,7 @@ const meetingDao = require('../dao/meeting')(models);
 const Either = require('monet').Either;
 
 /**
- * GET /meetings
+ * POST /meetings
  * Meetings home page.
  */
 exports.postMeetings = async (req, res) => {
@@ -24,7 +24,7 @@ exports.postMeetings = async (req, res) => {
 };
 
 /**
- * GET /meetings/:id
+ * POST /meeting
  * Get meeting by id.
  */
 exports.postMeeting = async (req, res) => {
@@ -54,7 +54,7 @@ exports.postMeetingUsers = (req, res) => {
   meetingDao.getPeopleByMeeting(meeting).then(result =>
     result.cata(
       err => res.status(401).json(err),
-      people => res.status(200).json(people.toArray())
+      people => res.status(200).json(people.toArray().map(p => p.hide()))
     )
   );
 };
@@ -73,9 +73,8 @@ exports.postCreateMeeting = async (req, res) => {
   }
 
   const creator = req.body.creator;
-  const people = req.body.users || [];
   const meeting = req.body.meeting;
-  console.log(meeting.time);
+  const people = [creator, ...req.body.users] || [creator];
   const createMeeting = await meetingDao.create(creator, meeting);
   const addPeople = await createMeeting.flatMap((createdMeeting) => {
     if (people.length === 0) {
@@ -85,14 +84,12 @@ exports.postCreateMeeting = async (req, res) => {
   });
   addPeople.cata(
     err => res.status(401).json(err),
-    () => {
-      console.log('hi');
-      return res.status(200).json(createMeeting.right())}
+    () => res.status(200).json(createMeeting.right())
   );
 };
 
 /**
- * POST /meetings/:id/update
+ * POST /meetings/update
  * Update meeting information.
  */
 exports.postUpdateMeeting = async (req, res) => {
@@ -114,7 +111,7 @@ exports.postUpdateMeeting = async (req, res) => {
 };
 
 /**
- * POST /meetings/:id/rsvp
+ * POST /meetings/rsvp
  * RSVP to a meeting.
  */
 exports.postRsvpMeeting = async (req, res) => {
@@ -140,12 +137,13 @@ exports.postRsvpMeeting = async (req, res) => {
 };
 
 /**
- * POST /meetings/:id/finalize
+ * POST /meetings/finalize
  * Finalize meeting time.
  */
 exports.postFinalizeMeeting = async (req, res) => {
   req.checkBody('meeting', 'Meeting was not specified');
   req.checkBody('meeting.id', 'Meeting id was not specified.');
+  // req.checkBody('user.id', 'You are not the meeting creator.').equals(req.body.meeting.creator_id);
   const errors = await req.getValidationResult();
   if (!errors.isEmpty()) {
     return res.status(401).json(errors);
@@ -161,12 +159,13 @@ exports.postFinalizeMeeting = async (req, res) => {
 };
 
 /**
- * POST /meetings/:id/unfinalize
+ * POST /meetings/unfinalize
  * Unfinalize meeting time.
  */
 exports.postUnfinalizeMeeting = async (req, res) => {
   req.checkBody('meeting', 'Meeting was not specified');
   req.checkBody('meeting.id', 'Meeting id was not specified.');
+  // req.checkBody('user.id', 'You are not the meeting creator.').equals(req.body.meeting.creator_id);
   const errors = await req.getValidationResult();
   if (!errors.isEmpty()) {
     return res.status(401).json(errors);
@@ -183,7 +182,7 @@ exports.postUnfinalizeMeeting = async (req, res) => {
 };
 
 /**
- * POST /meetings/:id/invite
+ * POST /meetings/invite
  * Invite users to meeting.
  */
 exports.postInviteMeeting = async (req, res) => {
@@ -207,7 +206,7 @@ exports.postInviteMeeting = async (req, res) => {
 
 
 /**
- * POST /meetings/:id/leave
+ * POST /meetings/leave
  * Leave a meeting.
  */
 exports.postLeaveMeetingGroup = async (req, res) => {
@@ -230,7 +229,7 @@ exports.postLeaveMeetingGroup = async (req, res) => {
 };
 
 /**
- * POST /meetings/:id/delete
+ * POST /meetings/delete
  * Delete a meeting.
  */
 exports.postDeleteMeeting = async (req, res) => {

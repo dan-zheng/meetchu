@@ -19,6 +19,7 @@
     "bootstrap-loader": "^2.0.0",
     "bootstrap-social": "^5.1.1",
     "bootstrap-vue": "^0.12.4",
+    "color": "^1.0.3",
     "dotenv-webpack": "^1.4.3",
     "font-awesome-loader": "^1.0.2",
     "interval-tree-1d": "^1.0.3",

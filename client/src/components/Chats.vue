@@ -26,9 +26,9 @@
             h5.word-wrap.mb-1 {{ chat.name }}
   #current-chat.d-flex.flex-column.col-8.px-0(v-model='currentChat')
     #chat-name.d-flex.text-center.px-4.align-items-stretch(v-if='hasCurrentChat')
-      span.ml-auto
+      span.ml-auto(style='width: 25px;')
       h2.my-2(style='min-height: 35px') {{ currentChat.name }}
-      span.d-flex.px-0.ml-auto.align-items-center
+      span.d-flex.px-0.ml-auto.align-items-center(style='width: 25px;')
         a.ml-auto(@click='resetCurrentChatNewUsers(); showModal("#chat-settings-modal");')
           i.fa.fa-lg.fa-cog
     .d-flex.text-center.px-4.align-items-center(v-else)
@@ -421,6 +421,10 @@ export default {
       $(modalId).modal('hide');
     },
     validationStyle
+  },
+  beforeRouteLeave(to, from, next) {
+    $('.modal').modal('hide');
+    next();
   }
 }
 </script>

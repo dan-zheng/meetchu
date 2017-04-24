@@ -51,9 +51,32 @@ const actions = {
         throw err;
       });
   },
-  getMeetingTimes({ commit }, { meeting }) {
-    return Vue.axios.post('/meeting/messages', { meeting })
-      .then(res => commit(types.SET_MEETING_TIMES, { meeting, messages: res.data }))
+  rsvpMeeting({ commit, rootState }, { meeting, times }) {
+    commit(types.RSVP_MEETING, { meeting, times, user: rootState.user.user });
+    return Vue.axios.post('/meetings/rsvp', { meeting, times, user: rootState.user.user })
+      .then((res) => {
+        return res.data;
+      })
+      .catch((err) => {
+        throw err;
+      });
+  },
+  finalizeMeeting({ commit, rootState }, { meeting, final_time }) {
+    commit(types.FINALIZE_MEETING, { meeting, final_time, user: rootState.user.user });
+    return Vue.axios.post('/meetings/finalize', { meeting, user: rootState.user.user })
+      .then((res) => {
+        return res.data;
+      })
+      .catch((err) => {
+        throw err;
+      });
+  },
+  unfinalizeMeeting({ commit, rootState }, { meeting }) {
+    commit(types.UNFINALIZE_MEETING, { meeting, user: rootState.user.user });
+    return Vue.axios.post('/meetings/rsvp', { meeting, user: rootState.user.user })
+      .then((res) => {
+        return res.data;
+      })
       .catch((err) => {
         throw err;
       });
@@ -115,6 +138,19 @@ const mutations = {
   [types.SET_MEETING_USERS](state, { meeting, users }) {
     const index = state.meetings.findIndex(m => m.id === meeting.id);
     Vue.set(state.meetings[index], 'users', users);
+  },
+  [types.RSVP_MEETING](state, { meeting, times, user }) {
+    const index = state.meetings.findIndex(m => m.id === meeting.id);
+    const userIndex = state.meetings[index].users.findIndex(u => u.id === user.id);
+    Vue.set(state.meetings[index].users[userIndex], 'time', times);
+  },
+  [types.FINALIZE_MEETING](state, { meeting, user, final_time }) {
+    const index = state.meetings.findIndex(m => m.id === meeting.id);
+    Vue.set(state.meetings[index], 'final_time', final_time);
+  },
+  [types.UNFINALIZE_MEETING](state, { meeting, user }) {
+    const index = state.meetings.findIndex(m => m.id === meeting.id);
+    Vue.set(state.meetings[index], 'final_time', null);
   },
   [types.ADD_MEETING](state, meeting) {
     state.meetings.push(meeting);

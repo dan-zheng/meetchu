@@ -32,7 +32,7 @@ exports.postChatUsers = (req, res) => {
   chatDao.getPeopleByChat(chat).then(result =>
     result.cata(
       err => res.status(401).json(err),
-      people => res.status(200).json(people.toArray())
+      people => res.status(200).json(people.toArray().map(p => p.hide()))
     )
   );
 };

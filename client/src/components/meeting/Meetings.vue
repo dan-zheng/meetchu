@@ -4,30 +4,26 @@
     .d-flex.text-center.px-4.align-items-stretch
       h2.my-2 Meetings
       span.d-flex.px-0.ml-auto.align-items-center
-        //- router-link.text-primary.d-flex.align-items-center(to='/meetings/create')
-          i.fa.fa-lg.fa-plus-square
-        // a.text-primary.d-flex.align-items-center(@click='resetNewMeeting(); clear(["userHits", "userQuery"]); startNewMeeting();')
         a.text-primary.d-flex.align-items-center(@click='clear(["userHits", "userQuery"]); startNewMeeting();')
           i.fa.fa-lg.fa-plus-square
     #meetings-list
       p.text-muted.px-3.py-2.my-0(v-if='!hasNewMeeting && !hasMeetings') You are not in any meetings.
       .list-group(v-else)
-        .list-group-item.list-group-item-action.meeting.rounded-0.border(v-if='hasNewMeeting', :class='{ active: isCurrentMeetingNew }', @click='setCurrentMeeting(newMeeting, true)')
-          .d-flex.w-100.justify-content-between.flex-wrap
-            h5.mb-1 New Meeting
         .list-group-item.list-group-item-action.meeting.rounded-0.border(v-for='meeting in sortedMeetings', :key='meeting.id', v-bind:class='{ active: currentMeeting == meeting }', @click='setCurrentMeeting(meeting)')
-          // p {{ meeting }}
           .d-flex.w-100.justify-content-between
             h5.mb-1 {{ meeting.name }}
           p.mb-1
             strong {{ meeting.location }}
+            .d-flex.w-100(v-if='meeting.final_time')
+              strong.mr-2 Time:
+              p  {{ formatDatetime(meeting.final_time) }}
   #current-meeting.d-flex.flex-column.col-sm-8.px-0(v-model='currentMeeting')
     #meeting-name.d-flex.text-center.px-4.align-items-stretch(v-if='hasCurrentMeeting')
-      span.ml-auto
+      span.ml-auto(style='width: 25px;')
       h2.my-2(style='min-height: 35px') {{ currentMeeting.name }}
-      span.d-flex.px-0.ml-auto.align-items-center
+      span.d-flex.px-0.ml-auto.align-items-center(style='width: 25px;')
         // a.ml-auto(@click='resetCurrentMeetingNewUsers(); showModal("#meeting-settings-modal");')
-        a.ml-auto
+        a.ml-auto(@click='showModal("#meeting-settings-modal");')
           i.fa.fa-lg.fa-cog
     .d-flex.text-center.px-4.align-items-center(v-else)
       h2.mx-auto.my-2(style='min-height: 35px')
@@ -35,17 +31,22 @@
         span(v-else) Meeting Info
     #users-list
       div(v-if='isCurrentMeetingNew')
-    //-
       p.text-muted.px-3.py-2.my-0(v-else-if='!hasMeetings') Create a meeting!
       p.text-muted.px-3.py-2.my-0(v-else-if='!hasCurrentMeeting') Click on a meeting to see meeting information!
-      h4.subtitle.px-2.py-2.my-0(v-else) Participants
-        span(v-if='hasCurrentMeetingUsers')  ({{ currentMeeting.users.length }})
-      .list-group(v-if='hasCurrentMeeting')
-        div(v-for='user in currentMeeting.users', :key='user.email')
-          router-link.list-group-item.list-group-item-action.user.rounded-0.border(:to='"/profile/" + user.id')
-            .d-flex.w-100.mx-1.justify-content-between.align-items-center
-              h5.mb-0 {{ user.first_name + ' ' + user.last_name }}
-              small.text-right {{ user.email }}
+      .offset-md-1.col-md-10.mt-3(v-else-if='currentMeeting.users')
+        meeting-time-grid(title='Meeting Info', type='view', :days='currentMeetingDays', :times='currentMeetingTimes', :select='false', ref='meeting-time-grid-view', display='view', :rsvp-times='currentMeetingRsvpTimes', :user-count='currentMeeting.users.length', :final-time='currentMeeting.final_time')
+        .py-2.mt-1.text-center
+          .btn-group(v-if='!currentMeeting.final_time', role='group')
+            button.btn.btn-primary(@click='showModal("#rsvp-meeting-modal")')
+              i.fa.fa-calendar-plus-o
+              | RSVP
+            button.btn.btn-primary(v-if='user.id === currentMeeting.creator_id', @click='showModal("#finalize-meeting-modal")')
+              i.fa.fa-calendar-check-o
+              | Finalize
+          .btn-group(v-else, role='group')
+            button.btn.btn-primary(@click='unfinalizeCurrentMeeting')
+              i.fa.fa-calendar-minus-o
+              | Unfinalize
 
   //- Modals
   .modal.fade#new-meeting-modal(tabindex='-1', role='dialog', aria-labelledby='newMeetingModalLabel', aria-hidden='true')
@@ -73,7 +74,7 @@
                   input(type='text', v-model='newMeeting.name')
                 calendar(title='Dates', ref='calendar-create')
                 p.mt-2
-                  strong Times:
+                  strong Time of day:
                   span  You can select more specific times later.
                 form.form-inline.justify-content-center
                   .form-check.mb-2.mr-sm-2.mb-sm-0
@@ -90,7 +91,7 @@
                   i.fa.fa-calendar
                   | Select times
             .tab-pane#new-meeting-modal-times
-              meeting-time-grid(title='Times', type='create', :days='getSelectedDates()', :times='times', ref='meeting-time-grid-create')
+              meeting-time-grid(title='Times', type='create', :days='getSelectedDates()', :times='times', :select='true', ref='meeting-time-grid-create')
               .py-2.mt-2.text-center
                 button.btn.btn-primary(@click='getSelectedDatetimes(); newMeetingSubmitTab(1)')
                   i.fa.fa-user-plus
@@ -120,6 +121,49 @@
                   button.btn.btn-primary(@click='newMeetingSubmitTab(2)')
                     i.fa.fa-calendar-plus-o
                     | Create meeting
+  .modal.fade#rsvp-meeting-modal(tabindex='-1', role='dialog', aria-labelledby='newMeetingModalLabel', aria-hidden='true')
+    .modal-dialog.modal-lg
+      .modal-content
+        .modal-header
+          h5.modal-title Meeting RSVP
+          button.close(type='button', data-dismiss='modal', aria-label='Close')
+            span(aria-hidden='true') ×
+        .modal-body(v-if='hasCurrentMeeting && currentMeeting.users')
+          p Select times when you are available.
+          meeting-time-grid(title='RSVP', type='rsvp', :days='currentMeetingDays', :times='currentMeetingTimes', :select='false', ref='meeting-time-grid-rsvp', display='rsvp', :rsvp-times='currentMeetingRsvpTimes', :user-count='currentMeeting.users.length')
+          .py-2.mt-1.text-center
+            button.btn.btn-primary(@click='rsvpCurrentMeeting')
+              i.fa.fa-calendar-plus-o
+              | RSVP
+  .modal.fade#finalize-meeting-modal(tabindex='-1', role='dialog', aria-labelledby='newMeetingModalLabel', aria-hidden='true')
+    .modal-dialog.modal-lg
+      .modal-content
+        .modal-header
+          h5.modal-title Finalize meeting time
+          button.close(type='button', data-dismiss='modal', aria-label='Close')
+            span(aria-hidden='true') ×
+        .modal-body(v-if='hasCurrentMeeting && currentMeeting.users')
+          p Select a final time for the meeting.
+          meeting-time-grid(title='Finalize', type='finalize', :days='currentMeetingDays', :times='currentMeetingTimes', :select='false', ref='meeting-time-grid-finalize', display='finalize', :rsvp-times='currentMeetingRsvpTimes', :user-count='currentMeeting.users.length', :final-time='currentMeeting.final_time')
+          .py-2.mt-1.text-center
+            button.btn.btn-primary(@click='finalizeCurrentMeeting')
+              i.fa.fa-calendar-check-o
+              | Finalize
+  .modal.fade#meeting-settings-modal(tabindex='-1', role='dialog', aria-labelledby='newMeetingModalLabel', aria-hidden='true')
+    .modal-dialog.modal-lg
+      .modal-content
+        .modal-header
+          h5.modal-title Meeting settings
+          button.close(type='button', data-dismiss='modal', aria-label='Close')
+            span(aria-hidden='true') ×
+        .modal-body
+          h6 Participants
+          .list-group.mb-3(v-if='hasCurrentMeeting')
+            div(v-for='user in currentMeeting.users', :key='user.email')
+              router-link.list-group-item.list-group-item-action.user.rounded-0.border(:to='"/profile/" + user.id', @click='$(".modal").modal("hide")')
+                .d-flex.w-100.mx-1.justify-content-between.align-items-center
+                  h5.mb-0 {{ user.first_name + ' ' + user.last_name }}
+                  small.text-right {{ user.email }}
 </template>
 
 <script>
@@ -127,7 +171,7 @@ import { mapGetters } from 'vuex';
 import * as moment from 'moment';
 import mergeRanges from 'merge-ranges';
 import createIntervalTree from 'interval-tree-1d';
-import { map as _map, groupBy as _groupBy, range as _range } from 'lodash';
+import { flatten as _flatten, groupBy as _groupBy, map as _map, range as _range, uniq as _uniq, uniqBy as _uniqBy } from 'lodash';
 import { default as swal } from 'sweetalert2';
 import { userIndex } from '../../common/algolia';
 import { validationStyle } from '../../common/form';
@@ -160,7 +204,8 @@ export default {
       currentMeeting: null,
       isCurrentMeetingNew: false,
       userQuery: '',
-      userHits: []
+      userHits: [],
+      progress: 0
     }
   },
   computed: {
@@ -193,8 +238,18 @@ export default {
         return u1.localeCompare(u2);
       });
     },
+    currentMeetingDays() {
+      const days = _uniqBy(_.flattenDeep(this.intervalToDatetimes(this.currentMeeting.time)),
+        (d => moment(d).startOf('day').unix()));
+      return days;
+    },
+    currentMeetingTimes() {
+      const times = _uniqBy(_.flattenDeep(this.intervalToDatetimes(this.currentMeeting.time)),
+        (t => moment(t).hour() * 60 + moment(t).minute()));
+      return times;
+    },
     hasMeetings() {
-      return this.meetings.length > 0;
+      return typeof this.meetings !== 'undefined' && this.meetings.length > 0;
     },
     hasNewMeeting() {
       return typeof this.newMeeting !== 'undefined' && this.newMeeting !== null;
@@ -204,7 +259,46 @@ export default {
     },
     hasCurrentMeetingUsers() {
       return typeof this.currentMeeting.users !== 'undefined' && this.currentMeeting.users.length > 1;
+    },
+    currentMeetingRsvpTimes() {
+      // TODO: Optimize
+      if (!this.currentMeeting || !this.currentMeeting.users) {
+        return [];
+      }
+      const _datetimes = _.flattenDeep(this.intervalToDatetimes(this.currentMeeting.time)).map(dt => dt.unix());
+      const meetingTimes = _.zipObject(_datetimes, _datetimes.map(dt => []));
+      this.currentMeeting.users.forEach((u) => {
+        const userTimes = _.flattenDeep(this.intervalToDatetimes(u.time).map(dts => {
+          dts.splice(-1);
+          return dts.map(dt => dt.unix());
+        }));
+        userTimes.forEach((dt) => {
+          meetingTimes[dt].push({
+            id: u.id,
+            first_name: u.first_name,
+            last_name: u.last_name
+          });
+        })
+      });
+      return meetingTimes;
     }
+  },
+  beforeCreate() {
+    this.$store.dispatch('getMeetings')
+      .then(() => {
+        if (this.sortedMeetings.length > 0) {
+          if (this.$route.query.meeting) {
+            const id = parseInt(this.$route.query.meeting);
+            const temp = this.sortedMeetings.find(c => c.id === id);
+            if (temp) {
+              this.currentMeeting = temp;
+            }
+          } else {
+            this.currentMeeting = this.sortedMeetings[0];
+          }
+          this.$store.dispatch('getMeetingUsers', { meeting: this.currentMeeting });
+        }
+      });
   },
   created() {
     this.resetNewMeeting();
@@ -234,7 +328,7 @@ export default {
           return;
         }
       } else if (tabIndex === 2) {
-        this.getIntervalTree();
+        this.newMeeting.time = this.getTimeIntervals(this.getSelectedDatetimes());
       }
       // Set tab to be valid and go to next tab, or next option
       this.$set(this.tabValid, tabIndex, true);
@@ -326,6 +420,84 @@ export default {
         .catch(swal.noop);
       });
     },
+    rsvpCurrentMeeting() {
+      const intervals = this.getTimeIntervals(_.flattenDeep(this.getRsvpDatetimes()));
+      const times = JSON.stringify(intervals);
+      this.$store.dispatch('rsvpMeeting', {
+        meeting: this.currentMeeting,
+        times
+      }).then(() => {
+        console.log('RSVP success.');
+        swal({
+          type: 'success',
+          title: 'Yay!',
+          text: 'You have RSVP\'d successfully.'
+        })
+        .catch(swal.noop);
+      }).catch((e) => {
+        console.log('RSVP fail.');
+        swal({
+          type: 'error',
+          title: 'Oops.',
+          text: e.response.data
+        })
+        .catch(swal.noop);
+      });
+    },
+    finalizeCurrentMeeting() {
+      if (!this.$refs['meeting-time-grid-finalize'].selectedDatetimes[0]) {
+        swal({
+          type: 'error',
+          title: 'Oopsies.',
+          text: 'Please select a final time for your meeting.'
+        })
+        .catch(swal.noop);
+        return;
+      }
+      const final_time = moment(this.$refs['meeting-time-grid-finalize'].selectedDatetimes[0]).format('YYYY-MM-DD H:mm:ss');
+      this.$store.dispatch('finalizeMeeting', {
+        meeting: this.currentMeeting,
+        final_time
+      }).then(() => {
+        console.log('Finalize success.');
+        this.hideModal('#finalize-meeting-modal');
+        swal({
+          type: 'success',
+          title: 'Yay!',
+          text: 'You have finalized the meeting.'
+        })
+        .catch(swal.noop);
+      }).catch((e) => {
+        console.log('Finalize fail.');
+        swal({
+          type: 'error',
+          title: 'Oops.',
+          text: e.response.data
+        })
+        .catch(swal.noop);
+      });
+    },
+    unfinalizeCurrentMeeting() {
+      this.$store.dispatch('unfinalizeMeeting', {
+        meeting: this.currentMeeting
+      }).then(() => {
+        console.log('Unfinalize success.');
+        swal({
+          type: 'success',
+          title: 'Yay!',
+          text: 'You have unfinalized the meeting.'
+        })
+        .catch(swal.noop);
+      }).catch((e) => {
+        console.log('Unfinalize fail.');
+        swal({
+          type: 'error',
+          title: 'Oops.',
+          text: e.response.data
+        })
+        .catch(swal.noop);
+      });
+    },
     addUserToNewMeeting(user, index) {
       this.userHits.splice(index, 1);
       this.newMeeting.users.push(user);
@@ -354,15 +526,36 @@ export default {
       }
       return this.$refs['meeting-time-grid-create'].selectedDatetimes;
     },
-    getIntervalTree() {
-      const datetimes = this.getSelectedDatetimes();
+    getRsvpDatetimes() {
+      if (!this.$refs['meeting-time-grid-rsvp']) {
+        return [];
+      }
+      return this.$refs['meeting-time-grid-rsvp'].selectedDatetimes;
+    },
+    intervalToDatetimes(interval) {
+      if (!interval) {
+        return [];
+      }
+      const intervals = JSON.parse(interval);
+      const ranges = intervals.reduce((acc, i) => {
+        const range = moment.range(moment.unix(i[0]), moment.unix(i[1]));
+        acc.push(Array.from(range.by('minutes', { step: 30 })));
+        return acc;
+      }, []);
+      const temp = ranges;
+      return temp;
+    },
+    getTimeIntervals(datetimes) {
       const intervals = datetimes.reduce((acc, dt) => {
         const start = dt.unix();
         const end = moment(dt).add(30, 'minutes').unix();
         return acc.concat([[start, end]]);
       }, []);
       const tree = createIntervalTree(intervals);
-      this.newMeeting.time = mergeRanges(tree.intervals);
+      return mergeRanges(tree.intervals);
+    },
+    formatDatetime(dt) {
+      return moment(dt).format('M/D h:mm A');
     },
     search(hits, query, meeting) {
       if (!query) {
@@ -405,6 +598,10 @@ export default {
       $(modalId).modal('hide');
     },
     validationStyle
+  },
+  beforeRouteLeave(to, from, next) {
+    $('.modal').modal('hide');
+    next();
   }
 }
 </script>

@@ -18,9 +18,9 @@
             strong {{ course.title }}
   #current-course.d-flex.flex-column.col-sm-8.px-0(v-model='currentCourse')
     .d-flex.px-4.align-items-stretch(v-if='hasCurrentCourse')
-      span.ml-auto
+      span.ml-auto(style='width: 25px;')
       h2.my-2(style='min-height: 35px') {{ currentCourse.subject + ' ' + currentCourse.number }}
-      span.d-flex.px-0.ml-auto.align-items-center
+      span.d-flex.px-0.ml-auto.align-items-center(style='width: 25px;')
         a.ml-auto(@click='showModal("#course-settings-modal")')
           i.fa.fa-lg.fa-cog
     .d-flex.px-4.align-items-center(v-else)

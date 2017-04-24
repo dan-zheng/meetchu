@@ -21,7 +21,7 @@ module.exports = models => ({
   },
   getPeopleByMeeting(meeting) {
     return models.pool.query(
-      `SELECT person.* FROM person
+      `SELECT person.*, time FROM person
         JOIN person_meeting
         ON person_id = person.id
         WHERE meeting_id = ?`, [meeting.id])
