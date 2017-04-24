@@ -92,7 +92,8 @@
                   | Select times
             .tab-pane#new-meeting-modal-times
               meeting-time-grid(title='Times', type='create', :days='getSelectedDates()', :times='times', :select='true', ref='meeting-time-grid-create')
-              .py-2.mt-2.text-center
+              .py-2.text-center
+                p By default, all times are selected. Click on a time to deselect it.
                 button.btn.btn-primary(@click='getSelectedDatetimes(); newMeetingSubmitTab(1)')
                   i.fa.fa-user-plus
                   | Invite users
@@ -158,7 +159,7 @@
             span(aria-hidden='true') ×
         .modal-body
           h6 Creator
-          .list-group.mb-3(v-if='hasCurrentMeeting')
+          .list-group.mb-3(v-if='hasCurrentMeeting && currentMeetingCreator')
             router-link.list-group-item.list-group-item-action.user.rounded-0.border(:to='"/profile/" + currentMeeting.creator_id', @click='$(".modal").modal("hide")')
               .d-flex.w-100.mx-1.justify-content-between.align-items-center
                 h5.mb-0 {{ currentMeetingCreator.first_name + ' ' + currentMeetingCreator.last_name }}
@@ -237,6 +238,9 @@ export default {
       });
     },
     sortedCurrentMeetingUsers() {
+      if (!this.currentMeeting.users) {
+        return [];
+      }
       const temp = this.currentMeeting.users.filter(u => u.id !== this.currentMeeting.creator_id);
       return temp.sort((a, b) => {
         const u1 = a.first_name + ' ' + a.last_name;
@@ -245,7 +249,9 @@ export default {
       });
     },
     currentMeetingCreator() {
-      return this.currentMeeting.users.filter(u => u.id === this.currentMeeting.creator_id)[0];
+      if (this.currentMeeting.users) {
+        return this.currentMeeting.users.filter(u => u.id === this.currentMeeting.creator_id)[0];
+      }
     },
     currentMeetingDays() {
       const days = _uniqBy(_.flattenDeep(this.intervalToDatetimes(this.currentMeeting.time)),
