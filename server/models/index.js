@@ -32,14 +32,11 @@ if (debugging) {
 }
 
 const dirs = [__dirname];
-const valid = ['person.js', 'course.js', 'invitation.js', 'message.js', 'chat.js', 'notification.js', 'datetime.js', 'meeting.js'];
 // TODO: invitation.js requires new foreign key for when chats are made
 
 // Flatten and filter directory files
 const files = [].concat.apply([], dirs.map(dir =>
   fs.readdirSync(dir)
-    // TODO remove once all models have been converted to new format
-    .filter(file => valid.includes(file))
     // Get fully qualified path
     .map(file => path.join(dir, file))
     // Ignore directories

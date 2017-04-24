@@ -17,58 +17,31 @@ const personDao = require('../dao/person')(models);
  */
 dotenv.load({ path: '.env', silent: process.env.NODE_ENV === 'production' });
 
-/*
- * Algolia configuration.
- */
-const client = algoliasearch(process.env.ALGOLIA_ID, process.env.ALGOLIA_ADMIN_KEY);
-const userIndex = client.initIndex('users');
-
 passport.serializeUser = ((user, done) => done(null, user.id));
 
-passport.deserializeUser = ((id, done) => {
-  personDao.findById(id)
-  .tap(maybePerson => maybePerson.cata(
-    () => done('User not found', null),
-    user => done(null, user)))
-});
+passport.deserializeUser = ((id, done) =>
+  personDao.findById(id).tap(result =>
+    result.cata(
+      () => done('User not found', null),
+      user => done(null, user)
+    )
+));
 
-/**
- * Add user to Algolia.
- */
-const addUserToAlgolia = (user) => {
-  // Add user to Algolia index
-  const userValues = {
-    objectID: user.id,
-    first_name: user.first_name,
-    last_name: user.last_name,
-    email: user.email
-  };
-  return Promise.resolve(userIndex.addObjects([userValues]));
-};
-
-const oauthLogin = (oauthId, profile, done) => {
-  const oauth = {};
-  oauth[oauthId] = profile.id;
-
-  const identity = Object.assign({
+function oauthLogin(oauthId, profile, done) {
+  const identity = {
     email: profile.emails[0].value,
     first_name: profile.name.givenName,
-    last_name: profile.name.familyName
-  }, oauth);
+    last_name: profile.name.familyName,
+    [oauthId]: profile.id
+  };
+  // TODO update algolia indexes upon external login
 
-  personDao.externalLogin(identity)
-  .then((user) => {
-    // if (userWasCreated) {
-    //   return addUserToAlgolia(user, done);
-    // }
-
-
-    // return done(null, false, {
-    //   message: `${profile.provider} account not found for email ${profile.emails[0].value}`
-    // });
-    return done(null, user);
-  });
-};
+  return personDao.externalLogin(identity).tap(result =>
+    result.cata(
+      err => done(err, null),
+      person => done(null, person)
+    ));
+}
 
 /**
  * Sign in using email and password.
@@ -85,7 +58,7 @@ passport.use('signup', new LocalStrategy({
   personDao.signup(person).tap(result =>
     result.cata(
       err => done(err, null),
-      user => done(null, user)
+      createdPerson => done(null, createdPerson)
     )
   );
 }));

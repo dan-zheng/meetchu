@@ -5,10 +5,24 @@ const Maybe = monet.Maybe;
 const Either = monet.Either;
 
 module.exports = models => ({
-  create(meeting) {
+  findByPerson(person) {
+    return models.pool.query(`
+      SELECT meeting.* FROM meeting
+      JOIN person_meeting
+      ON meeting_id = id AND person_id = ?`, [person.id])
+      .then(result => Either.Right(result.list()))
+      .errorToLeft();
+  },
+  findById(id) {
+    return models.pool.query('SELECT * FROM meeting WHERE id = ? LIMIT 1', [id])
+      .then(rows => rows.list().headMaybe())
+      .then(maybeMeeting => maybeMeeting.toEither('Meeting not found.'))
+      .errorToLeft();
+  },
+  create(person, meeting) {
     return models.pool.query(
-      'INSERT INTO meeting (name, location, description) VALUES (?, ?, ?)',
-        [meeting.name, meeting.location, meeting.description])
+      'INSERT INTO meeting (name, location, description, creator_id, time) VALUES (?, ?, ?, ?, ?)',
+        [meeting.name, meeting.location, meeting.description, person.id, meeting.time])
       .then(result => Either.Right(
         Object.assign(meeting, { id: result.insertId })))
       .errorToLeft();
@@ -26,6 +40,21 @@ module.exports = models => ({
     return models.pool.query(query, [...values, meeting.id])
       .then(result => Either.Right(result.affectedRows))
       .errorToLeft();
+  },
+  leave(meeting, person) {
+    const isCreator = meeting.creator_id === person.id;
+    const leaveMeeting = models.pool.query(
+      `DELETE FROM person_meeting WHERE person_id = ? AND meeting_id`,
+        [person.id, meeting.id])
+        .then(result => result.affectedRows === 0 ?
+          Either.Left('User was not a part of the meeting.') :
+          Either.Right(result.affectedRows));
+    if (isCreator) {
+      return leaveMeeting.then(result =>
+        result.flatMap(() => this.erase(meeting)))
+      .errorToLeft();
+    }
+    return leaveMeeting.errorToLeft();
   },
   addPerson(meeting, person) {
     return models.pool.query(
@@ -46,13 +75,13 @@ module.exports = models => ({
   },
   setMeetingTimes(meeting, times) {
     return models.pool.query(
-      'REPLACE INTO meeting_time (meeting_id, time) VALUES (?, ?)', [meeting.id, times])
+      'UPDATE meeting SET time = ? WHERE id = ?', [times, meeting.id])
       .then(result => Either.Right(result.affectedRows))
       .errorToLeft();
   },
   setPersonTimes(meeting, person, times) {
     return models.pool.query(
-      'REPLACE INTO person_meeting_time (person_id, meeting_id, time) VALUES (?, ?, ?)',
+      'REPLACE INTO person_meeting (person_id, meeting_id, time) VALUES (?, ?, ?)',
         [person.id, meeting.id, times])
       .then(result => Either.Right(result.affectedRows))
       .errorToLeft();
