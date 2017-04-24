@@ -118,6 +118,17 @@ module.exports = {
       FOREIGN KEY (meeting_id)
         REFERENCES meeting(id)
         ON DELETE CASCADE
+    )`,
+    `CREATE TABLE IF NOT EXISTS person_notification (
+      id INT AUTO_INCREMENT,
+      person_id INT NOT NULL,
+      body VARCHAR(255) NOT NULL,
+      seen BOOLEAN DEFAULT 0,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      PRIMARY KEY (id),
+      FOREIGN KEY (person_id)
+        REFERENCES meeting(id)
+        ON DELETE CASCADE
     )`
   ]
 };

@@ -50,21 +50,25 @@ exports.postMeeting = async (req, res) => {
 exports.postCreateMeeting = async (req, res) => {
   req.checkBody('meeting', 'Meeting was not specified');
   req.checkBody('meeting.times', 'Meeting times were not specified.');
+  req.checkBody('creator', 'Meeting creator was not specified.');
   const errors = await req.getValidationResult();
   if (!errors.isEmpty()) {
     return res.status(401).json(errors);
   }
 
-  const person = req.body.person;
+  const creator = req.body.creator;
+  const people = req.body.users || [];
   const meeting = req.body.meeting;
-  const times = req.body.times;
-  const createMeeting = await meetingDao.create(person, meeting);
-  const addTimes = await createMeeting.flatMap(
-    createdMeeting => meetingDao.setMeetingTimes(createdMeeting, times)
-  );
-  addTimes.cata(
+  const createMeeting = await meetingDao.create(creator, meeting);
+  const addPeople = await createMeeting.flatMap((createdMeeting) => {
+    if (people.isEmpty()) {
+      return 0;
+    }
+    return meetingDao.addPeople(createdMeeting, people);
+  });
+  addPeople.cata(
     err => res.status(401).json(err),
-    createdMeeting => res.status(200).json(createdMeeting)
+    () => res.status(200).json(createMeeting.right())
   );
 };
 
@@ -105,7 +109,7 @@ exports.postRsvpMeeting = async (req, res) => {
     return res.status(401).json(errors);
   }
 
-  const meeting = req.body.meetings;
+  const meeting = req.body.meeting;
   const person = req.body.user;
   const times = req.body.times;
   meetingDao.setPersonTimes(meeting, person, times).tap(result =>
@@ -128,7 +132,6 @@ exports.postFinalizeMeeting = async (req, res) => {
     return res.status(401).json(errors);
   }
 
-  const time = req.body.time;
   const meeting = req.body.meeting;
   meetingDao.update(meeting, ['final_time']).tap(result =>
     result.cata(
